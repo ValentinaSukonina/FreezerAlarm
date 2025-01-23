@@ -5,11 +5,7 @@ const API = axios.create({
 });
 
 export const fetchFreezers = async () => {
-    try {
-        const response = await API.get('/freezers'); // Replace with the actual endpoint
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching freezers:', error);
-        throw error;
-    }
+    const response = await API.get('/freezers'); // Replace with your endpoint
+    return response.data;
 };
+
