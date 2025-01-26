@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 @Service
+@Transactional
 public class FreezerUserService {
 /*
     private final FreezerUserRepository freezerUserRepository;
