@@ -1,6 +1,7 @@
 package com.example.backend.repository;
 
 import com.example.backend.entity.Freezer;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -12,19 +13,24 @@ import java.util.Optional;
 
 @Repository
 public interface FreezerRepository extends ListCrudRepository<Freezer, Long> {
-
-    // Custom query to fetch only active freezers
-    @Query("SELECT f FROM Freezer f WHERE f.isDeleted = false")
-    List<Freezer> findAllActive();
-
-    Optional<Freezer> findByFreezerNumber(String freezerNumber);
+    Optional<Freezer> findByNumber(String number);
 
     List<Freezer> findByType(String type);
 
     List<Freezer> findByRoom(String room);
 
-    // Soft delete by FreezerNumber
+    // Custom delete by freezer number
     @Modifying
-    @Query("UPDATE Freezer f SET f.isDeleted = true WHERE f.freezerNumber = :freezerNumber")
-    void softDeleteByFreezerNumber(@Param("freezerNumber") String freezerNumber);
+    void deleteByNumber(String number);
+
+    // Update freezer placement
+    @Modifying
+    @Transactional
+    @Query("UPDATE Freezer f SET f.room = :room, f.address = :address WHERE f.number = :number")
+    void updateFreezerDetailsByNumber(@Param("room") String room,
+                                      @Param("address") String address,
+                                      @Param("type") String type,
+                                      @Param("number") String number);
 }
+
+

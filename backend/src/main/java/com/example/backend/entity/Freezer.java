@@ -20,14 +20,13 @@ public class Freezer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "fileName", nullable = false)
-    private String fileName;
+    @Column(name = "file", nullable = false)
+    private String file;
 
-    @Column(name = "freezerNumber", unique = true, nullable = false, length = 4)
-    private String freezerNumber;
+    @Column(name = "number", unique = true, nullable = false, length = 4)
+    private String number;
 
     @Column(name = "address", nullable = false, length = 50)
     private String address;
@@ -38,21 +37,22 @@ public class Freezer {
     @Column(name = "type", nullable = false, length = 10)
     private String type;
 
-    @Column(name = "isDeleted", nullable = false)
-    private boolean isDeleted = false;
-
     @OneToMany(mappedBy = "freezer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FreezerUser> freezerUser = new HashSet<>();
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Freezer freezer)) return false;
-        return isDeleted() == freezer.isDeleted() && Objects.equals(getId(), freezer.getId()) && Objects.equals(getFileName(), freezer.getFileName()) && Objects.equals(getFreezerNumber(), freezer.getFreezerNumber()) && Objects.equals(getAddress(), freezer.getAddress()) && Objects.equals(getRoom(), freezer.getRoom()) && Objects.equals(getType(), freezer.getType()) && Objects.equals(getFreezerUser(), freezer.getFreezerUser());
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Freezer freezer = (Freezer) o;
+        return getId() != null && Objects.equals(getId(), freezer.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getFileName(), getFreezerNumber(), getAddress(), getRoom(), getType(), isDeleted(), getFreezerUser());
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

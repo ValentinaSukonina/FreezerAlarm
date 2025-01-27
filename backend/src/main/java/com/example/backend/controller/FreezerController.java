@@ -19,12 +19,6 @@ public class FreezerController {
         this.freezerService = freezerService;
     }
 
-    @GetMapping("/active")
-    public ResponseEntity<List<Freezer>> getActiveFreezers() {
-        List<Freezer> freezers = freezerService.findAllActive();
-        return ResponseEntity.ok(freezers);
-    }
-
     // GET ALL FREEZERS
     @GetMapping("/all")
     public ResponseEntity<List<Freezer>> getAllFreezers() {
@@ -33,9 +27,9 @@ public class FreezerController {
     }
 
     // GET FREEZER BY FREEZER NUMBER
-    @GetMapping("/number/{freezerNumber}")
-    public ResponseEntity<Freezer> getFreezerByNumber(@PathVariable String freezerNumber) {
-        Freezer freezer = freezerService.findByFreezerNumber(freezerNumber);
+    @GetMapping("/number/{number}")
+    public ResponseEntity<Freezer> getFreezerByNumber(@PathVariable String number) {
+        Freezer freezer = freezerService.findByNumber(number);
         return ResponseEntity.ok(freezer);
     }
 
@@ -68,19 +62,20 @@ public class FreezerController {
     }
 
     // UPDATE FREEZER
-    @PutMapping("/{id}")
-    public ResponseEntity<Freezer> updateFreezer(
-            @PathVariable Long id,
-            @Validated @RequestBody FreezerDto freezerDto) {
-        freezerDto.setId(id); // Ensure the path variable ID matches the DTO ID
-        Freezer updatedFreezer = freezerService.updateFreezer(freezerDto);
-        return ResponseEntity.ok(updatedFreezer);
+    @PutMapping("/{number}")
+    public ResponseEntity<String> updateFreezerDetails(
+            @PathVariable String number,
+            @RequestParam String room,
+            @RequestParam String address,
+            @RequestParam String type) {
+
+        freezerService.updateFreezerDetails(number, room, address, type);
+        return ResponseEntity.ok("Freezer details updated successfully");
     }
 
-    // SOFT DELETE FREEZER
-    @DeleteMapping("/{freezerNumber}")
-    public ResponseEntity<String> softDeleteFreezer(@PathVariable String freezerNumber) {
-        freezerService.softDeleteFreezer(freezerNumber);
-        return ResponseEntity.ok("Freezer with number " + freezerNumber + " soft deleted successfully.");
+    @DeleteMapping("/{number}")
+    public ResponseEntity<String> deleteFreezer(@PathVariable String number) {
+        freezerService.deleteFreezer(number);
+        return ResponseEntity.ok("Freezer with number " + number + " deleted successfully");
     }
 }

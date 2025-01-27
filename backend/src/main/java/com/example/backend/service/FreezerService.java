@@ -19,23 +19,19 @@ public class FreezerService {
         this.freezerRepository = freezerRepository;
     }
 
-    public List<Freezer> findAllActive() {
-        return freezerRepository.findAllActive();
+    public Freezer findById(Long id) {
+        return freezerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Freezer with id " + id + " not found"));
     }
 
     public List<Freezer> findAll() {
         return freezerRepository.findAll();
     }
 
-    public Freezer findByFreezerNumber(String freezerNumber) {
-        return freezerRepository.findByFreezerNumber(freezerNumber)
+    public Freezer findByNumber(String number) {
+        return freezerRepository.findByNumber(number)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Freezer with number " + freezerNumber + " not found"));
-    }
-
-    public Freezer findById(Long id) {
-        return freezerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Freezer with id " + id + " not found"));
+                        "Freezer with number " + number + " not found"));
     }
 
     public List<Freezer> findByType(String type) {
@@ -48,9 +44,9 @@ public class FreezerService {
 
     public Freezer createFreezer(FreezerDto freezerDto) {
         // Check for duplicate freezer number
-        if (freezerRepository.findByFreezerNumber(freezerDto.getFreezerNumber()).isPresent()) {
+        if (freezerRepository.findByNumber(freezerDto.getNumber()).isPresent()) {
             throw new IllegalArgumentException(
-                    "Freezer with number " + freezerDto.getFreezerNumber() + " already exists");
+                    "Freezer with number " + freezerDto.getNumber() + " already exists");
         }
 
         Freezer freezer = freezerDto.toEntity();
@@ -63,16 +59,17 @@ public class FreezerService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Freezer with ID " + freezerDto.getId() + " not found"));
 
- freezerRepository.findByFreezerNumber(freezerDto.getFreezerNumber())
+ freezerRepository.findByNumber(freezerDto.getNumber())
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(freezerDto.getId())) {
                         throw new IllegalArgumentException(
-                                "Freezer with number " + freezerDto.getFreezerNumber() + " already exists");
+                                "Freezer with number " + freezerDto.getNumber() + " already exists");
                     }
                 });
 
-        existingFreezer.setFileName(freezerDto.getFileName());
-        existingFreezer.setFreezerNumber(freezerDto.getFreezerNumber());
+ existingFreezer.setFile(freezerDto.getFile());
+
+        existingFreezer.setNumber(freezerDto.getNumber());
         existingFreezer.setAddress(freezerDto.getAddress());
         existingFreezer.setRoom(freezerDto.getRoom());
         existingFreezer.setType(freezerDto.getType());
@@ -81,11 +78,16 @@ public class FreezerService {
     }
 
     @Transactional
-    public void softDeleteFreezer(String freezerNumber) {
-        if (!freezerRepository.findByFreezerNumber(freezerNumber).isPresent()) {
-            throw new IllegalArgumentException("Freezer with number " + freezerNumber + " does not exist.");
+    public void deleteFreezer(String number) {
+        if (!freezerRepository.findByNumber(number).isPresent()) {
+            throw new IllegalArgumentException("Freezer with number " + number + " does not exist.");
         }
-        freezerRepository.softDeleteByFreezerNumber(freezerNumber);
+        freezerRepository.deleteByNumber(number);
+    }
+
+    @Transactional
+    public void updateFreezerDetails(String number, String room, String address, String type) {
+        freezerRepository.updateFreezerDetailsByNumber(room, address, type, number);
     }
 
 }

@@ -16,11 +16,11 @@ public class FreezerDto {
     private Long id;
 
     @NotBlank(message = "File name cannot be blank")
-    private String fileName;
+    private String file;
 
     @NotBlank(message = "Freezer number cannot be blank")
     @Size(min = 4, max = 4, message = "Freezer number must be exactly 4 characters long")
-    private String freezerNumber;
+    private String number;
 
     @NotBlank(message = "Address cannot be blank")
     @Size(max = 50, message = "Address must not exceed 50 characters")
@@ -36,8 +36,8 @@ public class FreezerDto {
     public Freezer toEntity() {
         Freezer freezer = new Freezer();
         freezer.setId(id); // Include the ID field
-        freezer.setFileName(fileName);
-        freezer.setFreezerNumber(freezerNumber);
+        freezer.setFile(file);
+        freezer.setNumber(number);
         freezer.setAddress(address);
         freezer.setRoom(room);
         freezer.setType(type);
