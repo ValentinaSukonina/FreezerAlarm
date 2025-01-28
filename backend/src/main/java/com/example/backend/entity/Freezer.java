@@ -55,4 +55,32 @@ public class Freezer {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Set<FreezerUser> getFreezerUser() {
+        return freezerUser;
+    }
 }
