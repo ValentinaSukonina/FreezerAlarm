@@ -19,5 +19,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+
       - name: Build without tests
         run: mvn -B clean package -DskipTests -f backend/pom.xml
+
