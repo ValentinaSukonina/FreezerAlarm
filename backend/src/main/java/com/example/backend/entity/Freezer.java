@@ -1,7 +1,10 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -54,30 +57,6 @@ public class Freezer {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getRoom() {
-        return room;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public Set<FreezerUser> getFreezerUser() {
