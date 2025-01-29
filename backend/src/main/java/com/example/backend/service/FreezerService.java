@@ -24,8 +24,13 @@ public class FreezerService {
             throw new Exceptions.FreezerAlreadyExistsException("Freezer with serial number "
                     + freezer.getNumber() + " already exists.");
         }
-
         return freezerRepository.save(freezer);
+    }
+
+    public Freezer findByNumber(String number) {
+        return freezerRepository.findByNumber(number)
+                .orElseThrow(() -> new Exceptions.NotFoundException(
+                        "Freezer with number " + number + " not found"));
     }
 
 }
