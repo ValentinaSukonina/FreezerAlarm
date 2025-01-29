@@ -5,17 +5,16 @@ import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
+
+@Getter
 @Entity
 @Setter
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "FreezerUser", uniqueConstraints = {
+@Table(name = "freezer_user", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"freezer_id", "user_id"})
 })
 public class FreezerUser {
@@ -47,17 +46,6 @@ public class FreezerUser {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Freezer getFreezer() {
-        return freezer;
-    }
-
-    public User getUser() {
-        return user;
-    }
 }
 
 
