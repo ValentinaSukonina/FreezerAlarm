@@ -61,6 +61,12 @@ public class FreezerController {
         return ResponseEntity.ok(updatedFreezer);
     }
 
+    @DeleteMapping("/number/{number}")
+    public ResponseEntity<Void> deleteFreezerByNumber(@PathVariable String number) {
+        freezerService.deleteFreezerByNumber(number);
+        return ResponseEntity.noContent().build();
+    }
+
 }
 
 

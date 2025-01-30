@@ -28,5 +28,9 @@ public interface FreezerRepository extends ListCrudRepository<Freezer, Long>{
                                      @Param("type") String type,
                                      @Param("number") String number);
 
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Freezer f WHERE f.number = :number")
+    int deleteByNumber(@Param("number") String number);
 
 }
