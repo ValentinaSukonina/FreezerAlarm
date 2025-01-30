@@ -4,7 +4,6 @@ import com.example.backend.entity.Freezer;
 import com.example.backend.exception.Exceptions;
 import com.example.backend.repository.FreezerRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

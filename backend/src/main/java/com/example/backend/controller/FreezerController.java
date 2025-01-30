@@ -30,8 +30,9 @@ public class FreezerController {
         return ResponseEntity.created(URI.create("/api/freezers/" + ((Freezer)createdFreezer).getId())).body(createdFreezer);
     }
 
-    }/*
-    // GET FREEZER BY ID
+    }
+
+   /* // GET FREEZER BY ID
     @GetMapping("/{id}")
     public ResponseEntity<Freezer> getFreezerById(@PathVariable Long id) throws Throwable {
         Freezer freezer = freezerService.findById(id);
