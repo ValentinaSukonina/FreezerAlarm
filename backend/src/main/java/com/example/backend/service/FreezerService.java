@@ -55,43 +55,8 @@ public class FreezerService {
 
         return freezerRepository.save(toUpdate);
     }
+}
 
-
-
-    }
-
-    /*    public User updateUserByUsername(String oldUsername, User updatedUserDetails) {
-        List<User> users = userRepository.findByUsername(oldUsername);
-        if (users.isEmpty()) {
-            throw new ResourceNotFoundException("User not found with username: " + oldUsername);
-        }
-        User user = users.get(0);
-
-        if (!user.getUsername().equals(updatedUserDetails.getUsername())) {
-            List<User> userWithNewUsername = userRepository.findByUsername(updatedUserDetails.getUsername());
-            if (!userWithNewUsername.isEmpty()) {
-                throw new IllegalArgumentException("Username " + updatedUserDetails.getUsername() + " is already taken");
-            }
-        }
-
-        user.setUsername(updatedUserDetails.getUsername());
-        user.setNameSurname(updatedUserDetails.getNameSurname());
-        user.setEmail(updatedUserDetails.getEmail());
-        user.setProfilePicture(updatedUserDetails.getProfilePicture());
-        return userRepository.save(user);
-    }
-/*
-    public Freezer updateFreezerDetailsByNumber(String room, String address, String type, String number) {
-        Freezer existingFreezer = findByNumber(number);
-        if (freezerRepository.findByNumber(number).isEmpty()) {
-            throw new Exceptions.NotFoundException("Freezer with number " + number + " not found");
-        } else {
-            existingFreezer.setRoom(room);
-            existingFreezer.setAddress(address);
-            existingFreezer.setType(type);
-            return freezerRepository.save(existingFreezer);
-        }
-    }*/
 
 
 

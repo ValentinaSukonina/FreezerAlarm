@@ -53,23 +53,7 @@ public class FreezerController {
         List<Freezer> freezers = freezerService.findAll();
         return ResponseEntity.ok(freezers);
     }
-/*
-    // Update freezer details by number
-    @PutMapping("/number/{number}")
-    public ResponseEntity<Freezer> updateFreezerDetailsByNumber(
-            @PathVariable String number,
-            @Valid @RequestBody Freezer freezer) {
-
-        Freezer updatedFreezer = freezerService.updateFreezerDetailsByNumber(number, freezer);
-
-        if (!freezerRepository.existsByNumber(number)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(updatedFreezer);
-    }*/
-
-                                                                }
+}
 
 
 
