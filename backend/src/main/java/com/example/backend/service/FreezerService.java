@@ -6,7 +6,10 @@ import com.example.backend.repository.FreezerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.util.ClassUtils.isPresent;
 
 @Service
 @Transactional
@@ -24,22 +27,36 @@ public class FreezerService {
             throw new Exceptions.FreezerAlreadyExistsException("Freezer with serial number "
                     + freezer.getNumber() + " already exists.");
         }
-
         return freezerRepository.save(freezer);
+    }
+
+    public Freezer findByNumber(String number) {
+        return freezerRepository.findByNumber(number)
+                .orElseThrow(() -> new Exceptions.NotFoundException(
+                        "Freezer with number " + number + " not found"));
+    }
+
+    public Freezer findById(Long id) {
+        return freezerRepository.findById(id)
+                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer with ID " + id + " not found"));
+    }
+
+    public List<Freezer> findAll() {
+        return freezerRepository.findAll();
+    }
+
+    public Freezer updateFreezerDetailsByNumber(String number, Freezer freezer) {
+        Freezer toUpdate = freezerRepository.findByNumber(number)
+                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer with number " + number + " not found."));
+
+        toUpdate.setRoom(freezer.getRoom());
+        toUpdate.setAddress(freezer.getAddress());
+        toUpdate.setType(freezer.getType());
+
+        return freezerRepository.save(toUpdate);
     }
 
 }
 
-
-
-
-
-/*
-    public Freezer findById(Long id) throws Throwable {
-        return freezerRepository.findById(id)
-                .<Freezer>orElseThrow(() -> new ResourceNotFoundException("Freezer with id " + id + " not found"));
-    }
-
- */
 
 
