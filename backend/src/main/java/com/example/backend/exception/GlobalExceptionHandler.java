@@ -12,20 +12,26 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Handle FreezerAlreadyExistsException
+    // Handle NotFoundException (Returns 404)
+    @ExceptionHandler(Exceptions.NotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFoundException(Exceptions.NotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    // Handle FreezerAlreadyExistsException (409 Conflict)
     @ExceptionHandler(Exceptions.FreezerAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleFreezerAlreadyExistsException(Exceptions.FreezerAlreadyExistsException ex) {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    // Handle DataIntegrityViolationException
+    // Handle DataIntegrityViolationException (400 Bad Request)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         String errorMessage = "Database constraint violation: " + extractConstraintViolationMessage(ex);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
-    // Generic Exception Handler (Fallback)
+    // Generic Exception Handler (Fallback for unexpected errors)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
@@ -45,6 +51,7 @@ public class GlobalExceptionHandler {
         Throwable rootCause = ex.getRootCause();
         return (rootCause != null && rootCause.getMessage() != null) ? rootCause.getMessage() : "Unknown database constraint violation";
     }
-
 }
+
+
 

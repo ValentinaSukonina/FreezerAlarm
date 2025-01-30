@@ -3,11 +3,14 @@ package com.example.backend.controller;
 import com.example.backend.entity.Freezer;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/freezers")
@@ -37,13 +40,38 @@ public class FreezerController {
         return ResponseEntity.ok(freezer);
     }
 
-    }/*
     // GET FREEZER BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<Freezer> getFreezerById(@PathVariable Long id) throws Throwable {
+    public ResponseEntity<Freezer> findById(@PathVariable Long id) {
         Freezer freezer = freezerService.findById(id);
         return ResponseEntity.ok(freezer);
     }
 
- */
+    // GET ALL FREEZERS
+    @GetMapping("/all")
+    public ResponseEntity<List<Freezer>> getAllFreezers() {
+        List<Freezer> freezers = freezerService.findAll();
+        return ResponseEntity.ok(freezers);
+    }
+/*
+    // Update freezer details by number
+    @PutMapping("/number/{number}")
+    public ResponseEntity<Freezer> updateFreezerDetailsByNumber(
+            @PathVariable String number,
+            @Valid @RequestBody Freezer freezer) {
+
+        Freezer updatedFreezer = freezerService.updateFreezerDetailsByNumber(number, freezer);
+
+        if (!freezerRepository.existsByNumber(number)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(updatedFreezer);
+    }*/
+
+                                                                }
+
+
+
+
 
