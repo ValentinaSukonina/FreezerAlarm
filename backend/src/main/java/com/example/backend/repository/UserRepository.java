@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends ListCrudRepository <User,Long> {
 
-    Optional<User> findByID(Long id);
+    Optional<User> findById(Long id);
 
 }
