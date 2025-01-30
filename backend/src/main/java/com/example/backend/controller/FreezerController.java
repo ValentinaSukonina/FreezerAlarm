@@ -53,7 +53,9 @@ public class FreezerController {
         List<Freezer> freezers = freezerService.findAll();
         return ResponseEntity.ok(freezers);
     }
+
 }
+
 
 
 

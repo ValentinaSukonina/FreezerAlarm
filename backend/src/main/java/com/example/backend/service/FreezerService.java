@@ -55,15 +55,8 @@ public class FreezerService {
 
         return freezerRepository.save(toUpdate);
     }
+
 }
-
-
-
-
-
-
-
-
 
 
 
