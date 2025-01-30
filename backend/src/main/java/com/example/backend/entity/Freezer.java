@@ -40,7 +40,7 @@ public class Freezer {
     @Column(name = "type", nullable = false, length = 10)
     private String type;
 
-    @OneToMany(mappedBy = "freezer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "freezer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<FreezerUser> freezerUser = new HashSet<>();
 
     @Override
