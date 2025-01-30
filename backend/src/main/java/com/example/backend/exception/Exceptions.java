@@ -19,4 +19,10 @@ public class Exceptions {
         }
     }
 
+    public static class UserAlreadyExistsException extends RuntimeException {
+        public UserAlreadyExistsException(String message) {
+            super(message);
+        }
+    }
+
 }
