@@ -20,6 +20,9 @@ import java.util.Objects;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "userdb")
 public class User {
+
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
