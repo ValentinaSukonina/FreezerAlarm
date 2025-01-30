@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.annotation.Nonnull;
-
 @Repository
 public interface FreezerRepository extends ListCrudRepository<Freezer, Long>{
     Optional<Freezer> findByNumber(String number);
@@ -23,11 +21,12 @@ public interface FreezerRepository extends ListCrudRepository<Freezer, Long>{
 
     @Modifying
     @Transactional
-    @Query("UPDATE Freezer f SET f.room = :room, f.address = :address WHERE f.number = :number")
-    public default void updateFreezerDetailsByNumber(@Param("room") String room,
-                                                     @Param("address") String address,
-                                                     @Param("type") String type,
-                                                     @Param("number") String number) {
+    @Query("UPDATE Freezer f SET f.file = :file, f.address = :address, f.room = :room, f.type = :type WHERE f.number = :number")
+    int updateFreezerDetailsByNumber(@Param("file") String file,
+                                     @Param("address") String address,
+                                     @Param("room") String room,
+                                     @Param("type") String type,
+                                     @Param("number") String number);
 
-    }
+
 }
