@@ -24,17 +24,11 @@ public class UserService {
         this.userRepository = userRepository;
     };
 
-
     public User createUser(User user) {
-        Optional<User> existingUser = userRepository.findById(user.getId());
-        if (existingUser.isPresent()) {
-            throw new Exceptions.UserAlreadyExistsException("User  with ID  "
-                    + user.getId() + " already exists.");
-        }
-        return userRepository.save(user);
-    }
+       return userRepository.save(user);
+   }
 
-    public void deleteUser(Long id) {
+   public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 

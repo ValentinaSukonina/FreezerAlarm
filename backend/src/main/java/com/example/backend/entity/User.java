@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -36,8 +37,9 @@ public class User {
     @Column(name="name",nullable = false, length = 50)
     private String name;
 
-    @Column(nullable = false, length = 20)
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Invalid phone number format")
+
+    @Column(name="phone_number",nullable = false, length = 20)
+    @JsonProperty("phone_number")
     private String phoneNumber;
 
     @Column(nullable = false, length = 50)
@@ -67,5 +69,7 @@ public class User {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
+
 
 }
