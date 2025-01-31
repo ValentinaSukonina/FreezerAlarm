@@ -4,12 +4,11 @@ import com.example.backend.entity.Freezer;
 import com.example.backend.exception.Exceptions;
 import com.example.backend.repository.FreezerRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.util.ClassUtils.isPresent;
 
 @Service
 @Transactional
@@ -46,14 +45,22 @@ public class FreezerService {
     }
 
     public Freezer updateFreezerDetailsByNumber(String number, Freezer freezer) {
-        Freezer toUpdate = freezerRepository.findByNumber(number)
-                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer with number " + number + " not found."));
+        int updatedRows = freezerRepository.updateFreezerDetailsByNumber(
+                freezer.getFile(), freezer.getAddress(), freezer.getRoom(), freezer.getType(), number
+        );
+        if (updatedRows == 0) {
+            throw new Exceptions.NotFoundException("Freezer with number " + number + " not found.");
+        }
+        // Fetch and return the updated freezer
+        return freezerRepository.findByNumber(number)
+                .orElseThrow(() -> new Exceptions.NotFoundException("Error retrieving updated freezer with number " + number));
+    }
 
-        toUpdate.setRoom(freezer.getRoom());
-        toUpdate.setAddress(freezer.getAddress());
-        toUpdate.setType(freezer.getType());
-
-        return freezerRepository.save(toUpdate);
+    public void deleteFreezerByNumber(String number) {
+        int deletedRows = freezerRepository.deleteByNumber(number);
+        if (deletedRows == 0) {
+            throw new Exceptions.NotFoundException("Freezer with number " + number + " not found.");
+        }
     }
 
 }
