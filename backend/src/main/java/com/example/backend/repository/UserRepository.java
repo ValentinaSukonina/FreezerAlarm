@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends ListCrudRepository <User,Long> {
 
-    Optional<User> findById(Long id);
+   //add only method that are not already inherited from ListCrudRepository
 
 }
