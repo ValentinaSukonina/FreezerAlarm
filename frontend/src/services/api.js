@@ -9,3 +9,4 @@ export const fetchFreezers = async () => {
     return response.data;
 };
 
+

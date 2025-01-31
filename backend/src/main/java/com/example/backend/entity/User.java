@@ -1,6 +1,9 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,17 +24,35 @@ import java.util.Objects;
 @Table(name = "userdb")
 public class User {
 
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.Set<FreezerUser> freezerUser = new HashSet<>();
+
     @Setter
     @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String firstName;
+    @Column(name="name",nullable = false, length = 50)
+    private String name;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.Set<FreezerUser> freezerUser = new HashSet<>();
+
+    @Column(name="phone_number",nullable = false, length = 20)
+    @JsonProperty("phone_number")
+    private String phoneNumber;
+
+    @Column(nullable = false, length = 50)
+    @Email(message = "Invalid email format")
+    private String email;
+
+    @Column(name = "user_rank", nullable = false)
+    private int user_rank;
+
+    @Column(nullable = false, length = 50)
+    private String role;
+
+
 
     @Override
     public final boolean equals(Object o) {
@@ -48,5 +69,7 @@ public class User {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
+
 
 }

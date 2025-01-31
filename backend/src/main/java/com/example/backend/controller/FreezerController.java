@@ -48,10 +48,23 @@ public class FreezerController {
     }
 
     // GET ALL FREEZERS
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Freezer>> getAllFreezers() {
         List<Freezer> freezers = freezerService.findAll();
         return ResponseEntity.ok(freezers);
+    }
+
+    // UPDATE FREEZER DETAILS BY FREEZER NUMBER
+    @PutMapping("/number/{number}")
+    public ResponseEntity<Freezer> updateFreezerDetailsByNumber(@PathVariable String number, @Validated @RequestBody Freezer freezer) {
+        Freezer updatedFreezer = freezerService.updateFreezerDetailsByNumber(number, freezer);
+        return ResponseEntity.ok(updatedFreezer);
+    }
+
+    @DeleteMapping("/number/{number}")
+    public ResponseEntity<Void> deleteFreezerByNumber(@PathVariable String number) {
+        freezerService.deleteFreezerByNumber(number);
+        return ResponseEntity.noContent().build();
     }
 
 }
