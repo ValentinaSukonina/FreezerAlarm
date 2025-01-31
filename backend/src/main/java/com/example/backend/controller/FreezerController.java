@@ -48,7 +48,7 @@ public class FreezerController {
     }
 
     // GET ALL FREEZERS
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Freezer>> getAllFreezers() {
         List<Freezer> freezers = freezerService.findAll();
         return ResponseEntity.ok(freezers);
