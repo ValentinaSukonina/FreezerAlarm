@@ -10,6 +10,7 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,6 +22,9 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     @Transactional
     @Query("DELETE FROM FreezerUser f WHERE f.freezer = :freezer AND f.user = :user")
     int deleteByFreezerAndUser(@Param("freezer") Freezer freezer, @Param("user") User user);
+
+    @Query("SELECT u FROM FreezerUser fu JOIN fu.user u JOIN fu.freezer f WHERE f.number = :freezerNumber")
+    List<User> findUsersByFreezerNumber(@Param("freezerNumber") String freezerNumber);
 
 }
 

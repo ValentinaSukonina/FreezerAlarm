@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.entity.FreezerUser;
 import com.example.backend.entity.User;
@@ -9,7 +10,9 @@ import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FreezerUserService {
@@ -81,7 +84,18 @@ public class FreezerUserService {
         return freezerUserRepository.save(freezerUser);
     }
 
+    public List<UserDTO> getUsersByFreezerNumber(String freezerNumber) {
+        Freezer freezer = freezerRepository.findByNumber(freezerNumber)
+                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer with number " + freezerNumber + " does not exist."));
+        List<User> users = freezerUserRepository.findUsersByFreezerNumber(freezerNumber);
 
+        if (users.isEmpty()) {
+            throw new Exceptions.NotFoundException("No users found for freezer number: " + freezerNumber);
+        }
 
+        return users.stream()
+                .map(user -> new UserDTO(user.getName(), user.getPhoneNumber(), user.getEmail(), user.getUser_rank()))
+                .collect(Collectors.toList());
+    }
 
 }

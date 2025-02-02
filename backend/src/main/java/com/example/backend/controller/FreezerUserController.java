@@ -1,17 +1,14 @@
 package com.example.backend.controller;
 
-import com.example.backend.entity.Freezer;
+import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.FreezerUser;
-import com.example.backend.repository.FreezerRepository;
 import com.example.backend.repository.FreezerUserRepository;
-import com.example.backend.service.FreezerService;
 import com.example.backend.service.FreezerUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/freezer-user")
@@ -65,6 +62,14 @@ public class FreezerUserController {
         );
         return ResponseEntity.ok(updatedFreezerUser);
     }
+
+    @GetMapping("/{freezerNumber}")
+    public ResponseEntity<List<UserDTO>> getUsersByFreezerNumber(@PathVariable String freezerNumber) {
+        List<UserDTO> users = freezerUserService.getUsersByFreezerNumber(freezerNumber);
+        return ResponseEntity.ok(users);
+    }
+
+
 
 }
 
