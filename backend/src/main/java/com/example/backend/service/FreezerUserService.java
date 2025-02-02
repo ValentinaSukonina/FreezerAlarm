@@ -46,4 +46,42 @@ public class FreezerUserService {
         freezerUser.setFreezer(freezer);
         return freezerUserRepository.save(freezerUser);
     }
+
+    public void unbindUserFromFreezer(Long userId, Long freezerId) {
+        // Find the user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exceptions.NotFoundException("User not found with ID: " + userId));
+
+        // Find the freezer
+        Freezer freezer = freezerRepository.findById(freezerId)
+                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer not found with ID: " + freezerId));
+
+        // Delete association
+        int deletedCount = freezerUserRepository.deleteByFreezerAndUser(freezer, user);
+
+        if (deletedCount == 0) {
+            throw new Exceptions.NotFoundException("No association found between user " + userId + " and freezer " + freezerId);
+        }
+    }
+
+    public FreezerUser updateFreezerUser(Long userId, Long oldFreezerId, Long newFreezerId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exceptions.NotFoundException("User not found with ID: " + userId));
+
+        Freezer oldFreezer = freezerRepository.findById(oldFreezerId)
+                .orElseThrow(() -> new Exceptions.NotFoundException("Old freezer not found with ID: " + oldFreezerId));
+
+         Freezer newFreezer = freezerRepository.findById(newFreezerId)
+                .orElseThrow(() -> new Exceptions.NotFoundException("New freezer not found with ID: " + newFreezerId));
+
+        FreezerUser freezerUser = freezerUserRepository.findByFreezerAndUser(oldFreezer, user)
+                .orElseThrow(() -> new Exceptions.NotFoundException("No association found between user " + userId + " and freezer " + oldFreezerId));
+
+        freezerUser.setFreezer(newFreezer);
+        return freezerUserRepository.save(freezerUser);
+    }
+
+
+
+
 }

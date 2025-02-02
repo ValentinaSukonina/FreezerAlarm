@@ -18,6 +18,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(Exceptions.ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(Exceptions.NotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     // Handle FreezerAlreadyExistsException (409 Conflict)
     @ExceptionHandler(Exceptions.FreezerAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleFreezerAlreadyExistsException(Exceptions.FreezerAlreadyExistsException ex) {

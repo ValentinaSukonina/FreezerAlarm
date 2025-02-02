@@ -29,29 +29,45 @@ public class FreezerUserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(freezerUser);
     }
 
-    // ✅ DTO class to receive JSON input
+    // DTO class to receive JSON input
     public static class FreezerUserRequest {
         private Long userId;
         private Long freezerId;
+        private Long oldFreezerId; // Optional, only used for updates
 
         public Long getUserId() { return userId; }
         public void setUserId(Long userId) { this.userId = userId; }
 
         public Long getFreezerId() { return freezerId; }
         public void setFreezerId(Long freezerId) { this.freezerId = freezerId; }
+
+        public Long getOldFreezerId() { return oldFreezerId; }
+        public void setOldFreezerId(Long oldFreezerId) { this.oldFreezerId = oldFreezerId; }
     }
+
+
+    // DELETE User-Freezer Association
+    @DeleteMapping
+    public ResponseEntity<String> unbindUserFromFreezer(@RequestBody FreezerUserRequest request) {
+        freezerUserService.unbindUserFromFreezer(request.getUserId(), request.getFreezerId());
+        return ResponseEntity.ok("User " + request.getUserId() + " unbound from Freezer " + request.getFreezerId());
+    }
+
+    //Update User-Freezer Association
+    @PutMapping
+    public ResponseEntity<FreezerUser> updateFreezerUser(@RequestBody FreezerUserRequest request) {
+        if (request.getOldFreezerId() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        FreezerUser updatedFreezerUser = freezerUserService.updateFreezerUser(
+                request.getUserId(), request.getOldFreezerId(), request.getFreezerId()
+        );
+        return ResponseEntity.ok(updatedFreezerUser);
+    }
+
 }
 
-/*    @PostMapping
-    public ResponseEntity<FreezerUser> bindUserToFreezer(@RequestParam Long userId, @RequestParam Long freezerId) {
-        FreezerUser freezerUser = freezerUserService.bindUserToFreezer(userId, freezerId);
-        return ResponseEntity.ok(freezerUser);
-    }*/
 
-/*    @PostMapping
-    public ResponseEntity<Freezer> createFreezer(@Validated @RequestBody Freezer freezer) {
-        Freezer createdFreezer = (Freezer) freezerService.createFreezer(freezer);
-        return ResponseEntity.created(URI.create("/api/freezers/" + ((Freezer)createdFreezer).getId())).body(createdFreezer);
-    }*/
 
 
