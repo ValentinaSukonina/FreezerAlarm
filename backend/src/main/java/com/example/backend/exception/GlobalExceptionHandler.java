@@ -24,6 +24,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(Exceptions.FreezerUserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleFreezerUserAlreadyExistsException(Exceptions.FreezerUserAlreadyExistsException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     // Handle DataIntegrityViolationException (400 Bad Request)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {

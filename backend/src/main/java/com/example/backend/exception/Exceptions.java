@@ -30,4 +30,10 @@ public class Exceptions {
             super(message);
         }
     }
+
+    public static class FreezerUserAlreadyExistsException extends RuntimeException {
+        public FreezerUserAlreadyExistsException(String message){
+            super(message);
+        }
+    }
 }

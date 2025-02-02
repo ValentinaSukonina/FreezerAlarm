@@ -41,7 +41,7 @@ public class Freezer {
     private String type;
 
     @OneToMany(mappedBy = "freezer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<FreezerUser> freezerUser = new HashSet<>();
+    private Set<FreezerUser> freezerUsers = new HashSet<>();
 
     @Override
     public final boolean equals(Object o) {
@@ -60,6 +60,6 @@ public class Freezer {
     }
 
     public Set<FreezerUser> getFreezerUser() {
-        return freezerUser;
+        return freezerUsers;
     }
 }
