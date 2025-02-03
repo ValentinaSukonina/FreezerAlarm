@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.example.backend.exception.Exceptions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 
 @Getter
@@ -26,7 +28,7 @@ public class User {
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.Set<FreezerUser> freezerUser = new HashSet<>();
+    private java.util.Set<FreezerUser> freezerUsers = new HashSet<>();
 
     @Setter
     @Getter
