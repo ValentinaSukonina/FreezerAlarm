@@ -1,12 +1,20 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://localhost:8000', // Replace with your backend URL
+    baseURL: 'http://localhost:8000',
+    headers: { 'Content-Type': 'application/json' },
+    withCredentials: true // 🔥
 });
 
+
 export const fetchFreezers = async () => {
-    const response = await API.get('/api/freezers'); // Replace with your endpoint
-    return response.data;
+    try {
+        const response = await API.get('/api/freezers');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching freezers:', error);
+        throw error;
+    }
 };
 
 
