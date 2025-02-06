@@ -3,6 +3,8 @@ package com.example.backend.controller;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -18,7 +20,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/users")
 public class UserController {
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private  final UserRepository userRepository;
 
@@ -52,11 +54,30 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping
+    /*@GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll().stream()
                 .peek(user -> user.setName(HtmlUtils.htmlEscape(user.getName())))
                 .toList();
+    }*/
+
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            logger.info("Fetching all users...");
+            List<User> users = userRepository.findAll();
+
+            if (users.isEmpty()) {
+                logger.warn("No users found in database.");
+                return ResponseEntity.ok("No users found.");
+            }
+
+            logger.info("Users fetched successfully: {}", users.size());
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            logger.error("Error fetching users", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching users.");
+        }
     }
 
     @GetMapping("/{id}")
