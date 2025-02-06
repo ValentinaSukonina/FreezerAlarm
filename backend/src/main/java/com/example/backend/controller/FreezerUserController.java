@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/freezer-user")
-@CrossOrigin(origins = "http://localhost:5173")//does it need the endpoint?
 public class FreezerUserController {
     private final FreezerUserService freezerUserService;
     private final FreezerUserRepository freezerUserRepository;

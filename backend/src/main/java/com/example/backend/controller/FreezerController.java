@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/freezers")
-@CrossOrigin(origins = "http://localhost:5173/")
 public class FreezerController {
 
     private final FreezerService freezerService;
