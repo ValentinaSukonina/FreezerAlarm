@@ -11,14 +11,13 @@ const App = () => {
     return (
         <Router>
             <Header />
-            <Dashboard/>
             <Routes>
                 <Route path="/" element={<Home/>} />
             </Routes>
         </Router>
     );
 };
-
+//dashborad is removed
 export default App
 
 
