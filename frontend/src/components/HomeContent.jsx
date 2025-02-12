@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 const HomeContent = () => {
     const navigate = useNavigate();
     return (
-        <div className="container d-flex justify-content-center align-items-center min-vh-100 text-center">
+
+        <div className="container d-flex justify-content-center align-items-center text-center py-5 mt-3">
             <div className="col-md-8">
+
                 <h2>Welcome to the Freezer Alarm Management System</h2>
                 <p>This system helps monitor and manage freezer temperatures in real-time.
                     Get alerts, view logs, and ensure optimal storage conditions.
