@@ -4,7 +4,7 @@ import "../assets/styles.css";
 console.log("Header.tsx: Rendering Header component...");
 
 const Header = () => {
-    const [isOpen, setIsOpen] = useState(false); // State menu visibility
+    const [isOpen, setIsOpen] = useState(false); // State to track menu visibility
 
     const toggleNavbar = () => {
         setIsOpen(!isOpen); // Toggle open/close state
@@ -24,11 +24,37 @@ const Header = () => {
                         Freezer Alarm Management
                     </a>
 
-                    {/* Navbar Toggler - Uses onClick to toggle menu */}
+                    {/* Search Bar - Always in the center on large screens */}
+                    <div className="d-none d-lg-flex justify-content-center flex-grow-1">
+                        <form className="d-flex w-auto mx-auto">
+                            <input
+                                className="form-control mx-3"
+                                type="search"
+                                placeholder="Search for freezer"
+                                aria-label="Search"
+                                style={{
+                                    backgroundColor: "#F4FFC3",
+                                    color: "#5D8736",
+                                    width: "200px",
+                                }}
+                            />
+                            <button
+                                className="btn"
+                                type="submit"
+                                style={{
+                                    backgroundColor: "#A9C46C",
+                                    color: "#fff",
+                                }}>
+                                Search
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Navbar Toggler for Mobile Screens */}
                     <button
                         className="navbar-toggler"
                         type="button"
-                        onClick={toggleNavbar} // Handles toggle manually
+                        onClick={toggleNavbar} // Toggle menu manually
                         aria-expanded={isOpen}
                         aria-label="Toggle navigation"
                     >
@@ -49,7 +75,7 @@ const Header = () => {
                             </li>
                         </ul>
 
-                        {/* Search Bar - Only visible when menu is expanded on mobile */}
+                        {/* Search Bar - Only visible inside the menu on small screens */}
                         <div className="d-lg-none text-center mt-2">
                             <form className="d-flex justify-content-center">
                                 <input
@@ -82,6 +108,7 @@ const Header = () => {
 };
 
 export default Header;
+
 
 
 
