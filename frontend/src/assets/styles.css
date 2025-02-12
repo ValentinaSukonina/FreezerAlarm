@@ -15,11 +15,4 @@ html, body, #root {
     flex-grow: 1; /* Allows content to expand, but NOT the footer */
 }
 
-footer {
-    flex-shrink: 0; /* Prevents the footer from growing */
-    min-height: 40px; /* Ensures footer stays compact */
-    padding: 5px 0; /* Reduces extra padding */
-    background-color: #5D8736;
-    text-align: center;
-    width: 100%;
-}
+

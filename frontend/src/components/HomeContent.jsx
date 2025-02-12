@@ -3,7 +3,7 @@ import React from "react";
 const HomeContent = () => {
     return (
 
-        <div className="container d-flex justify-content-center align-items-center text-center py-5">
+        <div className="container d-flex justify-content-center align-items-center text-center py-5 mt-3">
             <div className="col-md-8">
 
                 <h2>Welcome to the Freezer Alarm Management System</h2>
