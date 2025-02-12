@@ -14,7 +14,7 @@ const Footer = () => {
             }}
         >
             <p className="text-white text-center mb-0 small">
-                Copyright ⓒ {currentYear} ITHS Göteborg
+                Copyright ⓒ {currentYear} ITHS Gothenburg
             </p>
         </footer>
     );
