@@ -14,5 +14,3 @@ html, body, #root {
 .main-content > *:not(footer) {
     flex-grow: 1; /* Allows content to expand, but NOT the footer */
 }
-
-
