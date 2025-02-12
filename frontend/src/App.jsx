@@ -18,7 +18,7 @@ const App = () => {
         </Router>
     );
 };
-//dashborad is removed
+
 export default App
 
 
