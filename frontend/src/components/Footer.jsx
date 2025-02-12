@@ -5,15 +5,16 @@ const Footer = () => {
 
     return (
         <footer
-            className="d-flex justify-content-center align-items-center py-3 my-0 border-top"
+            className="d-flex justify-content-center align-items-center border-top"
             style={{
                 backgroundColor: "#5D8736",
                 width: "100vw",
-                minHeight: "30px",
+                minHeight: "40px",
+                padding: "5px 0",
             }}
         >
-            <p className="text-white mb-0" style={{lineHeight: "1.2"}}>
-                Copyright ⓒ {currentYear} ITHS
+            <p className="text-white text-center mb-0 small">
+                Copyright ⓒ {currentYear} ITHS Göteborg
             </p>
         </footer>
     );

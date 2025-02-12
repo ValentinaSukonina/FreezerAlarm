@@ -2,8 +2,10 @@ import React from "react";
 
 const HomeContent = () => {
     return (
-        <div className="container d-flex justify-content-center align-items-center min-vh-100 text-center">
+
+        <div className="container d-flex justify-content-center align-items-center text-center py-5">
             <div className="col-md-8">
+
                 <h2>Welcome to the Freezer Alarm Management System</h2>
                 <p>
                     This system helps monitor and manage freezer temperatures in real-time.
