@@ -1,12 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const HomeContent = () => {
+    const navigate = useNavigate();
     return (
         <div className="container d-flex justify-content-center align-items-center min-vh-100 text-center">
             <div className="col-md-8">
                 <h2>Welcome to the Freezer Alarm Management System</h2>
-                <p>
-                    This system helps monitor and manage freezer temperatures in real-time.
+                <p>This system helps monitor and manage freezer temperatures in real-time.
                     Get alerts, view logs, and ensure optimal storage conditions.
                 </p>
                 <h2>Why Use This System?</h2>
@@ -25,6 +26,7 @@ const HomeContent = () => {
                     type="button"
                     className="btn btn-lg mt-3"
                     style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
+                    onClick={() => navigate("/create-account")}
                 >
                     Create Account
                 </button>
