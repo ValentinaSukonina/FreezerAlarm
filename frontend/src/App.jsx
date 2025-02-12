@@ -3,7 +3,7 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
 import Header from './components/Header.jsx';
 import Home from "./pages/Home";
-import {BrowserRouter as Router,Route,Routes} from "react-router-dom";
+import Footer from "./components/Footer.jsx";
 import Personal from "./pages/Personal";
 
 
