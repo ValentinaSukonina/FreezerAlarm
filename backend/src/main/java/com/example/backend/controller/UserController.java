@@ -3,6 +3,8 @@ package com.example.backend.controller;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.UserService;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -14,6 +16,7 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -54,12 +57,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    /*@GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll().stream()
-                .peek(user -> user.setName(HtmlUtils.htmlEscape(user.getName())))
-                .toList();
-    }*/
 
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
@@ -86,5 +83,25 @@ public class UserController {
         return userOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
+    @PostMapping("/check-user")
+    public ResponseEntity<?> checkUser(@RequestBody UserRequest request) {
+        Optional<User> user = userService.findByName(request.name());
+        if (user.isPresent()) {
+            return ResponseEntity.ok().body(Map.of("exists", true));
+
+        } else {
+            return ResponseEntity.ok().body(Map.of("exists", false));
+
+        }
+    }
+
+    public record UserRequest(String name) {
+
+    }
 }
+
+
+
+
 

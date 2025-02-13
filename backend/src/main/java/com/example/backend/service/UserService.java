@@ -16,7 +16,7 @@ import java.util.Optional;
 @Transactional
 public class UserService {
 
-    //we can add find user by name, by role,by rank if needed
+
 
     private final UserRepository userRepository;
 
@@ -51,6 +51,10 @@ public class UserService {
 
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public  Optional<User> findByName(String name){
+        return userRepository.findByName(name);
     }
 
 }

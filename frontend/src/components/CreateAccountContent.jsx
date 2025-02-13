@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import axios from "axios"; // Import axios to make API requests
 
 const CreateAccountContent = () => {
-    // State to store user input
+    // store user input
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -9,7 +10,8 @@ const CreateAccountContent = () => {
     });
 
     const [submittedData, setSubmittedData] = useState(null); // Stores submitted data
-    const [message, setMessage] = useState(""); // Stores success message
+    const [message, setMessage] = useState(""); // Stores success/error message
+    const [isChecking, setIsChecking] = useState(false); // Loading state
 
     // Handle input change
     const handleChange = (e) => {
@@ -17,21 +19,47 @@ const CreateAccountContent = () => {
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault(); // Prevents page refresh
 
-        if (formData.fullName && formData.email && formData.phoneNumber) {
-            setSubmittedData(formData); // Save the submitted data
-            setMessage("✅ User Created Successfully!"); // Show success message
-
-            // Reset form fields after submission
-            setFormData({
-                fullName: "",
-                email: "",
-                phoneNumber: ""
-            });
-        } else {
+        if (!formData.fullName || !formData.email || !formData.phoneNumber) {
             setMessage("❌ Please fill in all fields."); // Error message for empty fields
+            return;
+        }
+
+        try {
+            setIsChecking(true); // Show loading state
+
+            // Make API request to check if the user exists
+            const response = await axios.post("http://localhost:8000/api/users/check-user", { name: formData.fullName });
+
+
+            if (response.data.exists) {
+                // If user exists, proceed with account creation
+                setSubmittedData(formData); // Save the submitted data
+                setMessage("✅ User Created Successfully!"); // Show success message
+
+                // Reset form fields after submission
+                setFormData({
+                    fullName: "",
+                    email: "",
+                    phoneNumber: ""
+                });
+            } else {
+                // If user does NOT exist, show error message
+                setMessage("❌ Please contact administration.");
+                setSubmittedData(null); // Prevents account from being created
+                setFormData({
+                    fullName: "",
+                    email: "",
+                    phoneNumber: ""
+                });
+            }
+        } catch (error) {
+            console.error("Error checking user:", error);
+            setMessage("❌ An error occurred. Please try again.");
+        } finally {
+            setIsChecking(false); // Hide loading state
         }
     };
 
@@ -52,6 +80,7 @@ const CreateAccountContent = () => {
                             placeholder="John Doe"
                             value={formData.fullName}
                             onChange={handleChange}
+                            required
                         />
                     </div>
 
@@ -66,6 +95,7 @@ const CreateAccountContent = () => {
                             placeholder="example@example.com"
                             value={formData.email}
                             onChange={handleChange}
+                            required
                         />
                     </div>
 
@@ -80,6 +110,7 @@ const CreateAccountContent = () => {
                             placeholder="+46 123 456 789"
                             value={formData.phoneNumber}
                             onChange={handleChange}
+                            required
                         />
                     </div>
 
@@ -89,8 +120,9 @@ const CreateAccountContent = () => {
                             type="submit"
                             className="btn btn-lg"
                             style={{ backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white" }}
+                            disabled={isChecking} // Disable button while checking
                         >
-                            Sign Up
+                            {isChecking ? "Checking..." : "Sign Up"}
                         </button>
                     </div>
                 </form>
@@ -108,7 +140,7 @@ const CreateAccountContent = () => {
                     </div>
                 )}
 
-                {/* Display Submitted Data Only After Button Click */}
+                {/* Display Submitted Data Only After Successful Signup */}
                 {submittedData && (
                     <div className="mt-4 p-3 border rounded text-center" style={{ backgroundColor: "#F4FFC3", color: "#5D8736" }}>
                         <h5>User Information</h5>
@@ -123,6 +155,7 @@ const CreateAccountContent = () => {
 };
 
 export default CreateAccountContent;
+
 
 
 
