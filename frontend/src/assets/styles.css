@@ -14,3 +14,35 @@ html, body, #root {
 .main-content > *:not(footer) {
     flex-grow: 1; /* Allows content to expand, but NOT the footer */
 }
+
+
+
+
+
+
+
+
+/* Title Hover Effect */
+
+.navbar-brand {
+    transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.navbar-brand:hover {
+    color: #FFD700 !important; /* Golden Yellow */
+    transform: scale(1.05); /* Slightly enlarges */
+}
+
+/* Navbar Links Hover Effect - More Noticeable */
+.navbar-nav .nav-link {
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    padding: 5px 10px; /* Adds some padding for better hover visibility */
+    border-radius: 5px; /* Soft rounded edges */
+}
+
+.navbar-nav .nav-link:hover {
+    color: #FFD700 !important; /* Golden Yellow */
+    background-color: rgba(255, 255, 255, 0.2); /* Subtle white background */
+    transform: scale(1.05); /* Slight enlargement */
+}
+
