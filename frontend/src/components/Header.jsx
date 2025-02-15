@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import "../assets/styles.css";
 
 console.log("Header.tsx: Rendering Header component...");
@@ -63,10 +63,12 @@ const Header = () => {
 
 
                     {/* Navbar Items */}
-                    <div className={`collapse navbar-collapse ${isOpen ? "show" : ""} justify-content-lg-end text-center`} id="navbarSupportedContent">
+                    <div
+                        className={`collapse navbar-collapse ${isOpen ? "show" : ""} justify-content-lg-end text-center`}
+                        id="navbarSupportedContent">
                         <ul className="navbar-nav ms-auto">
                             <li className="nav-item">
-                                <a className="nav-link text-white" href="#">Freezers</a>
+                                <a className="nav-link text-white" href="/freezers">Freezers</a>
                             </li>
                             <li className="nav-item">
                                 <a className="nav-link text-white" href="/personal">Personal</a>
@@ -109,7 +111,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-
-

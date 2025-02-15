@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Footer from "./components/Footer.jsx";
 import Personal from "./pages/Personal";
 import CreateAccount from "./pages/CreateAccount";
+import Freezer from "./pages/Freezer";
 
 
 console.log('App.tsx: Rendering App component...');
@@ -19,6 +20,7 @@ const App = () => {
                     <Route path="/" element={<Home/>}/>
                     <Route path="/personal" element={<Personal/>}/>
                     <Route path="/create-account" element={<CreateAccount/>}/>
+                    <Route path="/freezers" element={<Freezer/>}/>
                 </Routes>
                 <Footer/>
             </div>
@@ -28,6 +30,3 @@ const App = () => {
 
 
 export default App;
-
-
-
