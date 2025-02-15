@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends ListCrudRepository <User,Long> {
+    Optional<User> findByName(String name);
 
-   //add only method that are not already inherited from ListCrudRepository
 
 }
