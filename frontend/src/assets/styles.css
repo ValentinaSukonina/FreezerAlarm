@@ -69,3 +69,13 @@ html, body, #root {
     transform: scale(1.05);
 }
 
+.navbar .form-control {
+    transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+.navbar .form-control:focus {
+    outline: none;
+    border: 1px solid #635818;
+    box-shadow: 0 0 5px #FFD700;
+}
+

@@ -1,14 +1,24 @@
-import React, {useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import "../assets/styles.css";
 
 console.log("Header.tsx: Rendering Header component...");
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false); // State to track menu visibility
-
+    const mobileSearchRef = useRef(null);
     const toggleNavbar = () => {
         setIsOpen(!isOpen); // Toggle open/close state
     };
+
+    //Place focus on search bar on small screen
+    useEffect(() => {
+        if (isOpen && mobileSearchRef.current) {
+            // Optional slight delay if the collapse animation needs time
+            setTimeout(() => {
+                mobileSearchRef.current?.focus();
+            }, 300);
+        }
+    }, [isOpen]);
 
     return (
         <>
@@ -20,7 +30,7 @@ const Header = () => {
                     minHeight: "60px",
                 }}>
                 <div className="container-fluid px-3">
-                    <a className="navbar-brand text-white fw-bold"  href="/">
+                    <a className="navbar-brand text-white fw-bold" href="/">
                         Freezer Alarm Management
                     </a>
 
@@ -82,10 +92,12 @@ const Header = () => {
                         <div className="d-lg-none text-center mt-2">
                             <form className="d-flex justify-content-center">
                                 <input
+                                    ref={mobileSearchRef}
                                     className="form-control"
                                     type="search"
                                     placeholder="Search for freezer"
                                     aria-label="Search"
+                                    autoFocus
                                     style={{
                                         backgroundColor: "#F4FFC3",
                                         color: "#5D8736",
