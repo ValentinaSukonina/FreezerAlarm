@@ -20,7 +20,7 @@ const Header = () => {
                     minHeight: "60px",
                 }}>
                 <div className="container-fluid px-3">
-                    <a className="navbar-brand text-white fw-bold" href="/">
+                    <a className="navbar-brand text-white fw-bold"  href="/">
                         Freezer Alarm Management
                     </a>
 
@@ -52,7 +52,7 @@ const Header = () => {
 
                     {/* Navbar Toggler for Mobile Screens */}
                     <button
-                        className="navbar-toggler"
+                        className="navbar-toggler ms-auto me-3 d-lg-none"
                         type="button"
                         onClick={toggleNavbar} // Toggle menu manually
                         aria-expanded={isOpen}
@@ -60,6 +60,7 @@ const Header = () => {
                     >
                         <span className="navbar-toggler-icon"></span>
                     </button>
+
 
                     {/* Navbar Items */}
                     <div className={`collapse navbar-collapse ${isOpen ? "show" : ""} justify-content-lg-end text-center`} id="navbarSupportedContent">
