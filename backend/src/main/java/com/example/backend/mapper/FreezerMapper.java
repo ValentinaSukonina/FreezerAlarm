@@ -12,20 +12,17 @@ import java.util.List;
 public class FreezerMapper {
 
     public FreezerDTO toFreezerDTO(Freezer freezer) {
-        // Build the list of UserDTOs from the freezer's relationships
         List<UserDTO> userDTOs = freezer.getFreezerUsers().stream()
                 .map(freezerUser -> {
-                    // In your code, you have a "join" entity called FreezerUser; we pull the actual User from it:
                     User user = freezerUser.getUser();
 
-                    // Return a UserDTO with the exact JSON fields you want
                     return new UserDTO(
                             user.getId(),
-                            user.getName(),            // "name"
-                            user.getPhoneNumber(),     // "phone_number"
-                            user.getEmail(),           // "email"
-                            user.getUser_rank(),       // "user_rank"
-                            user.getRole()             // "role" (could be hardcoded or read from the DB)
+                            user.getName(),
+                            user.getPhoneNumber(),
+                            user.getEmail(),
+                            user.getUser_rank(),
+                            user.getRole()
                     );
                 })
                 .toList();

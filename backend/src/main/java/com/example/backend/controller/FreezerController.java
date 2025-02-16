@@ -55,6 +55,7 @@ public class FreezerController {
         return ResponseEntity.ok(freezers);
     }
 
+    // GET ALL FREEZERS WITH USERS
     @GetMapping("/with-users")
     public ResponseEntity<List<FreezerDTO>> getAllFreezersWithUsers() {
         List<FreezerDTO> freezerDTOs = freezerService.getAllFreezersWithUsers();

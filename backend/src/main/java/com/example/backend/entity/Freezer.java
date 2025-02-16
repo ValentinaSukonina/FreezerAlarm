@@ -42,7 +42,6 @@ public class Freezer {
     private String type;
 
     @OneToMany(mappedBy = "freezer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonManagedReference
     private Set<FreezerUser> freezerUsers = new HashSet<>();
 
 

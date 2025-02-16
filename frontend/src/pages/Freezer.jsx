@@ -6,5 +6,4 @@ const Freezer = () => {
     return <FreezersAll/>;
 };
 
-
 export default Freezer;

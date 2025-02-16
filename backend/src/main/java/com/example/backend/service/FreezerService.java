@@ -50,10 +50,8 @@ public class FreezerService {
     }
 
     public List<FreezerDTO> getAllFreezersWithUsers() {
-        // Get the entities with the custom fetch query
         List<Freezer> freezers = freezerRepository.findAllWithUsers();
 
-        // Convert them to DTOs
         return freezers.stream()
                 .map(freezerMapper::toFreezerDTO)
                 .toList();

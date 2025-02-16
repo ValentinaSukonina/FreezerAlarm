@@ -2,12 +2,10 @@ import React from "react";
 import "../assets/styles.css";
 
 const FreezerCard = ({freezer}) => {
-    // Guard clause: if freezer is undefined, return null (or a placeholder)
     if (!freezer) {
         return null;
     }
 
-    // Destructure properties from freezer (ensure the names match the JSON response)
     const {number, room, address, type, users = []} = freezer;
 
     return (
@@ -19,11 +17,13 @@ const FreezerCard = ({freezer}) => {
                     <p>Address: {address}</p>
                     <p>Type: {type}</p>
 
-                    <h6>Assigned Users:</h6>
+                    <p style={{fontWeight: "bold"}}>Assigned Users:</p>
                     <ul>
                         {users.map((user) => (
                             <li key={user.id}>
-                                <p>{user.name}</p>
+                                <p style={{fontWeight: "bold"}}>
+                                    {user.name} ({user.user_rank})
+                                </p>
                                 <p>{user.email}</p>
                                 <p>{user["phone_number"]}</p>
                             </li>

@@ -34,9 +34,17 @@ public interface FreezerRepository extends ListCrudRepository<Freezer, Long> {
     @Query("DELETE FROM Freezer f WHERE f.number = :number")
     int deleteByNumber(@Param("number") String number);
 
+    // Get all freezers with users
     @Query("SELECT DISTINCT f FROM Freezer f "
             + "LEFT JOIN FETCH f.freezerUsers fu "
             + "LEFT JOIN FETCH fu.user")
     List<Freezer> findAllWithUsers();
+
+    // Get freezer with users by number
+    @Query("SELECT DISTINCT f FROM Freezer f " +
+            "LEFT JOIN FETCH f.freezerUsers fu " +
+            "LEFT JOIN FETCH fu.user " +
+            "WHERE f.number = :number")
+    Freezer findByNumberWithUsers(@Param("number") String number);
 
 }
