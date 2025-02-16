@@ -20,7 +20,7 @@ const FreezerCard = ({freezer}) => {
                     <p style={{fontWeight: "bold"}}>Assigned Users:</p>
                     <ul>
                         {users.map((user) => (
-                            <li key={user.id}>
+                            <li key={user.id || user.email}> {/* Ensure unique key */}
                                 <p style={{fontWeight: "bold"}}>
                                     {user.name} ({user.user_rank})
                                 </p>
@@ -28,7 +28,6 @@ const FreezerCard = ({freezer}) => {
                                 <p>{user["phone_number"]}</p>
                             </li>
                         ))}
-
                     </ul>
                 </div>
             </div>

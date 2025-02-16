@@ -26,16 +26,18 @@ export const fetchFreezersWithUsers = async () => {
     }
 };
 
-export const fetchAllFreezers = async () => {
+export const fetchFreezer = async (freezerNumber) => {
     try {
-        const response = await API.get('/freezers');
-        console.log("Freezers fetched successfully:", response.data);
+        const response = await API.get(`/freezers/number/${freezerNumber}`);
+        console.log("Freezer fetched successfully:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error fetching users:", error.response ? error.response.data : error.message);
-        return [];
+        console.error("Error fetching freezer:", error.response ? error.response.data : error.message);
+        throw new Error("Freezer not found");
     }
 };
+
+
 
 
 

@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
-import "../assets/styles.css";
-import FreezerCard from "./FreezerCard";
+import FreezerCard from "../components/FreezerCard"; // Import reusable component
 
 const FreezersAll = () => {
     const [freezers, setFreezers] = useState([]);
@@ -10,12 +9,12 @@ const FreezersAll = () => {
     useEffect(() => {
         const fetchFreezersWithUsers = async () => {
             try {
-                const response = await fetch('/api/freezers/with-users'); // Adjust URL as needed
+                const response = await fetch("/api/freezers/with-users"); // Backend endpoint
                 if (!response.ok) {
                     throw new Error("Failed to fetch freezers");
                 }
                 const data = await response.json();
-                setFreezers(data);
+                setFreezers(data); // Store fetched freezers in state
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -32,7 +31,6 @@ const FreezersAll = () => {
     return (
         <div>
             {freezers.map((freezer) => (
-                // Ensure freezer is defined before passing
                 <FreezerCard key={freezer.id} freezer={freezer}/>
             ))}
         </div>
