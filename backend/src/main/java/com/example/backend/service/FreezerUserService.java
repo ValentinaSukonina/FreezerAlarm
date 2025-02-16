@@ -74,7 +74,7 @@ public class FreezerUserService {
         Freezer oldFreezer = freezerRepository.findById(oldFreezerId)
                 .orElseThrow(() -> new Exceptions.NotFoundException("Old freezer not found with ID: " + oldFreezerId));
 
-         Freezer newFreezer = freezerRepository.findById(newFreezerId)
+        Freezer newFreezer = freezerRepository.findById(newFreezerId)
                 .orElseThrow(() -> new Exceptions.NotFoundException("New freezer not found with ID: " + newFreezerId));
 
         FreezerUser freezerUser = freezerUserRepository.findByFreezerAndUser(oldFreezer, user)
@@ -94,7 +94,14 @@ public class FreezerUserService {
         }
 
         return users.stream()
-                .map(user -> new UserDTO(user.getName(), user.getPhoneNumber(), user.getEmail(), user.getUser_rank()))
+                .map(user -> new UserDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getPhoneNumber(),
+                        user.getEmail(),
+                        user.getUser_rank(),
+                        user.getRole()
+                ))
                 .collect(Collectors.toList());
     }
 

@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.FreezerUserDTO;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.FreezerUser;
 import com.example.backend.repository.FreezerUserRepository;
@@ -15,15 +16,22 @@ import java.util.List;
 public class FreezerUserController {
     private final FreezerUserService freezerUserService;
     private final FreezerUserRepository freezerUserRepository;
+
     public FreezerUserController(FreezerUserService freezerUserService, FreezerUserRepository freezerUserRepository) {
         this.freezerUserService = freezerUserService;
         this.freezerUserRepository = freezerUserRepository;
     }
 
     @PostMapping
-    public ResponseEntity<FreezerUser> bindUserToFreezer(@RequestBody FreezerUserRequest request) {
+    public ResponseEntity<FreezerUserDTO> bindUserToFreezer(@RequestBody FreezerUserRequest request) {
         FreezerUser freezerUser = freezerUserService.bindUserToFreezer(request.getUserId(), request.getFreezerId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(freezerUser);
+        // Create the DTO record from the entity's fields.
+        FreezerUserDTO dto = new FreezerUserDTO(
+                freezerUser.getId(),
+                freezerUser.getUser().getId(),
+                freezerUser.getFreezer().getId()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     // DTO class to receive JSON input
@@ -32,14 +40,29 @@ public class FreezerUserController {
         private Long freezerId;
         private Long oldFreezerId; // Optional, only used for updates
 
-        public Long getUserId() { return userId; }
-        public void setUserId(Long userId) { this.userId = userId; }
+        public Long getUserId() {
+            return userId;
+        }
 
-        public Long getFreezerId() { return freezerId; }
-        public void setFreezerId(Long freezerId) { this.freezerId = freezerId; }
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
 
-        public Long getOldFreezerId() { return oldFreezerId; }
-        public void setOldFreezerId(Long oldFreezerId) { this.oldFreezerId = oldFreezerId; }
+        public Long getFreezerId() {
+            return freezerId;
+        }
+
+        public void setFreezerId(Long freezerId) {
+            this.freezerId = freezerId;
+        }
+
+        public Long getOldFreezerId() {
+            return oldFreezerId;
+        }
+
+        public void setOldFreezerId(Long oldFreezerId) {
+            this.oldFreezerId = oldFreezerId;
+        }
     }
 
 
@@ -52,7 +75,7 @@ public class FreezerUserController {
 
     //Update User-Freezer Association
     @PutMapping
-    public ResponseEntity<FreezerUser> updateFreezerUser(@RequestBody FreezerUserRequest request) {
+    public ResponseEntity<FreezerUserDTO> updateFreezerUser(@RequestBody FreezerUserRequest request) {
         if (request.getOldFreezerId() == null) {
             return ResponseEntity.badRequest().body(null);
         }
@@ -60,7 +83,12 @@ public class FreezerUserController {
         FreezerUser updatedFreezerUser = freezerUserService.updateFreezerUser(
                 request.getUserId(), request.getOldFreezerId(), request.getFreezerId()
         );
-        return ResponseEntity.ok(updatedFreezerUser);
+        FreezerUserDTO responseDto = new FreezerUserDTO(
+                updatedFreezerUser.getId(),
+                updatedFreezerUser.getUser().getId(),
+                updatedFreezerUser.getFreezer().getId()
+        );
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/{freezerNumber}")
@@ -68,8 +96,6 @@ public class FreezerUserController {
         List<UserDTO> users = freezerUserService.getUsersByFreezerNumber(freezerNumber);
         return ResponseEntity.ok(users);
     }
-
-
 
 }
 

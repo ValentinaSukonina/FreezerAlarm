@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { fetchUsers } from "../services/api"; // Ensure this API function fetches users correctly
+import React, {useEffect, useState} from "react";
+import {fetchUsers} from "../services/api"; // Ensure this API function fetches users correctly
 
 console.log("PersonalContent.jsx: Rendering PersonalContent component...");
 
@@ -40,7 +40,7 @@ const PersonalContent = () => {
                                width: "100%",
                                tableLayout: "auto" // Allows columns to resize properly
                            }}>
-                        <thead style={{ backgroundColor: "#5D8736", color: "white" }}>
+                        <thead style={{backgroundColor: "#5D8736", color: "white"}}>
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
@@ -52,7 +52,8 @@ const PersonalContent = () => {
                         {users.map((user) => (
                             <tr key={user.id}>
                                 <td>{user.name}</td>
-                                <td className="text-wrap">{user.email}</td> {/* Allow wrapping */}
+                                <td className="text-wrap">{user.email}</td>
+                                {/* Allow wrapping */}
                                 <td>{user.phone_number}</td>
                                 <td>{user.role}</td>
                             </tr>
@@ -68,6 +69,3 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent
-
-
-
