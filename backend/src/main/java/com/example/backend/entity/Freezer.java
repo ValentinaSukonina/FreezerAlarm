@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,7 +42,9 @@ public class Freezer {
     private String type;
 
     @OneToMany(mappedBy = "freezer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<FreezerUser> freezerUsers = new HashSet<>();
+
 
     @Override
     public final boolean equals(Object o) {

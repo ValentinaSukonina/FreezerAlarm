@@ -1,5 +1,7 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -23,10 +25,12 @@ public class FreezerUser {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "freezer_id", nullable = false)
     private Freezer freezer;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

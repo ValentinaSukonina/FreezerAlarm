@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FreezerRepository extends ListCrudRepository<Freezer, Long>{
+public interface FreezerRepository extends ListCrudRepository<Freezer, Long> {
     Optional<Freezer> findByNumber(String number);
+
     Optional<Freezer> findById(Long id);
 
     @Override
@@ -32,5 +33,10 @@ public interface FreezerRepository extends ListCrudRepository<Freezer, Long>{
     @Transactional
     @Query("DELETE FROM Freezer f WHERE f.number = :number")
     int deleteByNumber(@Param("number") String number);
+
+    @Query("SELECT DISTINCT f FROM Freezer f "
+            + "LEFT JOIN FETCH f.freezerUsers fu "
+            + "LEFT JOIN FETCH fu.user")
+    List<Freezer> findAllWithUsers();
 
 }

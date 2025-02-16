@@ -1,7 +1,9 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.FreezerDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.exception.Exceptions;
+import com.example.backend.mapper.FreezerMapper;
 import com.example.backend.repository.FreezerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.repository.query.Param;
@@ -15,9 +17,12 @@ import java.util.Optional;
 public class FreezerService {
 
     private final FreezerRepository freezerRepository;
+    private final FreezerMapper freezerMapper;
 
-    public FreezerService(FreezerRepository freezerRepository) {
+
+    public FreezerService(FreezerRepository freezerRepository, FreezerMapper freezerMapper) {
         this.freezerRepository = freezerRepository;
+        this.freezerMapper = freezerMapper;
     }
 
     public Freezer createFreezer(Freezer freezer) {
@@ -42,6 +47,16 @@ public class FreezerService {
 
     public List<Freezer> findAll() {
         return freezerRepository.findAll();
+    }
+
+    public List<FreezerDTO> getAllFreezersWithUsers() {
+        // Get the entities with the custom fetch query
+        List<Freezer> freezers = freezerRepository.findAllWithUsers();
+
+        // Convert them to DTOs
+        return freezers.stream()
+                .map(freezerMapper::toFreezerDTO)
+                .toList();
     }
 
     public Freezer updateFreezerDetailsByNumber(String number, Freezer freezer) {

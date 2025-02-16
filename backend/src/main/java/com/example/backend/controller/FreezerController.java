@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.FreezerDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
@@ -30,7 +31,7 @@ public class FreezerController {
     @PostMapping
     public ResponseEntity<Freezer> createFreezer(@Validated @RequestBody Freezer freezer) {
         Freezer createdFreezer = (Freezer) freezerService.createFreezer(freezer);
-        return ResponseEntity.created(URI.create("/api/freezers/" + ((Freezer)createdFreezer).getId())).body(createdFreezer);
+        return ResponseEntity.created(URI.create("/api/freezers/" + ((Freezer) createdFreezer).getId())).body(createdFreezer);
     }
 
     // GET FREEZER BY FREEZER NUMBER
@@ -52,6 +53,12 @@ public class FreezerController {
     public ResponseEntity<List<Freezer>> getAllFreezers() {
         List<Freezer> freezers = freezerService.findAll();
         return ResponseEntity.ok(freezers);
+    }
+
+    @GetMapping("/with-users")
+    public ResponseEntity<List<FreezerDTO>> getAllFreezersWithUsers() {
+        List<FreezerDTO> freezerDTOs = freezerService.getAllFreezersWithUsers();
+        return ResponseEntity.ok(freezerDTOs);
     }
 
     // UPDATE FREEZER DETAILS BY FREEZER NUMBER

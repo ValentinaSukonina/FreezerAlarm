@@ -1,4 +1,11 @@
 package com.example.backend.dto;
 
-public record UserDTO(String name, String phone, String email, Integer rank) {}
-
+public record UserDTO(
+        Long id,
+        String name,
+        String phone_number,
+        String email,
+        Integer user_rank,
+        String role
+) {
+}

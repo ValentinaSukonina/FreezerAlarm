@@ -15,6 +15,28 @@ export const fetchUsers = async () => {
     }
 };
 
+export const fetchFreezersWithUsers = async () => {
+    try {
+        const response = await API.get('/freezers/with-users');
+        console.log("Freezers fetched successfully:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching users:", error.response ? error.response.data : error.message);
+        return [];
+    }
+};
+
+export const fetchAllFreezers = async () => {
+    try {
+        const response = await API.get('/freezers');
+        console.log("Freezers fetched successfully:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching users:", error.response ? error.response.data : error.message);
+        return [];
+    }
+};
+
 
 
 
