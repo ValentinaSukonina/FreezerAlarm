@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class FreezerMapper {
+public class FreezerUserMapper {
 
     public FreezerDTO toFreezerDTO(Freezer freezer) {
         List<UserDTO> userDTOs = freezer.getFreezerUsers().stream()
