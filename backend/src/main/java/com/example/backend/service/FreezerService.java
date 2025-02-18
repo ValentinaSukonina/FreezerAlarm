@@ -59,12 +59,6 @@ public class FreezerService {
                 .orElseThrow(() -> new Exceptions.NotFoundException("Freezer with ID " + id + " not found"));
     }
 
-    public List<FreezerDTO> findAll() {
-        return freezerRepository.findAll().stream()
-                .map(freezerMapper::toFreezerDTO)
-                .toList();
-    }
-
     public List<FreezerWithUsersDTO> getAllFreezersWithUsers() {
         return freezerRepository.findAllWithUsers().stream()
                 .map(freezerMapper::toFreezerWithUsersDTO)
@@ -91,6 +85,3 @@ public class FreezerService {
     }
 
 }
-
-
-

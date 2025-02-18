@@ -15,17 +15,19 @@ export const fetchUsers = async () => {
     }
 };
 
-// Fetch a single freezer with users
 export const fetchFreezerWithUsers = async (freezerNumber) => {
     try {
-        const response = await API.get(`/freezers/${freezerNumber}/with-users`); // ✅ Adjust to match backend
+        const response = await API.get(`/freezers/number/${freezerNumber}/with-users`);
         return response.data;
     } catch (error) {
-        console.error("Error fetching freezer:", error.response ? error.response.data : error.message);
-        throw new Error("Freezer not found");
+        // Optionally, extract a more detailed message from the backend response:
+        const errMsg = error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Freezer not found";
+        console.error("Error fetching freezer:", errMsg);
+        throw new Error(errMsg);
     }
 };
-
 
 // Fetch all freezers with users
 export const fetchAllFreezersWithUsers = async () => {
@@ -37,47 +39,4 @@ export const fetchAllFreezersWithUsers = async () => {
         throw new Error("Could not fetch freezers");
     }
 
-// // Fetch all freezers
-// export const fetchAllFreezers = async () => {
-//     try {
-//         console.log("Fetching all freezers...");
-//         const response = await API.get(`/freezers`);
-//         console.log("All freezers fetched successfully:", response.data);
-//         return response.data;
-//     } catch (error) {
-//         console.error("Error fetching freezers:", error.response ? error.response.data : error.message);
-//         throw new Error("Could not fetch freezers");
-//     }
-
-
-// export const fetchFreezer = async (freezerNumber) => {
-//     try {
-//         const response = await API.get(`/freezers/number/${freezerNumber}`);
-//         console.log("Freezer fetched successfully:", response.data);
-//         return response.data;
-//     } catch (error) {
-//         if (error.response) {
-//             // Server responded but with an error (e.g., 404 Not Found)
-//             console.error("Error fetching freezer:", error.response.data);
-//             if (error.response.status === 404) {
-//                 throw new Error("Freezer not found");
-//             } else {
-//                 throw new Error(`Error: ${error.response.data.message || "Something went wrong"}`);
-//             }
-//         } else if (error.request) {
-//             // Request was made but no response (server down, network issue)
-//             console.error("No response received:", error.request);
-//             throw new Error("Server is unreachable. Please try again later.");
-//         } else {
-//             // Other errors (e.g., config issues)
-//             console.error("Unexpected error:", error.message);
-//             throw new Error("Unexpected error occurred.");
-//         }
-//     }
 };
-
-
-
-
-
-

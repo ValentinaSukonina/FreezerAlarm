@@ -17,9 +17,6 @@ public interface FreezerRepository extends ListCrudRepository<Freezer, Long> {
 
     Optional<Freezer> findById(Long id);
 
-    @Override
-    List<Freezer> findAll();
-
     @Modifying
     @Transactional
     @Query("UPDATE Freezer f SET f.file = :file, f.address = :address, f.room = :room, f.type = :type WHERE f.number = :number")

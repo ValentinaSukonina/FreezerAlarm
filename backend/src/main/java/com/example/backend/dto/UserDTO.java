@@ -9,6 +9,3 @@ public record UserDTO(
         String role
 ) {
 }
-
-
-

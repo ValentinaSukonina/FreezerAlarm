@@ -29,7 +29,7 @@ const FreezersAll = () => {
 
     return (
         <div>
-            <h2>All Freezers</h2>
+            <h2>Freezers Biomedicine</h2>
             {freezers.map((freezer) => (
                 <FreezerCard key={freezer.id} freezer={freezer}/>
             ))}

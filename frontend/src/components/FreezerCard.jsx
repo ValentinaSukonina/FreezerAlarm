@@ -3,7 +3,7 @@ import "../assets/styles.css";
 
 const FreezerCard = ({freezer}) => {
     if (!freezer) {
-        return <p>No freezer data available.</p>; // Show fallback message
+        return <p>No freezer data available.</p>;
     }
 
     const {number, room, address, type, users = []} = freezer;

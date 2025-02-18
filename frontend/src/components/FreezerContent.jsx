@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {fetchFreezerWithUsers} from "../services/api";
-//import {fetchFreezer} from "../services/api";
-
-import FreezerCard from "../components/FreezerCard"; // Import FreezerCard
+import FreezerCard from "../components/FreezerCard";
 
 const FreezerContent = () => {
-    const {freezerNumber} = useParams(); // Get freezer number from URL
+    const {freezerNumber} = useParams();
     const [freezer, setFreezer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -17,7 +15,7 @@ const FreezerContent = () => {
                 const data = await fetchFreezerWithUsers(freezerNumber);
                 setFreezer(data);
             } catch (err) {
-                setError(err.message);
+                setError(err.message || "An error occurred");
             } finally {
                 setLoading(false);
             }
@@ -27,13 +25,18 @@ const FreezerContent = () => {
     }, [freezerNumber]);
 
     if (loading) return <p>Loading freezer data...</p>;
-    if (error) return <p>Error: {error}</p>;
-    if (!freezer) return <p>No freezer data found.</p>;
 
     return (
-        <div>
-            <h2>Freezer Details</h2>
-            <FreezerCard freezer={freezer}/> {/* Pass one freezer */}
+        <div className="content-wrapper">
+            {error ? (
+                <p className="m-3">Error: {error}</p>
+            ) : freezer ? (
+                <>
+                    <FreezerCard freezer={freezer}/>
+                </>
+            ) : (
+                <p>No freezer data found.</p>
+            )}
         </div>
     );
 };
