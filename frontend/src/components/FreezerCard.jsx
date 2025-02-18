@@ -3,7 +3,7 @@ import "../assets/styles.css";
 
 const FreezerCard = ({freezer}) => {
     if (!freezer) {
-        return null;
+        return <p>No freezer data available.</p>; // Show fallback message
     }
 
     const {number, room, address, type, users = []} = freezer;
@@ -12,23 +12,25 @@ const FreezerCard = ({freezer}) => {
         <div className="container my-5">
             <div className="row p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
                 <div className="col-lg-7 p-3 p-lg-5 pt-lg-3">
-                    <h5>Freezer: {number}</h5>
-                    <p>Room: {room}</p>
-                    <p>Address: {address}</p>
-                    <p>Type: {type}</p>
+                    <h5 className="fw-bold">Freezer: {number}</h5>
+                    <p><strong>Room:</strong> {room}</p>
+                    <p><strong>Address:</strong> {address}</p>
+                    <p><strong>Type:</strong> {type}</p>
 
-                    <p style={{fontWeight: "bold"}}>Assigned Users:</p>
-                    <ul>
-                        {users.map((user) => (
-                            <li key={user.id || user.email}> {/* Ensure unique key */}
-                                <p style={{fontWeight: "bold"}}>
-                                    {user.name} ({user.user_rank})
-                                </p>
-                                <p>{user.email}</p>
-                                <p>{user["phone_number"]}</p>
-                            </li>
-                        ))}
-                    </ul>
+                    <h6 className="mt-4 fw-bold">Assigned Users:</h6>
+                    {users.length > 0 ? (
+                        <ul>
+                            {users.map((user) => (
+                                <li key={user.id || user.email}>
+                                    <p className="fw-bold">{user.name} ({user.user_rank || "No rank"})</p>
+                                    <p>Email: {user.email}</p>
+                                    <p>Phone: {user.phone_number}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No assigned users.</p>
+                    )}
                 </div>
             </div>
         </div>

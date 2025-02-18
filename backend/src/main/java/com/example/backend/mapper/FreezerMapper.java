@@ -1,6 +1,7 @@
 package com.example.backend.mapper;
 
 import com.example.backend.dto.FreezerDTO;
+import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.entity.User;
@@ -9,9 +10,27 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class FreezerUserMapper {
+public class FreezerMapper {
 
     public FreezerDTO toFreezerDTO(Freezer freezer) {
+        if (freezer == null) {
+            return null;
+        }
+
+        return new FreezerDTO(
+                freezer.getId(),
+                freezer.getFile(),
+                freezer.getNumber(),
+                freezer.getAddress(),
+                freezer.getRoom(),
+                freezer.getType()
+        );
+    }
+
+    public FreezerWithUsersDTO toFreezerWithUsersDTO(Freezer freezer) {
+        if (freezer == null) {
+            return null;
+        }
         List<UserDTO> userDTOs = freezer.getFreezerUsers().stream()
                 .map(freezerUser -> {
                     User user = freezerUser.getUser();
@@ -28,7 +47,7 @@ public class FreezerUserMapper {
                 .toList();
 
         // Return a FreezerDTO that includes the list of users
-        return new FreezerDTO(
+        return new FreezerWithUsersDTO(
                 freezer.getId(),
                 freezer.getFile(),
                 freezer.getNumber(),

@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
-import FreezerCard from "../components/FreezerCard"; // Import reusable component
+import {fetchAllFreezersWithUsers} from "../services/api"; // API call for all freezers
+import FreezerCard from "../components/FreezerCard"; // Import FreezerCard
+import axios from "axios";
 
 const FreezersAll = () => {
     const [freezers, setFreezers] = useState([]);
@@ -7,14 +9,10 @@ const FreezersAll = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchFreezersWithUsers = async () => {
+        const getAllFreezers = async () => {
             try {
-                const response = await fetch("/api/freezers/with-users"); // Backend endpoint
-                if (!response.ok) {
-                    throw new Error("Failed to fetch freezers");
-                }
-                const data = await response.json();
-                setFreezers(data); // Store fetched freezers in state
+                const data = await fetchAllFreezersWithUsers(); // Fetch all freezers
+                setFreezers(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -22,14 +20,16 @@ const FreezersAll = () => {
             }
         };
 
-        fetchFreezersWithUsers();
+        getAllFreezers();
     }, []);
 
     if (loading) return <p>Loading freezers...</p>;
-    if (error) return <p style={{color: "red"}}>{error}</p>;
+    if (error) return <p>Error: {error}</p>;
+    if (freezers.length === 0) return <p>No freezers available.</p>;
 
     return (
         <div>
+            <h2>All Freezers</h2>
             {freezers.map((freezer) => (
                 <FreezerCard key={freezer.id} freezer={freezer}/>
             ))}

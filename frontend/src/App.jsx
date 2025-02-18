@@ -6,8 +6,8 @@ import Home from "./pages/Home";
 import Footer from "./components/Footer.jsx";
 import Personal from "./pages/Personal";
 import CreateAccount from "./pages/CreateAccount";
-import FreezersAll from "./pages/Freezers";
-import FreezerSingle from "./components/FreezerSingle";
+import Freezers from "./pages/Freezers";
+import FreezerPage from "./pages/FreezerPage";
 
 
 console.log('App.jsx: Rendering App component...');
@@ -21,8 +21,9 @@ const App = () => {
                     <Route path="/" element={<Home/>}/>
                     <Route path="/personal" element={<Personal/>}/>
                     <Route path="/create-account" element={<CreateAccount/>}/>
-                    <Route path="/freezers" element={<FreezersAll/>}/>
-                    <Route path="/freezer/:freezerNumber" element={<FreezerSingle/>}/>
+                    <Route path="/freezers" element={<Freezers/>}/>
+                    <Route path="/freezers/:freezerNumber" element={<FreezerPage/>}/>
+
                 </Routes>
                 <Footer/>
             </div>

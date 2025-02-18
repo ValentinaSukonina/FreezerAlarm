@@ -10,15 +10,23 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
     public UserDTO toUserDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        return dto;
+        if (user == null) {
+            return null;
+        }
+
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getPhoneNumber(),
+                user.getEmail(),
+                user.getUser_rank(),
+                user.getRole()
+        );
     }
 
     public List<UserDTO> toUserDTOList(List<User> users) {
-        return users.stream().map(this::toUserDTO).collect(Collectors.toList());
+        return users.stream()
+                .map(this::toUserDTO)
+                .collect(Collectors.toList());
     }
 }
-

@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import FreezerCard from "./FreezerCard";
-import {fetchFreezer} from "../services/api"; //
+import {fetchFreezerWithUsers} from "../services/api";
+//import {fetchFreezer} from "../services/api";
 
-const FreezerSingle = () => {
+import FreezerCard from "../components/FreezerCard"; // Import FreezerCard
+
+const FreezerContent = () => {
     const {freezerNumber} = useParams(); // Get freezer number from URL
     const [freezer, setFreezer] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ const FreezerSingle = () => {
     useEffect(() => {
         const getFreezer = async () => {
             try {
-                const data = await fetchFreezer(freezerNumber); //
+                const data = await fetchFreezerWithUsers(freezerNumber);
                 setFreezer(data);
             } catch (err) {
                 setError(err.message);
@@ -24,10 +26,16 @@ const FreezerSingle = () => {
         getFreezer();
     }, [freezerNumber]);
 
-    if (loading) return <p>Loading freezer...</p>;
-    if (error) return <p style={{color: "red"}}>{error}</p>;
+    if (loading) return <p>Loading freezer data...</p>;
+    if (error) return <p>Error: {error}</p>;
+    if (!freezer) return <p>No freezer data found.</p>;
 
-    return <FreezerCard freezer={freezer}/>;
+    return (
+        <div>
+            <h2>Freezer Details</h2>
+            <FreezerCard freezer={freezer}/> {/* Pass one freezer */}
+        </div>
+    );
 };
 
-export default FreezerSingle;
+export default FreezerContent;

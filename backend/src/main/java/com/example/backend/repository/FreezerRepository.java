@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +14,6 @@ import java.util.Optional;
 
 @Repository
 public interface FreezerRepository extends ListCrudRepository<Freezer, Long> {
-    Optional<Freezer> findByNumber(String number);
 
     Optional<Freezer> findById(Long id);
 
@@ -39,6 +39,10 @@ public interface FreezerRepository extends ListCrudRepository<Freezer, Long> {
             + "LEFT JOIN FETCH f.freezerUsers fu "
             + "LEFT JOIN FETCH fu.user")
     List<Freezer> findAllWithUsers();
+
+    //Get freezer with number
+    @Query("SELECT f FROM Freezer f WHERE f.number = :number")
+    Optional<Freezer> findByNumber(@Param("number") String number);
 
     // Get freezer with users by number
     @Query("SELECT DISTINCT f FROM Freezer f " +
