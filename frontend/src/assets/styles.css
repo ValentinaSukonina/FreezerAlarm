@@ -16,6 +16,10 @@ html, body, #root {
     flex-grow: 1; /* Allows content to expand, but NOT the footer */
 }
 
+.content-wrapper {
+    padding-top: 15px; /* Adjust based on your header height */
+}
+
 /* Title Hover Effect */
 .navbar-brand {
     transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;

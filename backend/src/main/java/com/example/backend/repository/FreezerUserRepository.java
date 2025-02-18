@@ -16,6 +16,7 @@ import java.util.Optional;
 @Repository
 public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, Long> {
     boolean existsByUserIdAndFreezerId(Long userId, Long freezerId);
+
     Optional<FreezerUser> findByFreezerAndUser(Freezer freezer, User user);
 
     @Modifying
@@ -27,4 +28,3 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     List<User> findUsersByFreezerNumber(@Param("freezerNumber") String freezerNumber);
 
 }
-

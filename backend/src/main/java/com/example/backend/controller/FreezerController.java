@@ -1,5 +1,8 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.FreezerDTO;
+import com.example.backend.dto.FreezerUserDTO;
+import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
@@ -30,14 +33,21 @@ public class FreezerController {
     @PostMapping
     public ResponseEntity<Freezer> createFreezer(@Validated @RequestBody Freezer freezer) {
         Freezer createdFreezer = (Freezer) freezerService.createFreezer(freezer);
-        return ResponseEntity.created(URI.create("/api/freezers/" + ((Freezer)createdFreezer).getId())).body(createdFreezer);
+        return ResponseEntity.created(URI.create("/api/freezers/" + ((Freezer) createdFreezer).getId())).body(createdFreezer);
     }
 
-    // GET FREEZER BY FREEZER NUMBER
+    // GET FREEZER BY NUMBER WITHOUT USERS
     @GetMapping("/number/{number}")
-    public ResponseEntity<Freezer> findByNumber(@PathVariable String number) {
-        Freezer freezer = freezerService.findByNumber(number);
-        return ResponseEntity.ok(freezer);
+    public ResponseEntity<FreezerDTO> findByNumber(@PathVariable String number) {
+        FreezerDTO dto = freezerService.findByNumber(number);
+        return ResponseEntity.ok(dto);
+    }
+
+    // GET FREEZER BY NUMBER WITH USERS
+    @GetMapping("/number/{number}/with-users")
+    public ResponseEntity<FreezerWithUsersDTO> findByNumberWithUsers(@PathVariable String number) {
+        FreezerWithUsersDTO dto = freezerService.findByNumberWithUsers(number);
+        return ResponseEntity.ok(dto);
     }
 
     // GET FREEZER BY ID
@@ -47,10 +57,10 @@ public class FreezerController {
         return ResponseEntity.ok(freezer);
     }
 
-    // GET ALL FREEZERS
+    // GET ALL FREEZERS WITH USERS (Convert to DTO)
     @GetMapping
-    public ResponseEntity<List<Freezer>> getAllFreezers() {
-        List<Freezer> freezers = freezerService.findAll();
+    public ResponseEntity<List<FreezerWithUsersDTO>> getAllFreezersWithUsers() {
+        List<FreezerWithUsersDTO> freezers = freezerService.getAllFreezersWithUsers();
         return ResponseEntity.ok(freezers);
     }
 
@@ -68,9 +78,3 @@ public class FreezerController {
     }
 
 }
-
-
-
-
-
-
