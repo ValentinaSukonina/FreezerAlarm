@@ -83,3 +83,21 @@ html, body, #root {
     box-shadow: 0 0 5px #FFD700;
 }
 
+.list-item {
+    display: grid;
+    grid-template-columns: 24px auto;
+    align-items: start;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.check-mark {
+    color: green;
+    font-size: 1.2rem;
+    text-align: center;
+    width: 24px;
+}
+
+.list-text {
+    text-align: left;
+}
