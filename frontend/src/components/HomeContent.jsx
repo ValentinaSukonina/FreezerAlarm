@@ -1,29 +1,33 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const HomeContent = () => {
     const navigate = useNavigate();
     return (
-
         <div className="container d-flex justify-content-center align-items-center text-center py-5 mt-3">
             <div className="col-md-8">
-
-                <h2>Welcome to the Freezer Alarm Management System</h2>
-                <p>This system helps monitor and manage freezer temperatures in real-time.
-                    Get alerts, view logs, and ensure optimal storage conditions.
-                </p>
                 <h2>Why Use This System?</h2>
+
                 <ul className="list-unstyled">
-                    <li>✔ Monitor freezer temperatures in real-time</li>
-                    <li>✔ Receive instant alerts for temperature fluctuations</li>
-                    <li>✔ Access detailed temperature logs and reports</li>
+                    <li className="list-item">
+                        <span className="check-mark">✔ </span>
+                        <span className="list-text"><strong>Search Freezer by Number</strong> – Instantly find freezer details by entering its unique number.</span>
+                    </li>
+                    <li className="list-item">
+                        <span className="check-mark">✔ </span>
+                        <span className="list-text"><strong>View Ownership Information</strong> – See the freezer’s owner, users, and contact details.</span>
+                    </li>
+                    <li className="list-item">
+                        <span className="check-mark">✔ </span>
+                        <span className="list-text"><strong>Send Notifications</strong> – System administrators can directly send SMS or email alerts in case of temperature fluctuations or emergencies.</span>
+                    </li>
+                    <li className="list-item">
+                        <span className="check-mark">✔ </span>
+                        <span className="list-text"><strong>Access detailed temperature logs and reports</strong></span>
+                    </li>
                 </ul>
-                <h2>How It Works</h2>
-                <p>
-                    Our system connects to sensors placed inside freezers. When temperature
-                    changes beyond the safe range, alerts are triggered, and corrective actions
-                    can be taken immediately.
-                </p>
+
+                <h2>Start using it now</h2>
                 <button
                     type="button"
                     className="btn btn-lg mt-3"
