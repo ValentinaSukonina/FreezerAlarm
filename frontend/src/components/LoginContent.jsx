@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios"; // Import axios to make API requests
 
-const CreateAccountContent = () => {
+const LoginContent = () => {
     // store user input
     const [formData, setFormData] = useState({
         fullName: "",
@@ -66,7 +66,25 @@ const CreateAccountContent = () => {
     return (
         <div className="container d-flex justify-content-center mt-5">
             <div className="col-md-6">
-                <h2 className="text-center mb-4">Create Account</h2>
+                <div className="max-w-xl mx-auto bg-gray-50 p-6 rounded-xl shadow-md space-y-3">
+
+                    <div className="flex items-start gap-2">
+                        <p><span className="pt-1">🔒 </span>
+                            <strong>Authorization verification:</strong> You must be authorized to use this application.
+                            Please fill in your detail below.</p>
+                    </div>
+
+                    <div className="flex items-start gap-2">
+                        <p><span className="pt-1">✅ </span>
+                            If <strong>authorized</strong>, you can log in using one of the methods available.</p>
+                    </div>
+
+                    <div className="flex items-start gap-2">
+                        <p><span className="pt-1">❌ </span>
+                            If <strong>not authorized</strong>, please contact the administrator for assistance.</p>
+                    </div>
+                </div>
+
 
                 <form className="row g-3" onSubmit={handleSubmit}>
                     {/* Full Name Field */}
@@ -119,10 +137,10 @@ const CreateAccountContent = () => {
                         <button
                             type="submit"
                             className="btn btn-lg"
-                            style={{ backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white" }}
+                            style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
                             disabled={isChecking} // Disable button while checking
                         >
-                            {isChecking ? "Checking..." : "Sign Up"}
+                            {isChecking ? "Checking..." : "Verify authorization"}
                         </button>
                     </div>
                 </form>
@@ -142,7 +160,8 @@ const CreateAccountContent = () => {
 
                 {/* Display Submitted Data Only After Successful Signup */}
                 {submittedData && (
-                    <div className="mt-4 p-3 border rounded text-center" style={{ backgroundColor: "#F4FFC3", color: "#5D8736" }}>
+                    <div className="mt-4 p-3 border rounded text-center"
+                         style={{backgroundColor: "#F4FFC3", color: "#5D8736"}}>
                         <h5>User Information</h5>
                         <p><strong>Full Name:</strong> {submittedData.fullName}</p>
                         <p><strong>Email:</strong> {submittedData.email}</p>
@@ -154,7 +173,7 @@ const CreateAccountContent = () => {
     );
 };
 
-export default CreateAccountContent;
+export default LoginContent;
 
 
 

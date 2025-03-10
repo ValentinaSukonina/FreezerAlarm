@@ -84,7 +84,7 @@ const Header = () => {
                                 <a className="nav-link text-white" href="/personal">Personal</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link text-white fw-bold" href="#">Login</a>
+                                <a className="nav-link text-white fw-bold" href="/create-account">Login</a>
                             </li>
                         </ul>
 
