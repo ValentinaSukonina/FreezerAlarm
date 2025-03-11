@@ -1,0 +1,62 @@
+spring:
+ application:
+  name: backend
+ main:
+  banner-mode: off
+ jpa:
+  hibernate:
+   ddl-auto: update
+  show-sql: true
+  generate-ddl: true
+ docker:
+  compose:
+   file: backend/compose.yaml
+ datasource:
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  username: ${DB_USER}
+  password: ${DB_PASSWORD}
+  url: ${DB_URL}
+ security:
+  oauth2:
+   client:
+    registration:
+     google:
+      client-id: 879966526770-k6ne16qhmqaa5171ba0h476cmpq53gpu.apps.googleusercontent.com
+      client-secret: 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
+      scope:
+       - email
+       - profile
+      redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+    provider:
+      google:
+       authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+       token-uri: https://oauth2.googleapis.com/token
+       user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
+server:
+  port: 8000
+
+logging:
+    level:
+      org:
+       hibernate:
+        SQL: DEBUG
+        type:
+         descriptor:
+          sql: TRACE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
