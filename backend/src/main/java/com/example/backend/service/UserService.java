@@ -4,6 +4,7 @@ import com.example.backend.controller.UserController;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
 import com.example.backend.exception.Exceptions;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,13 +22,13 @@ public class UserService {
 
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
-
-    ;
 
     public User createUser(User user) {
         return userRepository.save(user);
@@ -56,34 +57,19 @@ public class UserService {
 
         if (users.isEmpty()) {
             logger.warn("No users found in the database.");
-            throw new RuntimeException("No users found."); // Throws exception instead of returning null
+            throw new RuntimeException("No users found.");
         }
 
         logger.info("Users fetched successfully: {}", users.size());
-        return users.stream()
-                .map(user -> new UserDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getPhoneNumber(),
-                        user.getEmail(),
-                        user.getUser_rank(),
-                        user.getRole()
-                ))
-                .collect(Collectors.toList());
+        return userMapper.toUserDTOList(users);
     }
 
     public UserDTO getUserById(Long id) {
         logger.info("Fetching user with ID {}", id);
-        Optional<User> userOptional = userRepository.findById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
-        return userOptional.map(user -> new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getPhoneNumber(),
-                user.getEmail(),
-                user.getUser_rank(),
-                user.getRole()
-        )).orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+        return userMapper.toUserDTO(user);
     }
 
     public Optional<User> findByName(String name) {

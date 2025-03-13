@@ -48,11 +48,11 @@ public class FreezerController {
     }
 
     // GET FREEZER BY ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Freezer> findById(@PathVariable Long id) {
-        Freezer freezer = freezerService.findById(id);
-        return ResponseEntity.ok(freezer);
-    }
+/*    @GetMapping("/{id}")
+    public ResponseEntity<FreezerDTO> findById(@PathVariable Long id) {
+        FreezerDTO dto = freezerService.findById(id);
+        return ResponseEntity.ok(dto);
+    }*/
 
     // GET ALL FREEZERS WITH USERS (Convert to DTO)
     @GetMapping
