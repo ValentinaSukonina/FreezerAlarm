@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,6 +99,15 @@ public class UserController {
 
     public record UserRequest(String name) {
 
+    }
+
+    //check it !!!!
+    @GetMapping("/user")
+    public ResponseEntity<?> getAuthenticatedUser(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated.");
+        }
+        return ResponseEntity.ok(principal);
     }
 }
 

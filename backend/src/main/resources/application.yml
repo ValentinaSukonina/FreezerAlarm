@@ -28,22 +28,22 @@ spring:
        - profile
       redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
     provider:
-      google:
-       authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
-       token-uri: https://oauth2.googleapis.com/token
-       user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+     google:
+      authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+      token-uri: https://oauth2.googleapis.com/token
+      user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 
 server:
-  port: 8000
+ port: 8000
 
 logging:
-    level:
-      org:
-       hibernate:
-        SQL: DEBUG
-        type:
-         descriptor:
-          sql: TRACE
+ level:
+  org:
+   hibernate:
+    SQL: DEBUG
+   type:
+    descriptor:
+     sql: TRACE
 
 
 

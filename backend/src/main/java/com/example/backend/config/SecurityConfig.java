@@ -10,29 +10,25 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/create-account",
-                                "/api/users/check-user", // your specific endpoint
-                                "/oauth2/**",
-                                "/login/**",
-                                "/error", // make sure to allow error handling too
-                                "/**/*.css", "/**/*.js" // static files if needed
-                        ).permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // allow all OPTIONS
-                        .anyRequest().authenticated() // everything else needs auth
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/", true) // optional redirect after OAuth login
-                )
-                .cors(cors -> {}) // enable CORS (will use your CorsConfig)
-                .csrf(csrf -> csrf.disable()); // disable CSRF if using REST API
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/", "/create-account", "/api/users/check-user").permitAll() // public routes
+                            .requestMatchers("/oauth2/**", "/login/**", "/error").permitAll() // OAuth2 flow
+                            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // CORS preflight
+                            .anyRequest().authenticated() // everything else needs login
+                    )
+                    .oauth2Login(oauth -> oauth
+                            .defaultSuccessUrl("/", true) // redirect home after successful login
+                    )
+                    .cors(cors -> {})
+                    .csrf(csrf -> csrf.disable());
 
-        return http.build();
+            return http.build();
+        }
     }
-}
+
+
+
 
