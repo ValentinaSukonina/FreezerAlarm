@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {fetchAllFreezersWithUsers} from "../services/api"; // API call for all freezers
 import FreezerCard from "../components/FreezerCard"; // Import FreezerCard
-import axios from "axios";
 
 const FreezersAll = () => {
     const [freezers, setFreezers] = useState([]);
@@ -28,11 +27,13 @@ const FreezersAll = () => {
     if (freezers.length === 0) return <p>No freezers available.</p>;
 
     return (
-        <div>
-            <h2>Freezers Biomedicine</h2>
-            {freezers.map((freezer) => (
-                <FreezerCard key={freezer.id} freezer={freezer}/>
-            ))}
+        <div className="content-wrapper mx-2 my-1">
+            <h2 className="text-center my-4">Freezers Biomedicine</h2>
+            <div className="freezer-grid">
+                {freezers.map((freezer) => (
+                    <FreezerCard key={freezer.id} freezer={freezer}/>
+                ))}
+            </div>
         </div>
     );
 };

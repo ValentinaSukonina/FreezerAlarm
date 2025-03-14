@@ -1,16 +1,16 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.FreezerDTO;
-import com.example.backend.dto.FreezerUserDTO;
 import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/freezers")
 public class FreezerController {
-
+    private static final Logger logger = LoggerFactory.getLogger(FreezerController.class);
     private final FreezerService freezerService;
     private final FreezerRepository freezerRepository;
 
@@ -52,9 +52,9 @@ public class FreezerController {
 
     // GET FREEZER BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<Freezer> findById(@PathVariable Long id) {
-        Freezer freezer = freezerService.findById(id);
-        return ResponseEntity.ok(freezer);
+    public ResponseEntity<FreezerDTO> findById(@PathVariable Long id) {
+        FreezerDTO dto = freezerService.findById(id);
+        return ResponseEntity.ok(dto);
     }
 
     // GET ALL FREEZERS WITH USERS (Convert to DTO)
