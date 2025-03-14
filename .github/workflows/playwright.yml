@@ -21,14 +21,14 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Start Backend Server
-      run: mvn spring-boot:run -f backend/pom.xml &
+      run: mvn spring-boot:run -f ../backend/pom.xml &
       working-directory: backend
     - name: Build Vite Project
       run: npm run build
     - name: Start Vite Preview Server
       run: npm run preview &
     - name: Wait for server to be ready
-      run: npx wait-on --resources http://localhost:5173 http://localhost:8080
+      run: npx wait-on http-get://localhost:5173 http-get://localhost:8080
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4
