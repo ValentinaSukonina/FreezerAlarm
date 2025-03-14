@@ -25,7 +25,7 @@ jobs:
     - name: Start Vite Preview Server
       run: npm run preview &
     - name: Wait for server to be ready
-      run: npx wait-on http://localhost:4173
+      run: npx wait-on http://localhost:5173
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4
