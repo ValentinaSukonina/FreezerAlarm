@@ -31,11 +31,11 @@ public class FreezerUserService {
     public FreezerUser bindUserToFreezer(Long userId, Long freezerId) {
         // Validate if the user exists
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exceptions.NotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found with ID: " + userId));
 
         // Validate if the freezer exists
         Freezer freezer = freezerRepository.findById(freezerId)
-                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer not found with ID: " + freezerId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer not found with ID: " + freezerId));
 
         // Prevent duplicate binding
         boolean alreadyExists = freezerUserRepository.existsByUserIdAndFreezerId(userId, freezerId);
@@ -53,32 +53,32 @@ public class FreezerUserService {
     public void unbindUserFromFreezer(Long userId, Long freezerId) {
         // Find the user
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exceptions.NotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found with ID: " + userId));
 
         // Find the freezer
         Freezer freezer = freezerRepository.findById(freezerId)
-                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer not found with ID: " + freezerId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer not found with ID: " + freezerId));
 
         // Delete association
         int deletedCount = freezerUserRepository.deleteByFreezerAndUser(freezer, user);
 
         if (deletedCount == 0) {
-            throw new Exceptions.NotFoundException("No association found between user " + userId + " and freezer " + freezerId);
+            throw new Exceptions.ResourceNotFoundException("No association found between user " + userId + " and freezer " + freezerId);
         }
     }
 
     public FreezerUser updateFreezerUser(Long userId, Long oldFreezerId, Long newFreezerId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exceptions.NotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found with ID: " + userId));
 
         Freezer oldFreezer = freezerRepository.findById(oldFreezerId)
-                .orElseThrow(() -> new Exceptions.NotFoundException("Old freezer not found with ID: " + oldFreezerId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Old freezer not found with ID: " + oldFreezerId));
 
         Freezer newFreezer = freezerRepository.findById(newFreezerId)
-                .orElseThrow(() -> new Exceptions.NotFoundException("New freezer not found with ID: " + newFreezerId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("New freezer not found with ID: " + newFreezerId));
 
         FreezerUser freezerUser = freezerUserRepository.findByFreezerAndUser(oldFreezer, user)
-                .orElseThrow(() -> new Exceptions.NotFoundException("No association found between user " + userId + " and freezer " + oldFreezerId));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("No association found between user " + userId + " and freezer " + oldFreezerId));
 
         freezerUser.setFreezer(newFreezer);
         return freezerUserRepository.save(freezerUser);
@@ -86,11 +86,11 @@ public class FreezerUserService {
 
     public List<UserDTO> getUsersByFreezerNumber(String freezerNumber) {
         Freezer freezer = freezerRepository.findByNumber(freezerNumber)
-                .orElseThrow(() -> new Exceptions.NotFoundException("Freezer with number " + freezerNumber + " does not exist."));
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer with number " + freezerNumber + " does not exist."));
         List<User> users = freezerUserRepository.findUsersByFreezerNumber(freezerNumber);
 
         if (users.isEmpty()) {
-            throw new Exceptions.NotFoundException("No users found for freezer number: " + freezerNumber);
+            throw new Exceptions.ResourceNotFoundException("No users found for freezer number: " + freezerNumber);
         }
 
         return users.stream()

@@ -27,7 +27,7 @@ const FreezerContent = () => {
     if (loading) return <p>Loading freezer data...</p>;
 
     return (
-        <div className="content-wrapper">
+        <div>
             {error ? (
                 <p className="m-3">Error: {error}</p>
             ) : freezer ? (

@@ -17,7 +17,8 @@ html, body, #root {
 }
 
 .content-wrapper {
-    padding-top: 15px; /* Adjust based on your header height */
+    padding-top: 10px; /* Adjust based on your header height */
+    margin-top: inherit;
 }
 
 /* Title Hover Effect */
@@ -100,4 +101,26 @@ html, body, #root {
 
 .list-text {
     text-align: left;
+}
+
+/* Freezer grid container */
+.freezer-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centers the cards */
+    gap: 5px; /* Space between cards */
+}
+
+/* Ensure single column on small screens */
+@media (max-width: 768px) {
+    .freezer-grid {
+        flex-direction: column; /* Stack in 1 column */
+        align-items: center; /* Center the single column */
+    }
+}
+
+/* Ensure consistent card width */
+.freezer-card {
+    width: 100%; /* Take full width by default */
+    max-width: 400px; /* Limit max width */
 }
