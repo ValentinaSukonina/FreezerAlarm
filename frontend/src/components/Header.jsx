@@ -1,4 +1,6 @@
 import React, {useEffect, useState, useRef} from "react";
+import {fetchFreezerWithUsers} from "../services/search";
+import FreezerCard from "../components/FreezerCard";
 import "../assets/styles.css";
 
 console.log("Header.tsx: Rendering Header component...");
@@ -20,6 +22,27 @@ const Header = () => {
         }
     }, [isOpen]);
 
+    // Search for freezer with munber
+    const SearchFreezer = () => {
+        const [searchNumber, setSearchNumber] = useState("");
+        const [freezer, setFreezer] = useState(null);
+        const [error, setError] = useState(null);
+
+        const handleSearch = async (event) => {
+            event.preventDefault();
+            setError(null);
+            setFreezer(null);
+
+            try {
+                const data = await fetchFreezerWithUsers(searchNumber);
+                setFreezer(data);
+            } catch (err) {
+                setError("No freezer found for this number.");
+            }
+        };
+        return null; // You may replace this with a UI component
+    };
+
     return (
         <>
             <nav
@@ -36,11 +59,13 @@ const Header = () => {
 
                     {/* Search Bar - Always in the center on large screens */}
                     <div className="d-none d-lg-flex justify-content-center flex-grow-1">
-                        <form className="d-flex w-auto mx-auto">
+                        <form className="d-flex w-auto mx-auto" onSubmit={handleSearch}>
                             <input
                                 className="form-control mx-3"
                                 type="search"
                                 placeholder="Search for freezer"
+                                value={searchNumber}
+                                onChange={(e) => setSearchNumber(e.target.value)}
                                 aria-label="Search"
                                 style={{
                                     backgroundColor: "#F4FFC3",
