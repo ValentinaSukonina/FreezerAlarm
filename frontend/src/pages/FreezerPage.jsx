@@ -1,10 +1,10 @@
 import React from 'react';
 import {useParams} from "react-router-dom";
-import FreezerContent from "../components/FreezerContent";
+import FreezerResult from "../components/FreezerResult";
 
 const FreezerPage = () => {
     const {freezerNumber} = useParams(); // Get URL parameter
-    return <FreezerContent freezerNumber={freezerNumber}/>;
+    return <FreezerResult freezerNumber={freezerNumber}/>;
 };
 
 export default FreezerPage;
