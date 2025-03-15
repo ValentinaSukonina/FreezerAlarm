@@ -5,7 +5,7 @@ import Header from './components/Header.jsx';
 import Home from "./pages/Home";
 import Footer from "./components/Footer.jsx";
 import Personal from "./pages/Personal";
-import CreateAccount from "./pages/CreateAccount";
+import Login from "./pages/Login";
 import Freezers from "./pages/Freezers";
 import FreezerPage from "./pages/FreezerPage";
 
@@ -20,7 +20,7 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={<Home/>}/>
                     <Route path="/personal" element={<Personal/>}/>
-                    <Route path="/create-account" element={<CreateAccount/>}/>
+                    <Route path="/create-account" element={<Login/>}/>
                     <Route path="/freezers" element={<Freezers/>}/>
                     <Route path="/freezers/:freezerNumber" element={<FreezerPage/>}/>
 

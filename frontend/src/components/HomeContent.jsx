@@ -34,7 +34,7 @@ const HomeContent = () => {
                     style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
                     onClick={() => navigate("/create-account")}
                 >
-                    Create Account
+                    Log in
                 </button>
 
             </div>
