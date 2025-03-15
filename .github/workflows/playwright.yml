@@ -45,6 +45,9 @@ jobs:
         run: mvn spring-boot:run -f pom.xml &
         working-directory: backend
 
+      - name: Install wait-on
+        run: npm install -g wait-on
+
       - name: Wait for Backend to be ready
         run: npx wait-on tcp:localhost:8080
 
