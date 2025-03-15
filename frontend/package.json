@@ -20,6 +20,8 @@
     "react-router-dom": "^7.1.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^22.13.10",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^4.3.9",
     "vite-plugin-svgr": "^4.3.0"
