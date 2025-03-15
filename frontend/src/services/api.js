@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://localhost:8000/api', // Ensure base URL is correct
+    baseURL: 'http://localhost:8000/api',
+    withCredentials: true // testa detta
 });
 
 export const fetchUsers = async () => {
