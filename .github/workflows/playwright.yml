@@ -66,12 +66,6 @@ jobs:
         run: npm run preview &
         working-directory: frontend
 
-      - name: Install wait-on
-        run: npm install -g wait-on
-
-      - name: Wait for Frontend to be ready
-        run: npx wait-on tcp:localhost:5173
-
       - name: Run Playwright tests
         run: npx playwright test
         working-directory: frontend
