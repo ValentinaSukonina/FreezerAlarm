@@ -1,11 +1,15 @@
 import React, {useEffect, useState, useRef} from "react";
+import {useNavigate} from "react-router-dom";
 import "../assets/styles.css";
 
 console.log("Header.tsx: Rendering Header component...");
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false); // State to track menu visibility
+    const [searchNumber, setSearchNumber] = useState("");
     const mobileSearchRef = useRef(null);
+    const navigate = useNavigate();
+
     const toggleNavbar = () => {
         setIsOpen(!isOpen); // Toggle open/close state
     };
@@ -19,6 +23,15 @@ const Header = () => {
             }, 300);
         }
     }, [isOpen]);
+
+    // Redirect to the freezer result page when searching
+    const handleSearch = (event) => {
+        event.preventDefault();
+        if (searchNumber.trim()) {
+            setIsOpen(false);  // Close the menu
+            navigate(`/freezers/${searchNumber}`); // Redirect to FreezerPage
+        }
+    };
 
     return (
         <>
@@ -36,11 +49,13 @@ const Header = () => {
 
                     {/* Search Bar - Always in the center on large screens */}
                     <div className="d-none d-lg-flex justify-content-center flex-grow-1">
-                        <form className="d-flex w-auto mx-auto">
+                        <form className="d-flex w-auto mx-auto" onSubmit={handleSearch}>
                             <input
                                 className="form-control mx-3"
                                 type="search"
                                 placeholder="Search for freezer"
+                                value={searchNumber}
+                                onChange={(e) => setSearchNumber(e.target.value)}
                                 aria-label="Search"
                                 style={{
                                     backgroundColor: "#F4FFC3",
@@ -90,12 +105,14 @@ const Header = () => {
 
                         {/* Search Bar - Only visible inside the menu on small screens */}
                         <div className="d-lg-none text-center mt-2">
-                            <form className="d-flex justify-content-center">
+                            <form className="d-flex justify-content-center" onSubmit={handleSearch}>
                                 <input
                                     ref={mobileSearchRef}
                                     className="form-control"
                                     type="search"
                                     placeholder="Search for freezer"
+                                    value={searchNumber}
+                                    onChange={(e) => setSearchNumber(e.target.value)}
                                     aria-label="Search"
                                     autoFocus
                                     style={{

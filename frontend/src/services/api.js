@@ -16,19 +16,32 @@ export const fetchUsers = async () => {
     }
 };
 
-export const fetchFreezerWithUsers = async (freezerNumber) => {
+export async function fetchFreezerWithUsers(freezerNumber) {
     try {
-        const response = await API.get(`/freezers/number/${freezerNumber}/with-users`);
-        return response.data;
+        const response = await fetch(`http://localhost:8000/api/freezers/number/${freezerNumber}/with-users`, {
+            method: "GET",
+            credentials: "include", // Ensure cookies/tokens are sent
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (response.status === 401) { // Unauthorized, needs login
+            alert("You must be logged in to view this content.");
+            window.location.href = "http://localhost:8000/oauth2/authorization/google"; // Redirect manually
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Error fetching freezer: ${response.statusText}`);
+        }
+
+        return await response.json();
     } catch (error) {
-        // Optionally, extract a more detailed message from the backend response:
-        const errMsg = error.response && error.response.data && error.response.data.message
-            ? error.response.data.message
-            : "Freezer not found";
-        console.error("Error fetching freezer:", errMsg);
-        throw new Error(errMsg);
+        console.error("Error fetching freezer:", error);
+        throw error;
     }
-};
+}
 
 // Fetch all freezers with users
 export const fetchAllFreezersWithUsers = async () => {

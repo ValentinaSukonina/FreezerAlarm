@@ -128,6 +128,7 @@ html, body, #root {
 .google-icon {
     width: 20px;
     height: 20px;
+}
 
 /* Freezer grid container */
 .freezer-grid {
@@ -135,6 +136,13 @@ html, body, #root {
     flex-wrap: wrap;
     justify-content: center; /* Centers the cards */
     gap: 5px; /* Space between cards */
+}
+
+/* FreezerCard */
+.freezer-card {
+    width: 100%; /* Take full width by default */
+    max-width: 400px;
+    min-width: 400px;
 }
 
 /* Ensure single column on small screens */
@@ -145,8 +153,4 @@ html, body, #root {
     }
 }
 
-/* Ensure consistent card width */
-.freezer-card {
-    width: 100%; /* Take full width by default */
-    max-width: 400px; /* Limit max width */
-}
+

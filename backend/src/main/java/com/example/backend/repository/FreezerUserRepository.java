@@ -28,3 +28,4 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     List<User> findUsersByFreezerNumber(@Param("freezerNumber") String freezerNumber);
 
 }
+
