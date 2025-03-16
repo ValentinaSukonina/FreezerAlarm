@@ -1,9 +1,11 @@
+version: "3.8"
+
 services:
   mysql:
     image: 'mysql:8.3.0'
     container_name: mysql_db
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_DATABASE: ${DB_NAME}c
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_USER: ${DB_USER}
@@ -19,6 +21,26 @@ services:
     networks:
       - backend-network
 
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot_backend
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    networks:
+      - backend-network
+
 networks:
   backend-network:
     driver: bridge
+
+

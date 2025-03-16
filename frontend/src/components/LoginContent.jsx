@@ -22,7 +22,7 @@ const LoginContent = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.fullName || !formData.email || !formData.phoneNumber) {
+        if (!formData.fullName || !formData.email ) {
             setMessage("❌ Please fill in all fields.");
             return;
         }
