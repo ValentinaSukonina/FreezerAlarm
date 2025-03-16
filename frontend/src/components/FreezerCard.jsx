@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import "../assets/styles.css";
 
 const FreezerCard = ({freezer}) => {
@@ -43,8 +44,20 @@ const FreezerCard = ({freezer}) => {
     };
 
     // Placeholder send function
+    const navigate = useNavigate(); // Initialize navigation
+
     const handleSend = () => {
-        console.log("Sending to selected users:", selectedUsers.filter(user => user.selectedEmail || user.selectedSms));
+        const selectedRecipients = selectedUsers.filter(user => user.selectedEmail || user.selectedSms);
+
+        console.log("Sending to selected users:", selectedRecipients);
+
+        // Navigate to confirmation page
+        navigate("/confirmation", {
+            state: {
+                freezerNumber: number,
+                recipients: selectedRecipients
+            }
+        });
     };
 
     return (

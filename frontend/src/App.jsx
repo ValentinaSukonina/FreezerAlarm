@@ -8,6 +8,7 @@ import Personal from "./pages/Personal";
 import Login from "./pages/Login";
 import Freezers from "./pages/Freezers";
 import FreezerPage from "./pages/FreezerPage";
+import AlertConfirmation from "./components/AlertConformation";
 
 
 console.log('App.jsx: Rendering App component...');
@@ -23,6 +24,7 @@ const App = () => {
                     <Route path="/create-account" element={<Login/>}/>
                     <Route path="/freezers" element={<Freezers/>}/>
                     <Route path="/freezers/:freezerNumber" element={<FreezerPage/>}/>
+                    <Route path="/confirmation" element={<AlertConfirmation/>}/>
                 </Routes>
                 <Footer/>
             </div>
