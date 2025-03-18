@@ -22,23 +22,22 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .successHandler((request, response, authentication) -> {
                             System.out.println("Logged in as: " + authentication.getName());
-                            response.sendRedirect("http://localhost:5173/freezers"); // Or whichever frontend you want
+                            response.sendRedirect("http://localhost:5173/freezers"); // Redirect to frontend after login
                         })
                 )
-
                 .logout(logout -> logout
-                        .logoutSuccessUrl("http://localhost:5173") // redirect here after logout
+                        .logoutSuccessUrl("http://localhost:5173") // Redirect to homepage after logout
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .clearAuthentication(true)
                 )
-
                 .cors(cors -> {})
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
 }
+
 
 
 
