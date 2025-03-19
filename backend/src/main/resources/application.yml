@@ -5,9 +5,12 @@ spring:
   banner-mode: off
  jpa:
   hibernate:
-   ddl-auto: update
-  show-sql: true
-  generate-ddl: true
+          ddl-auto: none  # Disable auto schema updates (Flyway handles migrations)
+  generate-ddl: false
+ flyway:
+     enabled: true
+     baseline-on-migrate: true
+     locations: classpath:db/migration
  docker:
   compose:
    file: backend/compose.yaml
