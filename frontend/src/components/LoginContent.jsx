@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios"; // Import axios to make API requests
 
 
+
+
 const LoginContent = () => {
     const [formData, setFormData] = useState({
         fullName: "",
@@ -46,6 +48,16 @@ const LoginContent = () => {
         }
     };
 
+    // Handle Google Login
+   /* const handleLogin = () => {
+        window.location.href = "http://localhost:8000/oauth2/authorization/google";
+    };*/
+    const handleLogin = () => {
+        sessionStorage.setItem("isLoggedIn", "true");
+        window.location.href = "http://localhost:8000/oauth2/authorization/google";
+    };
+
+
     return (
         <div className="container d-flex justify-content-center mt-5">
             <div className="col-md-6">
@@ -69,6 +81,7 @@ const LoginContent = () => {
                     </div>
                 </div>
 
+                {/* Form for user authorization */}
                 <form className="row g-3" onSubmit={handleSubmit}>
                     <div className="col-12">
                         <label htmlFor="inputName" className="form-label">Full Name</label>
@@ -124,6 +137,7 @@ const LoginContent = () => {
                     </div>
                 </form>
 
+                {/* Message */}
                 {message && (
                     <div className="alert mt-4 text-center"
                          style={{
@@ -136,17 +150,11 @@ const LoginContent = () => {
                     </div>
                 )}
 
+                {/* Google Login Button (shown only if authorized) */}
                 {isAuthorized && (
                     <div className="text-center mt-4">
                         <button
-                            onClick={() => {
-                                setFormData({
-                                    fullName: "",
-                                    email: "",
-                                    phoneNumber: ""
-                                });
-                                window.location.href = "http://localhost:8000/oauth2/authorization/google";
-                            }}
+                            onClick={handleLogin}
                             className="google-btn"
                         >
                             <svg className="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3">
@@ -165,6 +173,7 @@ const LoginContent = () => {
 };
 
 export default LoginContent;
+
 
 
 
