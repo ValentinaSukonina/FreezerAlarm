@@ -24,7 +24,7 @@ const LoginContent = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.fullName || !formData.email || !formData.phoneNumber) {
+        if (!formData.fullName || !formData.email) {
             setMessage("❌ Please fill in all fields.");
             return;
         }
@@ -48,10 +48,7 @@ const LoginContent = () => {
         }
     };
 
-    // Handle Google Login
-   /* const handleLogin = () => {
-        window.location.href = "http://localhost:8000/oauth2/authorization/google";
-    };*/
+
     const handleLogin = () => {
         sessionStorage.setItem("isLoggedIn", "true");
         window.location.href = "http://localhost:8000/oauth2/authorization/google";
@@ -111,19 +108,7 @@ const LoginContent = () => {
                         />
                     </div>
 
-                    <div className="col-12">
-                        <label htmlFor="inputPhone" className="form-label">Phone Number</label>
-                        <input
-                            type="tel"
-                            className="form-control"
-                            id="inputPhone"
-                            name="phoneNumber"
-                            placeholder="+46 123 456 789"
-                            value={formData.phoneNumber}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+
 
                     <div className="col-12 text-center mt-3">
                         <button
