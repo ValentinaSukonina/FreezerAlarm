@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles.css";
 
@@ -21,9 +21,10 @@ const Header = () => {
 
     const handleSearch = (event) => {
         event.preventDefault();
-        if (searchNumber.trim()) {
-            setIsOpen(false);
+        if (searchNumber.trim() && isLoggedIn) {
             navigate(`/freezers/${searchNumber}`);
+            setSearchNumber(""); // Clear search field after searching
+            setIsOpen(false); // Close navbar on mobile
         }
     };
 
@@ -45,12 +46,17 @@ const Header = () => {
                         <input
                             className="form-control mx-3"
                             type="search"
-                            placeholder="Search for freezer"
+                            placeholder={isLoggedIn ? "Search for freezer" : "Login to search"}
                             value={searchNumber}
                             onChange={(e) => setSearchNumber(e.target.value)}
+                            disabled={!isLoggedIn}
                             style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
                         />
-                        <button className="btn" type="submit" style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                        <button
+                            className="btn"
+                            type="submit"
+                            disabled={!isLoggedIn}
+                            style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
                             Search
                         </button>
                     </form>
@@ -68,20 +74,36 @@ const Header = () => {
 
                 {/* Navbar Items */}
                 <div className={`collapse navbar-collapse ${isOpen ? "show" : ""}`}>
-                    <ul className="navbar-nav ms-auto text-center">
+                    <ul className="navbar-nav ms-auto d-flex align-items-center text-center">
                         <li className="nav-item">
-                            <a className="nav-link text-white" href="/freezers">Freezers</a>
+                            <a
+                                className={`nav-link text-white ${!isLoggedIn ? "disabled" : ""}`}
+                                href={isLoggedIn ? "/freezers" : "#"}
+                                onClick={(e) => !isLoggedIn && e.preventDefault()}
+                                style={!isLoggedIn ? { opacity: 0.5, cursor: "not-allowed" } : {}}>
+                                Freezers
+                            </a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link text-white" href="/personal">Personal</a>
+                            <a
+                                className={`nav-link text-white ${!isLoggedIn ? "disabled" : ""}`}
+                                href={isLoggedIn ? "/personal" : "#"}
+                                onClick={(e) => !isLoggedIn && e.preventDefault()}
+                                style={!isLoggedIn ? { opacity: 0.5, cursor: "not-allowed" } : {}}>
+                                Personal
+                            </a>
                         </li>
 
                         {/* Conditionally render Login/Logout */}
                         <li className="nav-item">
                             {isLoggedIn ? (
-                                <button className="btn nav-link text-white" onClick={handleLogout}>
+                                <a
+                                    className="nav-link text-white"
+                                    href="#"
+                                    onClick={handleLogout}
+                                    style={{ cursor: "pointer" }}>
                                     Logout
-                                </button>
+                                </a>
                             ) : (
                                 <a className="nav-link text-white fw-bold" href="/create-account">
                                     Login
@@ -90,20 +112,27 @@ const Header = () => {
                         </li>
                     </ul>
 
-                    {/* Mobile Search (Optional - if needed) */}
-                    <form className="d-flex d-lg-none my-3 justify-content-center" onSubmit={handleSearch}>
-                        <input
-                            className="form-control"
-                            type="search"
-                            placeholder="Search for freezer"
-                            value={searchNumber}
-                            onChange={(e) => setSearchNumber(e.target.value)}
-                            style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
-                        />
-                        <button className="btn ms-2" type="submit" style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
-                            Search
-                        </button>
-                    </form>
+                    {/* Search Bar for Mobile - Appears inside menu when open */}
+                    {isOpen && (
+                        <form className="d-flex d-lg-none my-3 justify-content-center" onSubmit={handleSearch}>
+                            <input
+                                className="form-control"
+                                type="search"
+                                placeholder={isLoggedIn ? "Search for freezer" : "Login to search"}
+                                value={searchNumber}
+                                onChange={(e) => setSearchNumber(e.target.value)}
+                                disabled={!isLoggedIn}
+                                style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
+                            />
+                            <button
+                                className="btn ms-2"
+                                type="submit"
+                                disabled={!isLoggedIn}
+                                style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                                Search
+                            </button>
+                        </form>
+                    )}
                 </div>
             </div>
         </nav>
@@ -111,3 +140,7 @@ const Header = () => {
 };
 
 export default Header;
+
+
+
+
