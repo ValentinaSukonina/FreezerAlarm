@@ -10,7 +10,7 @@ export class HomePage extends BasePage {
         super(page);
 
         this.searchButton = this.page.getByRole('button', { name: 'Search' });
-        this.createAccountButton = this.page.getByRole('button', { name: 'Create Account' });
+        this.createAccountButton = this.page.getByRole('button', { name: 'Log in' });
     }
 
     async visit() {
