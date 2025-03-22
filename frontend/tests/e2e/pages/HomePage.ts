@@ -1,16 +1,14 @@
 import { BasePage } from "./base/BasePage";
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 export class HomePage extends BasePage {
 
-    readonly searchButton: Locator;
-    readonly createAccountButton: Locator;
+    readonly loginButton: Locator;
 
     constructor(readonly page: Page) {
         super(page);
 
-        this.searchButton = this.page.getByRole('button', { name: 'Search' });
-        this.createAccountButton = this.page.getByRole('button', { name: 'Log in' });
+        this.loginButton = this.page.getByRole('button', { name: 'Log in' });
     }
 
     async visit() {
@@ -19,11 +17,6 @@ export class HomePage extends BasePage {
 
     async close() {
         await this.page.close();
-    }
-
-    async verifyButtonsVisible() {
-        await expect(this.searchButton).toBeVisible();
-        await expect(this.createAccountButton).toBeVisible();
     }
 
 }
