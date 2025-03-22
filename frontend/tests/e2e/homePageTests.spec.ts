@@ -15,14 +15,21 @@ test.describe('Home Page Tests', () => {
 
     test('navbar should be visible', async () => {
         await expect(homePage.navbar.navigation).toBeVisible();
-    });
-
-    test('navbar should have a search input', async () => {
+        await expect(homePage.navbar.header).toBeVisible();
         await expect(homePage.navbar.searchInput).toBeVisible();
+        await expect(homePage.navbar.searchButton).toBeVisible();
+        await expect(homePage.navbar.freezersButton).toBeVisible();
+        await expect(homePage.navbar.personalButton).toBeVisible();
+        await expect(homePage.navbar.loginButton).toBeVisible();
     });
 
-    test('buttons should be visible', async () => {
-        await homePage.verifyButtonsVisible();
+    test('login button should be visible', async () => {
+        await expect(homePage.loginButton).toBeVisible();
+    });
+
+    test('footer should be visible', async () => {
+        await expect(homePage.footer.contentInfo).toBeVisible();
+        await expect(homePage.footer.copyrightText).toBeVisible();
     });
 
 });
