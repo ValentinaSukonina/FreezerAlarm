@@ -1,8 +1,38 @@
 import React from "react";
 import {useNavigate} from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const HomeContent = () => {
     const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const checkLogin = () => {
+            const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+            setIsLoggedIn(loggedIn);
+        };
+
+        // Initial check
+        checkLogin();
+
+        // Optional: Update on storage change (e.g., in other tabs)
+        window.addEventListener("storage", checkLogin);
+
+        return () => {
+            window.removeEventListener("storage", checkLogin);
+        };
+    }, []);
+
+    const handleLogin = () => {
+        navigate("/create-account");
+    };
+
+    const handleLogout = () => {
+        sessionStorage.removeItem("isLoggedIn");
+        sessionStorage.removeItem("role");
+        window.location.href = "http://localhost:8000/logout";
+    };
+
     return (
         <div className="container d-flex justify-content-center align-items-center text-center py-5 mt-3">
             <div className="col-md-8">
@@ -31,12 +61,11 @@ const HomeContent = () => {
                 <button
                     type="button"
                     className="btn btn-lg mt-3"
-                    style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
-                    onClick={() => navigate("/create-account")}
+                    style={{ backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white" }}
+                    onClick={isLoggedIn ? handleLogout : handleLogin}
                 >
-                    Log in
+                    {isLoggedIn ? "Logout" : "Log in"}
                 </button>
-
             </div>
         </div>
     );
