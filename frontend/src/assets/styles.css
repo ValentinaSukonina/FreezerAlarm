@@ -5,15 +5,8 @@ html, body, #root {
     flex-direction: column;
 }
 
-.main-content {
-    display: flex;
-    margin-top: 40px;
-    flex-direction: column;
-    min-height: 100vh; /* Ensures full height */
-}
-
-.main-content > *:not(footer) {
-    flex-grow: 1; /* Allows content to expand, but NOT the footer */
+main {
+    padding-top: 40px; /* or whatever your header height is */
 }
 
 .content-wrapper {
@@ -156,7 +149,7 @@ html, body, #root {
 .freezer-card {
     width: 100%; /* Take full width by default */
     max-width: 500px;
-    min-width: 400px;
+    min-width: 375px;
 }
 
 /* Ensure single column on small screens */
@@ -165,6 +158,10 @@ html, body, #root {
         flex-direction: column; /* Stack in 1 column */
         align-items: center; /* Center the single column */
     }
+}
+
+* {
+    outline: 1px dashed red; /* REMOVE after debugging */
 }
 
 

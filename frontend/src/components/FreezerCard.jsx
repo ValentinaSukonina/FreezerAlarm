@@ -61,7 +61,7 @@ const FreezerCard = ({freezer}) => {
     };
 
     return (
-        <div className="container my-2 freezer-card d-flex justify-content-center align-items-center">
+        <div className="container my-2 freezer-card freezer-card mx-auto my-2 px-3 py-3">
             <div className="row p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg"
                  style={{width: "100%"}}>
                 <div className="p-2 pt-lg-2 text-start">
