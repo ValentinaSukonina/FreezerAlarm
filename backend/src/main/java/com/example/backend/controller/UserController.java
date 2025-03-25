@@ -36,14 +36,30 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    @DeleteMapping("/{id}")
+   /* @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         if (!userRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }*/
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        if (!userRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            userService.deleteUserById(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            logger.error("Failed to delete user with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete user");
+        }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
@@ -55,7 +71,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping
+   /* @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {
             List<UserDTO> users = userService.getAllUsers();
@@ -68,9 +84,22 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred.");
         }
-    }
+    }*/
+   @GetMapping
+   public ResponseEntity<?> getAllUsers() {
+       try {
+           List<UserDTO> users = userService.getAllUsers();
+           return ResponseEntity.ok(users);
+       } catch (Exception e) {
+           logger.error("Error fetching users", e);
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("An unexpected error occurred.");
+       }
+   }
 
-    @GetMapping("/{id}")
+
+
+    /* @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             UserDTO userDTO = userService.getUserById(id);
@@ -83,7 +112,19 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred.");
         }
-    }
+    }*/
+   @GetMapping("/{id}")
+   public ResponseEntity<?> getUserById(@PathVariable Long id) {
+       try {
+           UserDTO userDTO = userService.getUserById(id);
+           return ResponseEntity.ok(userDTO);
+       } catch (Exception e) {
+           logger.error("Error fetching user with ID {}", id, e);
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("An unexpected error occurred.");
+       }
+   }
+
 
     @PostMapping("/check-user")
     public ResponseEntity<?> checkUser(@RequestBody UserRequest request) {
