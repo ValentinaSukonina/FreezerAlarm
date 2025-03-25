@@ -91,3 +91,14 @@ export const fetchAllFreezersWithUsers = async () => {
     }
 
 };
+
+// Fetch the authenticated user's role
+export const fetchUserRole = async () => {
+    try {
+        const response = await API.get('/users/user'); // this hits your /api/users/user endpoint
+        return response.data?.role || null;
+    } catch (error) {
+        console.error("Failed to fetch user role:", error.response ? error.response.data : error.message);
+        return null;
+    }
+};

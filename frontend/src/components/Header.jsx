@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assets/styles.css";
-
-
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +63,12 @@ const Header = () => {
                             disabled={!isLoggedIn}
                             style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
                         />
-                        <button className="btn" type="submit" disabled={!isLoggedIn} style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                        <button
+                            className="btn"
+                            type="submit"
+                            disabled={!isLoggedIn}
+                            style={{ backgroundColor: "#A9C46C", color: "#fff" }}
+                        >
                             Search
                         </button>
                     </form>
@@ -125,7 +127,12 @@ const Header = () => {
                                 disabled={!isLoggedIn}
                                 style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
                             />
-                            <button className="btn ms-2" type="submit" disabled={!isLoggedIn} style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                            <button
+                                className="btn ms-2"
+                                type="submit"
+                                disabled={!isLoggedIn}
+                                style={{ backgroundColor: "#A9C46C", color: "#fff" }}
+                            >
                                 Search
                             </button>
                         </form>
@@ -137,6 +144,7 @@ const Header = () => {
 };
 
 export default Header;
+
 
 
 

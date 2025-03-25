@@ -71,20 +71,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-   /* @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        try {
-            List<UserDTO> users = userService.getAllUsers();
-            return ResponseEntity.ok(users);
-        } catch (RuntimeException e) { // Handles "No users found" exception
-            logger.warn("No users found: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) { // Handles any unexpected error
-            logger.error("Error fetching users", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred.");
-        }
-    }*/
    @GetMapping
    public ResponseEntity<?> getAllUsers() {
        try {
@@ -99,20 +85,7 @@ public class UserController {
 
 
 
-    /* @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        try {
-            UserDTO userDTO = userService.getUserById(id);
-            return ResponseEntity.ok(userDTO);
-        } catch (RuntimeException e) {
-            logger.warn("User with ID {} not found: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            logger.error("Error fetching user with ID {}", id, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred.");
-        }
-    }*/
+
    @GetMapping("/{id}")
    public ResponseEntity<?> getUserById(@PathVariable Long id) {
        try {
@@ -139,7 +112,7 @@ public class UserController {
     public record UserRequest(String name) {
     }
 
-    //check it !!!!
+
     @GetMapping("/user")
     public ResponseEntity<?> getAuthenticatedUser(Principal principal) {
         if (principal == null) {
