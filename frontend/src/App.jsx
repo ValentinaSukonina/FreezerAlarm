@@ -16,16 +16,19 @@ console.log('App.jsx: Rendering App component...');
 const App = () => {
     return (
         <Router> {/* Router should wrap everything */}
-            <div className="main-content">
+            <div className="d-flex flex-column min-vh-100">
                 <Header/>
-                <Routes>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="/personal" element={<Personal/>}/>
-                    <Route path="/create-account" element={<Login/>}/>
-                    <Route path="/freezers" element={<Freezers/>}/>
-                    <Route path="/freezers/:freezerNumber" element={<FreezerPage/>}/>
-                    <Route path="/confirmation" element={<AlertConfirmation/>}/>
-                </Routes>
+                {/* Main content that grows */}
+                <main className="flex-grow-1 d-flex flex-column">
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/personal" element={<Personal/>}/>
+                        <Route path="/create-account" element={<Login/>}/>
+                        <Route path="/freezers" element={<Freezers/>}/>
+                        <Route path="/freezers/:freezerNumber" element={<FreezerPage/>}/>
+                        <Route path="/confirmation" element={<AlertConfirmation/>}/>
+                    </Routes>
+                </main>
                 <Footer/>
             </div>
         </Router>

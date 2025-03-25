@@ -65,7 +65,6 @@ public class FreezerUserController {
         }
     }
 
-
     // DELETE User-Freezer Association
     @DeleteMapping
     public ResponseEntity<String> unbindUserFromFreezer(@RequestBody FreezerUserRequest request) {
