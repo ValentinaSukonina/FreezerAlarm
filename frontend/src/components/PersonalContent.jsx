@@ -6,16 +6,14 @@ import { fetchUsers, updateUser, deleteUser, createUser } from '../services/api'
 
 console.log("PersonalContent.jsx: Rendering PersonalContent component...");
 
-
 const PersonalContent = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [editingUserId, setEditingUserId] = useState(null);
     const [newUser, setNewUser] = useState({
-        name: "", email: "", phone_number: "", role: ""
+        name: "", email: "", phone_number: "", user_rank: "", role: ""
     });
-
 
 
     useEffect(() => {
@@ -45,29 +43,22 @@ const PersonalContent = () => {
     const handleSave = async (userId) => {
         const userToUpdate = users.find((user) => user.id === userId);
         try {
-            await updateUser(userId, userToUpdate); // ✅ Pass ID and data
+            await updateUser(userId, userToUpdate);
             setEditingUserId(null);
         } catch (err) {
             alert("Failed to update user");
         }
     };
 
-
-
     const handleDelete = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
-
-        console.log("Deleting user with ID:", userId);
-
         try {
             await deleteUser(userId);
             setUsers((prev) => prev.filter((user) => user.id !== userId));
         } catch (err) {
-            console.error("Delete failed:", err);
             alert("Failed to delete user");
         }
     };
-
 
     const handleNewChange = (e) => {
         const { name, value } = e.target;
@@ -83,13 +74,11 @@ const PersonalContent = () => {
         try {
             const created = await createUser(newUser);
             setUsers((prev) => [...prev, created]);
-            setNewUser({ name: "", email: "", phone_number: "", role: "" });
+            setNewUser({ name: "", email: "", phone_number: "", role: "", rank: "" });
         } catch (err) {
             alert("Failed to create user");
         }
     };
-
-
 
     return (
         <main className="container mt-5">
@@ -98,16 +87,41 @@ const PersonalContent = () => {
             {loading && <p className="text-center">Loading users...</p>}
             {error && <p className="text-center text-danger">{error}</p>}
 
-
             {/* Add New User */}
             <div className="mb-4 mt-3 border p-3 rounded" style={{ backgroundColor: "#f8fff0" }}>
                 <h5>Add New User</h5>
                 <div className="row g-2">
-                    <input name="name" className="form-control col" placeholder="Name" value={newUser.name} onChange={handleNewChange} />
-                    <input name="email" className="form-control col" placeholder="Email" value={newUser.email} onChange={handleNewChange} />
-                    <input name="phone_number" className="form-control col" placeholder="Phone" value={newUser.phone_number} onChange={handleNewChange} />
-                    <input name="role" className="form-control col" placeholder="Role" value={newUser.role} onChange={handleNewChange} />
-                    <button className="btn btn-success col-2" onClick={handleAddUser}>Add</button>
+                    <input name="name" className="form-control col" placeholder="Name" value={newUser.name}
+                           onChange={handleNewChange}/>
+                    <input name="email" className="form-control col" placeholder="Email" value={newUser.email}
+                           onChange={handleNewChange}/>
+                    <input name="phone_number" className="form-control col" placeholder="Phone"
+                           value={newUser.phone_number} onChange={handleNewChange}/>
+                    <input name="user_rank" className="form-control col" placeholder="Rank"
+                           value={newUser.user_rank} onChange={handleNewChange}/>
+
+                    <input name="role" className="form-control col" placeholder="Role" value={newUser.role}
+                           onChange={handleNewChange}/>
+
+                    <button
+                        className="btn btn-sm"
+                        style={{
+                            backgroundColor: "#5D8736",
+                            color: "white",
+                            border: "none",
+                            padding: "6px 16px",
+                            fontSize: "14px",
+                            borderRadius: "5px",
+                            width: "auto",        // No full-width stretch
+                            alignSelf: "center",  // Center vertically if needed
+                            height: "38px"        // Consistent height with inputs
+                        }}
+                        onClick={handleAddUser}
+                    >
+                        Add
+                    </button>
+
+
                 </div>
             </div>
 
@@ -125,6 +139,7 @@ const PersonalContent = () => {
                             <th>Name</th>
                             <th>Email</th>
                             <th>Phone Number</th>
+                            <th>Rank</th>
                             <th>Role</th>
                             <th>Actions</th>
                         </tr>
@@ -134,35 +149,78 @@ const PersonalContent = () => {
                             <tr key={user.id}>
                                 <td>
                                     {editingUserId === user.id ? (
-                                        <input name="name" value={user.name} onChange={(e) => handleEditChange(e, user.id)} />
+                                        <input name="name" value={user.name}
+                                               onChange={(e) => handleEditChange(e, user.id)}/>
                                     ) : user.name}
                                 </td>
                                 <td>
                                     {editingUserId === user.id ? (
-                                        <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} />
+                                        <input name="email" value={user.email}
+                                               onChange={(e) => handleEditChange(e, user.id)}/>
                                     ) : user.email}
                                 </td>
                                 <td>
                                     {editingUserId === user.id ? (
-                                        <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} />
+                                        <input name="phone_number" value={user.phone_number}
+                                               onChange={(e) => handleEditChange(e, user.id)}/>
                                     ) : user.phone_number}
                                 </td>
                                 <td>
                                     {editingUserId === user.id ? (
-                                        <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} />
+                                        <input name="user_rank" value={user.user_rank}
+                                               onChange={(e) => handleEditChange(e, user.id)}/>
+                                    ) : user.user_rank}
+                                </td>
+
+                                <td>
+                                    {editingUserId === user.id ? (
+                                        <input name="role" value={user.role}
+                                               onChange={(e) => handleEditChange(e, user.id)}/>
                                     ) : user.role}
                                 </td>
+
                                 <td>
                                     {editingUserId === user.id ? (
                                         <>
-                                            <button className="btn btn-success btn-sm me-2" onClick={() => handleSave(user.id)}>Save</button>
-                                            <button className="btn btn-secondary btn-sm" onClick={() => setEditingUserId(null)}>Cancel</button>
+                                            <button
+                                                className="btn btn-sm me-2"
+                                                style={{ backgroundColor: "#7BAE3F", color: "white", border: "none" }}
+                                                onClick={() => handleSave(user.id)}
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                className="btn btn-sm"
+                                                style={{ backgroundColor: "#6c757d", color: "white", border: "none" }}
+                                                onClick={() => setEditingUserId(null)}
+                                            >
+                                                Cancel
+                                            </button>
                                         </>
                                     ) : (
                                         <>
-                                            <button className="btn btn-primary btn-sm me-2" onClick={() => setEditingUserId(user.id)}>Edit</button>
-                                            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(user.id)}>Delete</button>
+                                            <button
+                                                className="btn btn-sm me-2"
+                                                style={{backgroundColor: "#5D8736", color: "white", border: "none"}}
+                                                onClick={() => setEditingUserId(user.id)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="btn btn-sm me-2"
+                                                style={{
+                                                    backgroundColor:"#A9C46C", // Light soft green (used in Bootstrap success alerts)
+                                                    color: "#dc3545",           // Bootstrap red text
+                                                    border: "1px solid #c3e6cb", // Optional border for definition
+                                                    fontWeight: "500"
+                                                }}
+                                                onClick={() => handleDelete(user.id)}
+                                            >
+                                                Delete
+                                            </button>
+
                                         </>
+
                                     )}
                                 </td>
                             </tr>
@@ -178,3 +236,4 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
