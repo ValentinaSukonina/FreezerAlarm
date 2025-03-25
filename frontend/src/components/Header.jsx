@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useEffect, useRef, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import "../assets/styles.css";
-
 
 
 const Header = () => {
@@ -10,6 +9,7 @@ const Header = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState("");
     const navigate = useNavigate();
+    const mobileSearchRef = useRef(null);
 
     useEffect(() => {
         const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
@@ -32,6 +32,12 @@ const Header = () => {
         }
     }, []);
 
+    useEffect(() => {
+        if (isOpen && isLoggedIn && mobileSearchRef.current) {
+            mobileSearchRef.current.focus();
+        }
+    }, [isOpen, isLoggedIn]);
+
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchNumber.trim() && isLoggedIn) {
@@ -48,7 +54,7 @@ const Header = () => {
     };
 
     return (
-        <nav className="navbar navbar-expand-lg fixed-top py-2" style={{ backgroundColor: "#5D8736" }}>
+        <nav className="navbar navbar-expand-lg fixed-top py-2" style={{backgroundColor: "#5D8736"}}>
             <div className="container-fluid px-3">
                 <a className="navbar-brand text-white fw-bold" href="/">
                     Freezer Alarm Management
@@ -64,9 +70,10 @@ const Header = () => {
                             value={searchNumber}
                             onChange={(e) => setSearchNumber(e.target.value)}
                             disabled={!isLoggedIn}
-                            style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
+                            style={{backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px"}}
                         />
-                        <button className="btn" type="submit" disabled={!isLoggedIn} style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                        <button className="btn" type="submit" disabled={!isLoggedIn}
+                                style={{backgroundColor: "#A9C46C", color: "#fff"}}>
                             Search
                         </button>
                     </form>
@@ -85,7 +92,7 @@ const Header = () => {
                                 className={`nav-link text-white ${!isLoggedIn ? "disabled" : ""}`}
                                 href={isLoggedIn ? "/freezers" : "#"}
                                 onClick={(e) => !isLoggedIn && e.preventDefault()}
-                                style={!isLoggedIn ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                                style={!isLoggedIn ? {opacity: 0.5, cursor: "not-allowed"} : {}}
                             >
                                 Freezers
                             </a>
@@ -95,7 +102,7 @@ const Header = () => {
                                 className={`nav-link text-white ${!isLoggedIn || role !== "admin" ? "disabled" : ""}`}
                                 href={isLoggedIn && role === "admin" ? "/personal" : "#"}
                                 onClick={(e) => (!isLoggedIn || role !== "admin") && e.preventDefault()}
-                                style={!isLoggedIn || role !== "admin" ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                                style={!isLoggedIn || role !== "admin" ? {opacity: 0.5, cursor: "not-allowed"} : {}}
                             >
                                 Personal
                             </a>
@@ -117,15 +124,17 @@ const Header = () => {
                     {isOpen && (
                         <form className="d-flex d-lg-none my-3 justify-content-center" onSubmit={handleSearch}>
                             <input
+                                ref={mobileSearchRef}
                                 className="form-control"
                                 type="search"
                                 placeholder={isLoggedIn ? "Search for freezer" : "Login to search"}
                                 value={searchNumber}
                                 onChange={(e) => setSearchNumber(e.target.value)}
                                 disabled={!isLoggedIn}
-                                style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
+                                style={{backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px"}}
                             />
-                            <button className="btn ms-2" type="submit" disabled={!isLoggedIn} style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                            <button className="btn ms-2" type="submit" disabled={!isLoggedIn}
+                                    style={{backgroundColor: "#A9C46C", color: "#fff"}}>
                                 Search
                             </button>
                         </form>
@@ -137,13 +146,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-
-
-
-
-
-
-
-
