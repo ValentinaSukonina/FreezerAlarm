@@ -8,28 +8,42 @@ const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchNumber, setSearchNumber] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [role, setRole] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
-        const loggedInUser = sessionStorage.getItem("isLoggedIn");
-        setIsLoggedIn(loggedInUser === "true");
+        const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+        const storedRole = sessionStorage.getItem("role");
+
+        setIsLoggedIn(loggedIn);
+        setRole(storedRole || "");
+
+        // If logged in but no role in sessionStorage, fetch from backend
+        if (loggedIn && !storedRole) {
+            fetch("http://localhost:8000/api/auth/role", {
+                credentials: "include"
+            })
+                .then((res) => res.text())
+                .then((fetchedRole) => {
+                    sessionStorage.setItem("role", fetchedRole);
+                    setRole(fetchedRole);
+                })
+                .catch((err) => console.error("Failed to fetch role", err));
+        }
     }, []);
 
-    const toggleNavbar = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const handleSearch = (event) => {
-        event.preventDefault();
+    const handleSearch = (e) => {
+        e.preventDefault();
         if (searchNumber.trim() && isLoggedIn) {
             navigate(`/freezers/${searchNumber}`);
-            setSearchNumber(""); // Clear search field after searching
-            setIsOpen(false); // Close navbar on mobile
+            setSearchNumber("");
+            setIsOpen(false);
         }
     };
 
     const handleLogout = () => {
         sessionStorage.removeItem("isLoggedIn");
+        sessionStorage.removeItem("role");
         window.location.href = "http://localhost:8000/logout";
     };
 
@@ -40,7 +54,7 @@ const Header = () => {
                     Freezer Alarm Management
                 </a>
 
-                {/* Search Bar (Large Screens) */}
+                {/* Desktop Search */}
                 <div className="d-none d-lg-flex justify-content-center flex-grow-1">
                     <form className="d-flex w-auto mx-auto" onSubmit={handleSearch}>
                         <input
@@ -52,56 +66,43 @@ const Header = () => {
                             disabled={!isLoggedIn}
                             style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
                         />
-                        <button
-                            className="btn"
-                            type="submit"
-                            disabled={!isLoggedIn}
-                            style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                        <button className="btn" type="submit" disabled={!isLoggedIn} style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
                             Search
                         </button>
                     </form>
                 </div>
 
-                {/* Mobile Menu Toggler */}
-                <button
-                    className="navbar-toggler"
-                    type="button"
-                    onClick={toggleNavbar}
-                    aria-expanded={isOpen}
-                    aria-label="Toggle navigation">
+                {/* Mobile Toggle */}
+                <button className="navbar-toggler" type="button" onClick={() => setIsOpen(!isOpen)}>
                     <span className="navbar-toggler-icon"></span>
                 </button>
 
                 {/* Navbar Items */}
                 <div className={`collapse navbar-collapse ${isOpen ? "show" : ""}`}>
-                    <ul className="navbar-nav ms-auto d-flex align-items-center text-center">
+                    <ul className="navbar-nav ms-auto text-center">
                         <li className="nav-item">
                             <a
                                 className={`nav-link text-white ${!isLoggedIn ? "disabled" : ""}`}
                                 href={isLoggedIn ? "/freezers" : "#"}
                                 onClick={(e) => !isLoggedIn && e.preventDefault()}
-                                style={!isLoggedIn ? { opacity: 0.5, cursor: "not-allowed" } : {}}>
+                                style={!isLoggedIn ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                            >
                                 Freezers
                             </a>
                         </li>
                         <li className="nav-item">
                             <a
-                                className={`nav-link text-white ${!isLoggedIn ? "disabled" : ""}`}
-                                href={isLoggedIn ? "/personal" : "#"}
-                                onClick={(e) => !isLoggedIn && e.preventDefault()}
-                                style={!isLoggedIn ? { opacity: 0.5, cursor: "not-allowed" } : {}}>
+                                className={`nav-link text-white ${!isLoggedIn || role !== "admin" ? "disabled" : ""}`}
+                                href={isLoggedIn && role === "admin" ? "/personal" : "#"}
+                                onClick={(e) => (!isLoggedIn || role !== "admin") && e.preventDefault()}
+                                style={!isLoggedIn || role !== "admin" ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                            >
                                 Personal
                             </a>
                         </li>
-
-                        {/* Conditionally render Login/Logout */}
                         <li className="nav-item">
                             {isLoggedIn ? (
-                                <a
-                                    className="nav-link text-white"
-                                    href="#"
-                                    onClick={handleLogout}
-                                    style={{ cursor: "pointer" }}>
+                                <a className="nav-link text-white" href="#" onClick={handleLogout}>
                                     Logout
                                 </a>
                             ) : (
@@ -112,7 +113,7 @@ const Header = () => {
                         </li>
                     </ul>
 
-                    {/* Search Bar for Mobile - Appears inside menu when open */}
+                    {/* Mobile Search */}
                     {isOpen && (
                         <form className="d-flex d-lg-none my-3 justify-content-center" onSubmit={handleSearch}>
                             <input
@@ -124,11 +125,7 @@ const Header = () => {
                                 disabled={!isLoggedIn}
                                 style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
                             />
-                            <button
-                                className="btn ms-2"
-                                type="submit"
-                                disabled={!isLoggedIn}
-                                style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
+                            <button className="btn ms-2" type="submit" disabled={!isLoggedIn} style={{ backgroundColor: "#A9C46C", color: "#fff" }}>
                                 Search
                             </button>
                         </form>
@@ -140,6 +137,12 @@ const Header = () => {
 };
 
 export default Header;
+
+
+
+
+
+
 
 
 
