@@ -70,7 +70,7 @@ const HomeContent = () => {
                     <h4>Start using it now</h4>
                     <button
                         type="button"
-                        className="btn btn-lg mt-3"
+                        className="btn btn-sm mt-2 px-4"
                         style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
                         onClick={isLoggedIn ? handleLogout : handleLogin}
                     >
