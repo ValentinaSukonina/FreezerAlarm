@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Freezers from "./pages/Freezers";
 import FreezerPage from "./pages/FreezerPage";
 import AlertConfirmation from "./components/AlertConformation";
+import Unauthorized from "./components/Unauthorized";
 
 
 console.log('App.jsx: Rendering App component...');
@@ -27,6 +28,7 @@ const App = () => {
                         <Route path="/freezers" element={<Freezers/>}/>
                         <Route path="/freezers/:freezerNumber" element={<FreezerPage/>}/>
                         <Route path="/confirmation" element={<AlertConfirmation/>}/>
+                        <Route path="/unauthorized" element={<Unauthorized />} />
                     </Routes>
                 </main>
                 <Footer/>
