@@ -16,6 +16,8 @@ const PersonalContent = () => {
         name: "", email: "", phone_number: "", role: ""
     });
 
+
+
     useEffect(() => {
         loadUsers();
     }, []);
@@ -43,12 +45,15 @@ const PersonalContent = () => {
     const handleSave = async (userId) => {
         const userToUpdate = users.find((user) => user.id === userId);
         try {
-            await updateUser(userToUpdate);
+            await updateUser(userId, userToUpdate); // ✅ Pass ID and data
             setEditingUserId(null);
         } catch (err) {
             alert("Failed to update user");
         }
     };
+
+
+
 
     const handleDelete = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
@@ -80,12 +85,15 @@ const PersonalContent = () => {
         }
     };
 
+
+
     return (
         <main className="container mt-5">
             <h2 className="text-center">List of Registered Personnel</h2>
 
             {loading && <p className="text-center">Loading users...</p>}
             {error && <p className="text-center text-danger">{error}</p>}
+
 
             {/* Add New User */}
             <div className="mb-4 mt-3 border p-3 rounded" style={{ backgroundColor: "#f8fff0" }}>
