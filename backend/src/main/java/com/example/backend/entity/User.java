@@ -41,7 +41,7 @@ public class User {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false,  unique = true,length = 50)
     @Email(message = "Invalid email format")
     private String email;
 

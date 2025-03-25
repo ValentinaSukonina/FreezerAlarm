@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
+
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -32,27 +34,27 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth -> oauth
-                                .successHandler((request, response, authentication) -> {
-                                    OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+                        .successHandler((request, response, authentication) -> {
+                            OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
-                                    // Debug: print all available attributes
-                                    oauthUser.getAttributes().forEach((k, v) -> System.out.println(k + ": " + v));
+                            // Debug: print all available attributes
+                            oauthUser.getAttributes().forEach((k, v) -> System.out.println(k + ": " + v));
 
-                                    String name = oauthUser.getAttribute("name");
-                                    System.out.println("Logged in as (name): " + name);
+                            String name = oauthUser.getAttribute("name");
+                            System.out.println("Logged in as (name): " + name);
 
-                                    userRepository.findByName(name).ifPresent(user -> {
-                                        HttpSession session = request.getSession();
-                                        session.setAttribute("isLoggedIn", "true");
-                                        session.setAttribute("role", user.getRole());
-                                        System.out.println("Stored role in session: " + user.getRole());
-                                    });
+                            // Use findByName instead of email
+                            userRepository.findByName(name).ifPresent(user -> {
+                                HttpSession session = request.getSession();
+                                session.setAttribute("isLoggedIn", "true");
 
-                                    response.sendRedirect("http://localhost:5173/freezers");
-                                })
+                                // Store the role (either 'admin' or 'user')
+                                session.setAttribute("role", user.getRole());
+                                System.out.println("Stored role in session: " + user.getRole());
+                            });
 
-
-
+                            response.sendRedirect("http://localhost:5173/freezers");
+                        })
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("http://localhost:5173")
@@ -67,6 +69,7 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
 
 
 
