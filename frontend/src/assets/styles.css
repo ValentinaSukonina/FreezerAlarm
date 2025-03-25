@@ -158,10 +158,26 @@ main {
         flex-direction: column; /* Stack in 1 column */
         align-items: center; /* Center the single column */
     }
+
+    .freezer-grid {
+        /* Centers the cards */
+        gap: 1px; /* Space between cards */
+    }
 }
 
-* {
-    outline: 1px dashed red; /* REMOVE after debugging */
+@media (max-width: 375px) {
+    .freezer-card {
+        margin-left: 0.25rem !important; /* smaller horizontal margins */
+        margin-right: 0.25rem !important;
+        padding-left: 0.5rem !important; /* smaller padding */
+        padding-right: 0.5rem !important;
+    }
+
+    .freezer-card .row {
+        padding: 1rem !important; /* shrink internal padding */
+    }
 }
+
+
 
 

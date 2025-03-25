@@ -28,7 +28,7 @@ const FreezersAll = () => {
 
     return (
         <div className="content-wrapper mx-2 my-1">
-            <h2 className="text-center my-4">Freezers Biomedicine</h2>
+            <h2 className="text-center mt-3 mb-2">Freezers Biomedicine</h2>
             <div className="freezer-grid">
                 {freezers.map((freezer) => (
                     <FreezerCard key={freezer.id} freezer={freezer}/>

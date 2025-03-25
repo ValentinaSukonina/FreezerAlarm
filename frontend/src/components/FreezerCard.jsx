@@ -61,7 +61,7 @@ const FreezerCard = ({freezer}) => {
     };
 
     return (
-        <div className="container my-2 freezer-card freezer-card mx-auto my-2 px-3 py-3">
+        <div className="freezer-card mx-auto my-2 px-3 py-1">
             <div className="row p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg"
                  style={{width: "100%"}}>
                 <div className="p-2 pt-lg-2 text-start">
@@ -72,8 +72,8 @@ const FreezerCard = ({freezer}) => {
                             Send notification
                         </button>
                     </div>
-                    <p><strong>Room:</strong> {room}</p>
-                    <p><strong>Address:</strong> {address}</p>
+                    <p className="mb-1"><strong>Room:</strong> {room}</p>
+                    <p className="mb-1"><strong>Address:</strong> {address}</p>
                     <p><strong>Type:</strong> {type}</p>
 
                     {/* Assigned Users Section */}
