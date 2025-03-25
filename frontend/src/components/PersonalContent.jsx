@@ -209,15 +209,19 @@ const PersonalContent = () => {
                                             <button
                                                 className="btn btn-sm me-2"
                                                 style={{
-                                                    backgroundColor:"#A9C46C", // Light soft green (used in Bootstrap success alerts)
-                                                    color: "#dc3545",           // Bootstrap red text
-                                                    border: "1px solid #c3e6cb", // Optional border for definition
-                                                    fontWeight: "500"
+                                                    backgroundColor: "#A9C46C",
+                                                    color: "#ffffff",  // white text default
+                                                    border: "1px solid #c3e6cb",
+                                                    fontWeight: "500",
+                                                    transition: "color 0.2s ease"
                                                 }}
+                                                onMouseEnter={(e) => e.target.style.color = "#fff700"} // yellow on hover
+                                                onMouseLeave={(e) => e.target.style.color = "#ffffff"} // back to white
                                                 onClick={() => handleDelete(user.id)}
                                             >
                                                 Delete
                                             </button>
+
 
                                         </>
 
