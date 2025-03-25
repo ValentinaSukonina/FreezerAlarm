@@ -5,6 +5,7 @@ import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
 import com.example.backend.exception.Exceptions;
 import com.example.backend.mapper.UserMapper;
+import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,12 +21,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserService {
 
+    private final FreezerUserRepository freezerUserRepository;
+
+
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(FreezerUserRepository freezerUserRepository, UserRepository userRepository, UserMapper userMapper) {
+        this.freezerUserRepository = freezerUserRepository;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
     }
@@ -37,6 +42,15 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+    @Transactional
+    public void deleteUserById(Long userId) {
+        // First, delete all freezer-user bindings for this user
+        freezerUserRepository.deleteByUserId(userId);
+
+        // Then, delete the user
+        userRepository.deleteById(userId);
+    }
+
 
     public User updateUser(Long id, User user) {
         return userRepository.findById(id).map(dbUser -> {

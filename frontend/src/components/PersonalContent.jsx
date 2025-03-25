@@ -54,16 +54,20 @@ const PersonalContent = () => {
 
 
 
-
     const handleDelete = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+        console.log("Deleting user with ID:", userId);
+
         try {
             await deleteUser(userId);
             setUsers((prev) => prev.filter((user) => user.id !== userId));
         } catch (err) {
+            console.error("Delete failed:", err);
             alert("Failed to delete user");
         }
     };
+
 
     const handleNewChange = (e) => {
         const { name, value } = e.target;
