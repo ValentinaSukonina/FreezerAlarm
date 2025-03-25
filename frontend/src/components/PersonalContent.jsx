@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { fetchUsers, updateUser, deleteUser, createUser } from '../services/api';
-
-
-
+import {useEffect, useState} from "react";
+import {fetchUsers, updateUser, deleteUser, createUser} from '../services/api';
+import AddUserForm from "./AddUserForm";
 
 console.log("PersonalContent.jsx: Rendering PersonalContent component...");
 
 const PersonalContent = () => {
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -15,9 +15,16 @@ const PersonalContent = () => {
         name: "", email: "", phone_number: "", user_rank: "", role: ""
     });
 
-
     useEffect(() => {
         loadUsers();
+    }, []);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobileView(window.innerWidth < 768);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     const loadUsers = async () => {
@@ -32,10 +39,10 @@ const PersonalContent = () => {
     };
 
     const handleEditChange = (e, userId) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setUsers((prev) =>
             prev.map((user) =>
-                user.id === userId ? { ...user, [name]: value } : user
+                user.id === userId ? {...user, [name]: value} : user
             )
         );
     };
@@ -61,8 +68,8 @@ const PersonalContent = () => {
     };
 
     const handleNewChange = (e) => {
-        const { name, value } = e.target;
-        setNewUser((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setNewUser((prev) => ({...prev, [name]: value}));
     };
 
     const handleAddUser = async () => {
@@ -74,56 +81,62 @@ const PersonalContent = () => {
         try {
             const created = await createUser(newUser);
             setUsers((prev) => [...prev, created]);
-            setNewUser({ name: "", email: "", phone_number: "", role: "", rank: "" });
+            setNewUser({name: "", email: "", phone_number: "", role: "", rank: ""});
         } catch (err) {
-            alert("Failed to create user");
+            alert(err.message);
         }
     };
 
     return (
         <main className="container mt-5">
-            <h2 className="text-center">List of Registered Personnel</h2>
+            <h2 className="text-center">Registered Personnel</h2>
 
             {loading && <p className="text-center">Loading users...</p>}
             {error && <p className="text-center text-danger">{error}</p>}
 
-            {/* Add New User */}
-            <div className="mb-4 mt-3 border p-3 rounded" style={{ backgroundColor: "#f8fff0" }}>
-                <h5>Add New User</h5>
-                <div className="row g-2">
-                    <input name="name" className="form-control col" placeholder="Name" value={newUser.name}
-                           onChange={handleNewChange}/>
-                    <input name="email" className="form-control col" placeholder="Email" value={newUser.email}
-                           onChange={handleNewChange}/>
-                    <input name="phone_number" className="form-control col" placeholder="Phone"
-                           value={newUser.phone_number} onChange={handleNewChange}/>
-                    <input name="user_rank" className="form-control col" placeholder="Rank"
-                           value={newUser.user_rank} onChange={handleNewChange}/>
-
-                    <input name="role" className="form-control col" placeholder="Role" value={newUser.role}
-                           onChange={handleNewChange}/>
-
-                    <button
-                        className="btn btn-sm"
-                        style={{
-                            backgroundColor: "#5D8736",
-                            color: "white",
-                            border: "none",
-                            padding: "6px 16px",
-                            fontSize: "14px",
-                            borderRadius: "5px",
-                            width: "auto",        // No full-width stretch
-                            alignSelf: "center",  // Center vertically if needed
-                            height: "38px"        // Consistent height with inputs
-                        }}
-                        onClick={handleAddUser}
-                    >
-                        Add
-                    </button>
-
-
-                </div>
-            </div>
+            {/* Add New User - use AddUserComponent*/}
+            {/* Add New User Section */}
+            {isMobileView ? (
+                <>
+                    {!showAddForm ? (
+                        <div className="text-center mb-3">
+                            <button
+                                className="btn"
+                                style={{
+                                    backgroundColor: "#5D8736",
+                                    color: "white",
+                                    padding: "8px 16px",
+                                    fontSize: "16px",
+                                    borderRadius: "5px"
+                                }}
+                                onClick={() => setShowAddForm(true)}
+                            >
+                                Add New User
+                            </button>
+                        </div>
+                    ) : (
+                        <AddUserForm
+                            newUser={newUser}
+                            onChange={handleNewChange}
+                            onAddUser={() => {
+                                handleAddUser();
+                                setShowAddForm(false);
+                            }}
+                            onCancel={() => setShowAddForm(false)} // ✅ Now Cancel will show
+                        />
+                    )}
+                </>
+            ) : (
+                // Always show form on desktop
+                <AddUserForm
+                    newUser={newUser}
+                    onChange={handleNewChange}
+                    onAddUser={() => {
+                        handleAddUser();
+                        setShowAddForm(false);
+                    }}
+                />
+            )}
 
             {users.length > 0 ? (
                 <div className="table-responsive mt-4 px-2">
@@ -134,7 +147,7 @@ const PersonalContent = () => {
                                border: "2px solid #5D8736",
                                width: "100%",
                            }}>
-                        <thead style={{ backgroundColor: "#5D8736", color: "white" }}>
+                        <thead style={{backgroundColor: "#5D8736", color: "white"}}>
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
@@ -184,14 +197,14 @@ const PersonalContent = () => {
                                         <>
                                             <button
                                                 className="btn btn-sm me-2"
-                                                style={{ backgroundColor: "#7BAE3F", color: "white", border: "none" }}
+                                                style={{backgroundColor: "#7BAE3F", color: "white", border: "none"}}
                                                 onClick={() => handleSave(user.id)}
                                             >
                                                 Save
                                             </button>
                                             <button
                                                 className="btn btn-sm"
-                                                style={{ backgroundColor: "#6c757d", color: "white", border: "none" }}
+                                                style={{backgroundColor: "#6c757d", color: "white", border: "none"}}
                                                 onClick={() => setEditingUserId(null)}
                                             >
                                                 Cancel
