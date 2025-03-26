@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { fetchUsers, updateUser, deleteUser, createUser } from '../services/api';
 import { Navigate } from "react-router-dom";
@@ -12,7 +11,28 @@ const PersonalContent = () => {
         name: "", email: "", phone_number: "", user_rank: "", role: ""
     });
 
-    const role = sessionStorage.getItem("role");
+    const [role, setRole] = useState(sessionStorage.getItem("role"));
+
+    useEffect(() => {
+        const fetchRoleIfNeeded = async () => {
+            if (!role) {
+                try {
+                    const res = await fetch("http://localhost:8000/api/auth/role", {
+                        credentials: "include"
+                    });
+                    if (res.ok) {
+                        const fetchedRole = await res.text();
+                        sessionStorage.setItem("role", fetchedRole);
+                        setRole(fetchedRole);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch role", err);
+                }
+            }
+        };
+
+        fetchRoleIfNeeded();
+    }, [role]);
 
     useEffect(() => {
         if (role === "admin") {
@@ -80,7 +100,7 @@ const PersonalContent = () => {
         }
     };
 
-    if (role !== "admin") {
+    if (role && role !== "admin") {
         return <Navigate to="/unauthorized" replace />;
     }
 
@@ -89,6 +109,7 @@ const PersonalContent = () => {
             <h2 className="text-center">List of Registered Personnel</h2>
             {loading && <p className="text-center">Loading users...</p>}
             {error && <p className="text-center text-danger">{error}</p>}
+
             <div className="mb-4 mt-3 border p-3 rounded" style={{ backgroundColor: "#f8fff0" }}>
                 <h5>Add New User</h5>
                 <div className="row g-2">
@@ -97,9 +118,25 @@ const PersonalContent = () => {
                     <input name="phone_number" className="form-control col" placeholder="Phone" value={newUser.phone_number} onChange={handleNewChange} />
                     <input name="user_rank" className="form-control col" placeholder="Rank" value={newUser.user_rank} onChange={handleNewChange} />
                     <input name="role" className="form-control col" placeholder="Role" value={newUser.role} onChange={handleNewChange} />
-                    <button className="btn btn-sm" style={{ backgroundColor: "#5D8736", color: "white", border: "none", padding: "6px 16px", fontSize: "14px", borderRadius: "5px", width: "auto", height: "38px" }} onClick={handleAddUser}>Add</button>
+                    <button
+                        className="btn btn-sm"
+                        style={{
+                            backgroundColor: "#5D8736",
+                            color: "white",
+                            border: "none",
+                            padding: "6px 16px",
+                            fontSize: "14px",
+                            borderRadius: "5px",
+                            width: "auto",
+                            height: "38px"
+                        }}
+                        onClick={handleAddUser}
+                    >
+                        Add
+                    </button>
                 </div>
             </div>
+
             {users.length > 0 ? (
                 <div className="table-responsive mt-4 px-2">
                     <table className="table table-bordered table-hover text-center" style={{ backgroundColor: "#F4FFC3", color: "#5D8736", border: "2px solid #5D8736", width: "100%" }}>
@@ -145,5 +182,6 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
 
 
