@@ -52,7 +52,6 @@ export const deleteUser = async (id) => {
 };
 
 
-
 export async function fetchFreezerWithUsers(freezerNumber) {
     try {
         const response = await fetch(`http://localhost:8000/api/freezers/number/${freezerNumber}/with-users`, {
@@ -95,10 +94,11 @@ export const fetchAllFreezersWithUsers = async () => {
 // Fetch the authenticated user's role
 export const fetchUserRole = async () => {
     try {
-        const response = await API.get('/users/user'); // this hits your /api/users/user endpoint
-        return response.data?.role || null;
+        const response = await API.get('/auth/role'); // ✅ correct endpoint
+        return response.data || null;
     } catch (error) {
         console.error("Failed to fetch user role:", error.response ? error.response.data : error.message);
         return null;
     }
 };
+
