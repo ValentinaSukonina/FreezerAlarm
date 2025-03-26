@@ -72,7 +72,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.36</version> <!-- Or latest version -->
+            <scope>provided</scope> <!-- This ensures it's available at compile time -->
         </dependency>
 
         <!-- Spring Boot Test -->
@@ -120,10 +121,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
+
     </dependencies>
 
     <build>
