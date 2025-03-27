@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -25,7 +24,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // ✅ use this instead of empty curly braces
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/create-account", "/api/users/check-user", "/api/auth/**").permitAll()
@@ -40,16 +39,14 @@ public class SecurityConfig {
                             // Debug: print all available attributes
                             oauthUser.getAttributes().forEach((k, v) -> System.out.println(k + ": " + v));
 
-                            String name = oauthUser.getAttribute("name");
-                            System.out.println("Logged in as (name): " + name);
+                            String email = oauthUser.getAttribute("email");
+                            System.out.println("Logged in as (email): " + email);
 
-                            // Use findByName instead of email
-                            userRepository.findByName(name).ifPresent(user -> {
+                            userRepository.findByEmail(email).ifPresent(user -> {
                                 HttpSession session = request.getSession();
                                 session.setAttribute("isLoggedIn", "true");
-
-                                // Store the role (either 'admin' or 'user')
-                                session.setAttribute("role", user.getRole());
+                                session.setAttribute("email", email); // store email
+                                session.setAttribute("role", user.getRole()); // store role
                                 System.out.println("Stored role in session: " + user.getRole());
                             });
 
@@ -62,17 +59,12 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .clearAuthentication(true)
                         .addLogoutHandler((request, response, authentication) -> {
-                            System.out.println("User logged out: " + authentication.getName());
+                            if (authentication != null) {
+                                System.out.println("User logged out: " + authentication.getName());
+                            }
                         })
                 );
 
         return http.build();
     }
 }
-
-
-
-
-
-
-

@@ -15,4 +15,10 @@ public class AuthController {
         Object role = request.getSession().getAttribute("role");
         return ResponseEntity.ok(role != null ? role.toString() : "");
     }
+
+    @GetMapping("/email")
+    public ResponseEntity<String> getUserEmail(HttpServletRequest request) {
+        Object email = request.getSession().getAttribute("email");
+        return ResponseEntity.ok(email != null ? email.toString() : "");
+    }
 }
