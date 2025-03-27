@@ -10,6 +10,7 @@ const PersonalContent = () => {
     const [newUser, setNewUser] = useState({
         name: "", email: "", phone_number: "", user_rank: "", role: ""
     });
+    const [showAddForm, setShowAddForm] = useState(false);
 
     const [role, setRole] = useState(sessionStorage.getItem("role"));
 
@@ -94,7 +95,8 @@ const PersonalContent = () => {
         try {
             const created = await createUser(newUser);
             setUsers((prev) => [...prev, created]);
-            setNewUser({ name: "", email: "", phone_number: "", role: "", user_rank: "" });
+            setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
+            setShowAddForm(false);
         } catch (err) {
             alert("Failed to create user");
         }
@@ -106,40 +108,45 @@ const PersonalContent = () => {
 
     return (
         <main className="container mt-5">
-            <h2 className="text-center">List of Registered Personnel</h2>
+            <h2 className="text-center mb-4">Registered Personnel</h2>
+
+            <div className="text-center mb-3">
+                <button
+                    className="btn"
+                    style={{ backgroundColor: "#5D8736", color: "white" }}
+                    onClick={() => setShowAddForm(!showAddForm)}
+                >
+                    {showAddForm ? "Hide Form" : "Add New User"}
+                </button>
+            </div>
+
+            {showAddForm && (
+                <div className="border p-3 rounded mb-4" style={{ backgroundColor: "#f8fff0", maxWidth: "500px", margin: "0 auto" }}>
+                    <h5 className="mb-3">Add New User</h5>
+                    <div className="d-flex flex-column gap-2">
+                        <input name="name" className="form-control" placeholder="Name" value={newUser.name} onChange={handleNewChange} />
+                        <input name="email" className="form-control" placeholder="Email" value={newUser.email} onChange={handleNewChange} />
+                        <input name="phone_number" className="form-control" placeholder="Phone" value={newUser.phone_number} onChange={handleNewChange} />
+                        <input name="user_rank" className="form-control" placeholder="Rank" value={newUser.user_rank} onChange={handleNewChange} />
+                        <input name="role" className="form-control" placeholder="Role" value={newUser.role} onChange={handleNewChange} />
+                    </div>
+
+                    <div className="d-flex justify-content-between mt-3">
+                        <button className="btn" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={handleAddUser}>Add</button>
+                        <button className="btn btn-secondary" onClick={() => {
+                            setShowAddForm(false);
+                            setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
+                        }}>Cancel</button>
+                    </div>
+                </div>
+            )}
+
             {loading && <p className="text-center">Loading users...</p>}
             {error && <p className="text-center text-danger">{error}</p>}
 
-            <div className="mb-4 mt-3 border p-3 rounded" style={{ backgroundColor: "#f8fff0" }}>
-                <h5>Add New User</h5>
-                <div className="row g-2">
-                    <input name="name" className="form-control col" placeholder="Name" value={newUser.name} onChange={handleNewChange} />
-                    <input name="email" className="form-control col" placeholder="Email" value={newUser.email} onChange={handleNewChange} />
-                    <input name="phone_number" className="form-control col" placeholder="Phone" value={newUser.phone_number} onChange={handleNewChange} />
-                    <input name="user_rank" className="form-control col" placeholder="Rank" value={newUser.user_rank} onChange={handleNewChange} />
-                    <input name="role" className="form-control col" placeholder="Role" value={newUser.role} onChange={handleNewChange} />
-                    <button
-                        className="btn btn-sm"
-                        style={{
-                            backgroundColor: "#5D8736",
-                            color: "white",
-                            border: "none",
-                            padding: "6px 16px",
-                            fontSize: "14px",
-                            borderRadius: "5px",
-                            width: "auto",
-                            height: "38px"
-                        }}
-                        onClick={handleAddUser}
-                    >
-                        Add
-                    </button>
-                </div>
-            </div>
-
             {users.length > 0 ? (
                 <div className="table-responsive mt-4 px-2">
-                    <table className="table table-bordered table-hover text-center" style={{ backgroundColor: "#F4FFC3", color: "#5D8736", border: "2px solid #5D8736", width: "100%" }}>
+                    <table className="table table-bordered table-hover text-center" style={{ backgroundColor: "#F4FFC3", color: "#5D8736", border: "2px solid #5D8736" }}>
                         <thead style={{ backgroundColor: "#5D8736", color: "white" }}>
                         <tr>
                             <th>Name</th>
@@ -161,13 +168,13 @@ const PersonalContent = () => {
                                 <td>
                                     {editingUserId === user.id ? (
                                         <>
-                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white", border: "none" }} onClick={() => handleSave(user.id)}>Save</button>
-                                            <button className="btn btn-sm" style={{ backgroundColor: "#6c757d", color: "white", border: "none" }} onClick={() => setEditingUserId(null)}>Cancel</button>
+                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
+                                            <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
                                         </>
                                     ) : (
                                         <>
-                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white", border: "none" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
-                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#A9C46C", color: "#ffffff", border: "1px solid #c3e6cb", fontWeight: "500", transition: "color 0.2s ease" }} onMouseEnter={(e) => e.target.style.color = "#fff700"} onMouseLeave={(e) => e.target.style.color = "#ffffff"} onClick={() => handleDelete(user.id)}>Delete</button>
+                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
+                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb", fontWeight: "500" }} onClick={() => handleDelete(user.id)}>Delete</button>
                                         </>
                                     )}
                                 </td>
@@ -182,6 +189,8 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
+
 
 
 
