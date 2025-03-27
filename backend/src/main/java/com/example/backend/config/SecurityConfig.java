@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.io.IOException;
+
 
 @Configuration
 @EnableWebSecurity
@@ -35,22 +37,31 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
-
-                            // Debug: print all available attributes
-                            oauthUser.getAttributes().forEach((k, v) -> System.out.println(k + ": " + v));
-
+                            String googleId = oauthUser.getAttribute("sub");
                             String email = oauthUser.getAttribute("email");
-                            System.out.println("Logged in as (email): " + email);
 
-                            userRepository.findByEmail(email).ifPresent(user -> {
+                            userRepository.findByGoogleId(googleId).ifPresentOrElse(user -> {
                                 HttpSession session = request.getSession();
                                 session.setAttribute("isLoggedIn", "true");
-                                session.setAttribute("email", email); // store email
-                                session.setAttribute("role", user.getRole()); // store role
-                                System.out.println("Stored role in session: " + user.getRole());
+                                session.setAttribute("email", email);
+                                session.setAttribute("role", user.getRole());
+                                session.setMaxInactiveInterval(10 * 60); // Optional
+
+                                try {
+                                    response.sendRedirect("http://localhost:5173/freezers");
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }, () -> {
+                                System.out.println("Unauthorized login attempt by Google ID: " + googleId);
+                                try {
+                                    response.sendRedirect("http://localhost:5173/unauthorized");
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
                             });
 
-                            response.sendRedirect("http://localhost:5173/freezers");
+                            return; //
                         })
                 )
                 .logout(logout -> logout

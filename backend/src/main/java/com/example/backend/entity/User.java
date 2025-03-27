@@ -33,15 +33,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="name",nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
 
-    @Column(name="phone_number",nullable = false, length = 20)
+    @Column(name = "phone_number", nullable = false, length = 20)
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false,  unique = true,length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     @Email(message = "Invalid email format")
     private String email;
 
@@ -51,7 +51,8 @@ public class User {
     @Column(nullable = false, length = 50)
     private String role;
 
-
+    @Column(unique = true)
+    private String googleId;
 
     @Override
     public final boolean equals(Object o) {

@@ -13,5 +13,5 @@ public interface UserRepository extends ListCrudRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-
+    Optional<User> findByGoogleId(String googleId);
 }
