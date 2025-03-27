@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-    fetchAllFreezersWithUsers,
-    createFreezer
-} from "../services/api";
-import FreezerCardAdmin from "../components/FreezerCardAdmin";
-import FreezerCardUser from "../components/FreezerCardUser";
+import { fetchAllFreezersWithUsers, createFreezer } from "../services/api";
+import FreezerCardUser from "../components/FreezerCardUser"; // ✅ Use user card always
 import AddFreezerForm from "./AddFreezerForm";
 
 const FreezersAll = () => {
@@ -82,18 +78,6 @@ const FreezersAll = () => {
         }
     };
 
-    const handleFreezerUpdated = (updatedFreezer) => {
-        setFreezers((prev) =>
-            prev.map((f) => (f.id === updatedFreezer.id ? updatedFreezer : f))
-        );
-    };
-
-    const handleFreezerDeleted = (deletedId) => {
-        setFreezers((prev) => prev.filter((f) => f.id !== deletedId));
-        setDeleteMessage("🗑️ Freezer deleted successfully.");
-        setTimeout(() => setDeleteMessage(""), 3000);
-    };
-
     if (loading) return <p>Loading freezers...</p>;
     if (error) return <p>Error: {error}</p>;
 
@@ -102,58 +86,47 @@ const FreezersAll = () => {
             <h2 className="text-center mt-3 mb-2">Freezers Biomedicine</h2>
 
             {role === "admin" && (
-                <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-                    <AddFreezerForm
-                        newFreezer={newFreezer}
-                        onChange={handleNewFreezerChange}
-                        onAdd={handleAddFreezer}
-                    />
+                <>
+                    <div className="freezer-form-container">
+                        <AddFreezerForm
+                            newFreezer={newFreezer}
+                            onChange={handleNewFreezerChange}
+                            onAdd={handleAddFreezer}
+                        />
 
-                    {successMessage && (
-                        <div className="text-center mb-3" style={{
-                            backgroundColor: "#d4edda",
-                            color: "#155724",
-                            border: "1px solid #c3e6cb",
-                            padding: "10px 16px",
-                            borderRadius: "5px"
-                        }}>
-                            {successMessage}
-                        </div>
-                    )}
-
-                    {deleteMessage && (
-                        <div className="text-center mb-3" style={{
-                            backgroundColor: "#f8d7da",
-                            color: "#721c24",
-                            border: "1px solid #f5c6cb",
-                            padding: "10px 16px",
-                            borderRadius: "5px"
-                        }}>
-                            {deleteMessage}
-                        </div>
-                    )}
-                </div>
+                        {successMessage && (
+                            <div className="success-message text-center mx-auto my-3">
+                                {successMessage}
+                            </div>
+                        )}
+                        {deleteMessage && (
+                            <div className="text-center mb-3" style={{
+                                backgroundColor: "#f8d7da",
+                                color: "#721c24",
+                                border: "1px solid #f5c6cb",
+                                padding: "10px 16px",
+                                borderRadius: "5px",
+                                maxWidth: "500px",
+                                margin: "0 auto"
+                            }}>
+                                {deleteMessage}
+                            </div>
+                        )}
+                    </div>
+                </>
             )}
 
             <div className="freezer-grid">
-                {freezers.map((freezer) =>
-                    role === "admin" ? (
-                        <FreezerCardAdmin
-                            key={freezer.id}
-                            freezer={freezer}
-                            onFreezerUpdated={handleFreezerUpdated}
-                            onFreezerDeleted={handleFreezerDeleted}
-                        />
-                    ) : (
-                        <FreezerCardUser key={freezer.id} freezer={freezer} />
-                    )
-                )}
+                {freezers.map((freezer) => (
+                    <FreezerCardUser key={freezer.id} freezer={freezer} />
+                ))}
             </div>
         </div>
     );
 };
 
 export default FreezersAll;
+
 
 
 

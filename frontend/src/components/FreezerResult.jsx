@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { fetchFreezerWithUsers } from "../services/api";
 import FreezerCardAdmin from "../components/FreezerCardAdmin";
-import { useNavigate } from "react-router-dom";
+import FreezerCardUser from "../components/FreezerCardUser";
 
 const FreezerResult = ({ freezerNumber }) => {
     const [freezer, setFreezer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState("");
-
-    const navigate = useNavigate();
+    const role = sessionStorage.getItem("role");
 
     useEffect(() => {
         const getFreezer = async () => {
@@ -20,7 +19,9 @@ const FreezerResult = ({ freezerNumber }) => {
 
             try {
                 const data = await fetchFreezerWithUsers(freezerNumber);
-                if (!data) throw new Error("No freezer found.");
+                if (!data) {
+                    throw new Error("No freezer found for this number.");
+                }
                 setFreezer(data);
             } catch (err) {
                 setError("No freezer found for this number.");
@@ -39,11 +40,9 @@ const FreezerResult = ({ freezerNumber }) => {
     };
 
     const handleFreezerDeleted = () => {
+        setFreezer(null);
         setMessage("🗑️ Freezer deleted successfully.");
-        setTimeout(() => {
-            setMessage("");
-            navigate("/freezers");
-        }, 2000); // Delay to let user see confirmation
+        setTimeout(() => setMessage(""), 3000);
     };
 
     if (loading) return <p>Loading freezer data...</p>;
@@ -53,15 +52,17 @@ const FreezerResult = ({ freezerNumber }) => {
             <h2 className="text-center my-4">Search Results</h2>
 
             {message && (
-                <div className="text-center mb-3" style={{
-                    backgroundColor: "#d4edda",
-                    color: "#155724",
-                    border: "1px solid #c3e6cb",
-                    padding: "10px 16px",
-                    borderRadius: "5px",
-                    maxWidth: "500px",
-                    margin: "0 auto"
-                }}>
+                <div className="text-center mb-3"
+                     style={{
+                         backgroundColor: "#d4edda",
+                         color: "#155724",
+                         border: "1px solid #c3e6cb",
+                         padding: "10px 16px",
+                         borderRadius: "5px",
+                         maxWidth: "500px",
+                         margin: "0 auto"
+                     }}
+                >
                     {message}
                 </div>
             )}
@@ -69,17 +70,22 @@ const FreezerResult = ({ freezerNumber }) => {
             {error ? (
                 <p className="alert alert-danger text-center">{error}</p>
             ) : freezer ? (
-                <FreezerCardAdmin
-                    freezer={freezer}
-                    onFreezerUpdated={handleFreezerUpdated}
-                    onFreezerDeleted={handleFreezerDeleted}
-                />
+                role === "admin" ? (
+                    <FreezerCardAdmin
+                        freezer={freezer}
+                        onFreezerUpdated={handleFreezerUpdated}
+                        onFreezerDeleted={handleFreezerDeleted}
+                    />
+                ) : (
+                    <FreezerCardUser freezer={freezer} />
+                )
             ) : null}
         </div>
     );
 };
 
 export default FreezerResult;
+
 
 
 
