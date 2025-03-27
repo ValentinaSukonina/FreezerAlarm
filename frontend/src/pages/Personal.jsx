@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react"
 import PersonalContent from "../components/PersonalContent";
 
 const Personal = () => {

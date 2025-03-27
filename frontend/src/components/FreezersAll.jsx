@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchAllFreezersWithUsers, createFreezer } from "../services/api";
-import FreezerCardUser from "../components/FreezerCardUser"; // ✅ Use user card always
+import FreezerCardUser from "../components/FreezerCardUser";
 import AddFreezerForm from "./AddFreezerForm";
 
 const FreezersAll = () => {
@@ -83,7 +83,7 @@ const FreezersAll = () => {
 
     return (
         <div className="content-wrapper mx-2 my-1">
-            <h2 className="text-center mt-3 mb-2">Freezers Biomedicine</h2>
+            <h2 className="text-center mt-3 mb-4">Freezers Biomedicine</h2>
 
             {role === "admin" && (
                 <>
@@ -116,16 +116,23 @@ const FreezersAll = () => {
                 </>
             )}
 
-            <div className="freezer-grid">
-                {freezers.map((freezer) => (
-                    <FreezerCardUser key={freezer.id} freezer={freezer} />
-                ))}
+            {/* Updated Card Layout */}
+            <div className="container mt-4">
+                <div className="row">
+                    {freezers.map((freezer) => (
+                        <div key={freezer.id} className="col-12 col-md-6 col-lg-4 d-flex justify-content-center mb-4">
+                            <FreezerCardUser freezer={freezer} />
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
 };
 
 export default FreezersAll;
+
+
 
 
 

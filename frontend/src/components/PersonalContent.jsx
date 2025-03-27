@@ -11,7 +11,6 @@ const PersonalContent = () => {
         name: "", email: "", phone_number: "", user_rank: "", role: ""
     });
     const [showAddForm, setShowAddForm] = useState(false);
-
     const [role, setRole] = useState(sessionStorage.getItem("role"));
 
     useEffect(() => {
@@ -145,15 +144,15 @@ const PersonalContent = () => {
             {error && <p className="text-center text-danger">{error}</p>}
 
             {users.length > 0 ? (
-                <div className="table-responsive mt-4 px-2">
-                    <table className="table table-bordered table-hover text-center" style={{ backgroundColor: "#F4FFC3", color: "#5D8736", border: "2px solid #5D8736" }}>
-                        <thead style={{ backgroundColor: "#5D8736", color: "white" }}>
+                <div className="table-responsive mt-4">
+                    <table className="table table-bordered table-hover text-center" style={{ backgroundColor: "#A9C46C", color: "white" }}>
+                        <thead className="table-success">
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Phone Number</th>
-                            <th>Rank</th>
-                            <th>Role</th>
+                            <th className="d-none d-md-table-cell">Phone</th>
+                            <th className="d-none d-lg-table-cell">Rank</th>
+                            <th className="d-none d-lg-table-cell">Role</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -162,9 +161,9 @@ const PersonalContent = () => {
                             <tr key={user.id}>
                                 <td>{editingUserId === user.id ? <input name="name" value={user.name} onChange={(e) => handleEditChange(e, user.id)} /> : user.name}</td>
                                 <td>{editingUserId === user.id ? <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} /> : user.email}</td>
-                                <td>{editingUserId === user.id ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
-                                <td>{editingUserId === user.id ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
-                                <td>{editingUserId === user.id ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
+                                <td className="d-none d-md-table-cell">{editingUserId === user.id ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
+                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
+                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
                                 <td>
                                     {editingUserId === user.id ? (
                                         <>
@@ -174,7 +173,7 @@ const PersonalContent = () => {
                                     ) : (
                                         <>
                                             <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
-                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb", fontWeight: "500" }} onClick={() => handleDelete(user.id)}>Delete</button>
+                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white" }} onClick={() => handleDelete(user.id)}>Delete</button>
                                         </>
                                     )}
                                 </td>
@@ -189,6 +188,7 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
 
 
 
