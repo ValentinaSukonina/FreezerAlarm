@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.io.IOException;
 
 
 @Configuration
@@ -25,7 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // ✅ use this instead of empty curly braces
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/create-account", "/api/users/check-user", "/api/auth/**").permitAll()
@@ -36,24 +37,31 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+                            String googleId = oauthUser.getAttribute("sub");
+                            String email = oauthUser.getAttribute("email");
 
-                            // Debug: print all available attributes
-                            oauthUser.getAttributes().forEach((k, v) -> System.out.println(k + ": " + v));
-
-                            String name = oauthUser.getAttribute("name");
-                            System.out.println("Logged in as (name): " + name);
-
-                            // Use findByName instead of email
-                            userRepository.findByName(name).ifPresent(user -> {
+                            userRepository.findByGoogleId(googleId).ifPresentOrElse(user -> {
                                 HttpSession session = request.getSession();
                                 session.setAttribute("isLoggedIn", "true");
-
-                                // Store the role (either 'admin' or 'user')
+                                session.setAttribute("email", email);
                                 session.setAttribute("role", user.getRole());
-                                System.out.println("Stored role in session: " + user.getRole());
+                                session.setMaxInactiveInterval(10 * 60); // Optional
+
+                                try {
+                                    response.sendRedirect("http://localhost:5173/freezers");
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }, () -> {
+                                System.out.println("Unauthorized login attempt by Google ID: " + googleId);
+                                try {
+                                    response.sendRedirect("http://localhost:5173/unauthorized");
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
                             });
 
-                            response.sendRedirect("http://localhost:5173/freezers");
+                            return; //
                         })
                 )
                 .logout(logout -> logout
@@ -62,17 +70,12 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .clearAuthentication(true)
                         .addLogoutHandler((request, response, authentication) -> {
-                            System.out.println("User logged out: " + authentication.getName());
+                            if (authentication != null) {
+                                System.out.println("User logged out: " + authentication.getName());
+                            }
                         })
                 );
 
         return http.build();
     }
 }
-
-
-
-
-
-
-

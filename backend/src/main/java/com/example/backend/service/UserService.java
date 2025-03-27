@@ -24,7 +24,6 @@ public class UserService {
     private final FreezerUserRepository freezerUserRepository;
 
 
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -42,6 +41,7 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
     @Transactional
     public void deleteUserById(Long userId) {
         // First, delete all freezer-user bindings for this user
@@ -87,6 +87,10 @@ public class UserService {
     }
 
     public Optional<User> findByName(String name) {
+        return userRepository.findByName(name);
+    }
+
+    public Optional<User> findByEmail(String name) {
         return userRepository.findByName(name);
     }
 
