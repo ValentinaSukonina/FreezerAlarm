@@ -145,8 +145,15 @@ const PersonalContent = () => {
 
             {users.length > 0 ? (
                 <div className="table-responsive mt-4">
-                    <table className="table table-bordered table-hover text-center" style={{ backgroundColor: "#A9C46C", color: "white" }}>
-                        <thead className="table-success">
+                    <table
+                        className="table table-bordered table-hover text-center"
+                        style={{
+                            backgroundColor: "#F4FFC3", // light greenish background
+                            color: "#5D8736",            // dark green text
+                            border: "2px solid #5D8736"
+                        }}
+                    >
+                        <thead style={{backgroundColor: "#A9C46C", color: "white"}}>
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
@@ -159,21 +166,43 @@ const PersonalContent = () => {
                         <tbody>
                         {users.map((user) => (
                             <tr key={user.id}>
-                                <td>{editingUserId === user.id ? <input name="name" value={user.name} onChange={(e) => handleEditChange(e, user.id)} /> : user.name}</td>
-                                <td>{editingUserId === user.id ? <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} /> : user.email}</td>
-                                <td className="d-none d-md-table-cell">{editingUserId === user.id ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
-                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
-                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
+                                <td>{editingUserId === user.id ? <input name="name" value={user.name}
+                                                                        onChange={(e) => handleEditChange(e, user.id)}/> : user.name}</td>
+                                <td>{editingUserId === user.id ? <input name="email" value={user.email}
+                                                                        onChange={(e) => handleEditChange(e, user.id)}/> : user.email}</td>
+                                <td className="d-none d-md-table-cell">{editingUserId === user.id ?
+                                    <input name="phone_number" value={user.phone_number}
+                                           onChange={(e) => handleEditChange(e, user.id)}/> : user.phone_number}</td>
+                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ?
+                                    <input name="user_rank" value={user.user_rank}
+                                           onChange={(e) => handleEditChange(e, user.id)}/> : user.user_rank}</td>
+                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ?
+                                    <input name="role" value={user.role}
+                                           onChange={(e) => handleEditChange(e, user.id)}/> : user.role}</td>
                                 <td>
                                     {editingUserId === user.id ? (
                                         <>
-                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
-                                            <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
+                                            <button className="btn btn-sm me-2"
+                                                    style={{backgroundColor: "#7BAE3F", color: "white"}}
+                                                    onClick={() => handleSave(user.id)}>Save
+                                            </button>
+                                            <button className="btn btn-sm btn-secondary"
+                                                    onClick={() => setEditingUserId(null)}>Cancel
+                                            </button>
                                         </>
                                     ) : (
                                         <>
-                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
-                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white" }} onClick={() => handleDelete(user.id)}>Delete</button>
+                                            <button className="btn btn-sm me-2"
+                                                    style={{backgroundColor: "#5D8736", color: "white"}}
+                                                    onClick={() => setEditingUserId(user.id)}>Edit
+                                            </button>
+                                            <button className="btn btn-sm" style={{
+                                                backgroundColor: "#A9C46C",
+                                                color: "white",
+                                                border: "1px solid #c3e6cb",
+                                                fontWeight: "500"
+                                            }} onClick={() => handleDelete(user.id)}>Delete
+                                            </button>
                                         </>
                                     )}
                                 </td>
@@ -181,6 +210,7 @@ const PersonalContent = () => {
                         ))}
                         </tbody>
                     </table>
+
                 </div>
             ) : (!loading && <p className="text-center">No users found.</p>)}
         </main>
