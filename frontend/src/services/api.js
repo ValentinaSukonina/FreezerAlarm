@@ -102,3 +102,18 @@ export const fetchUserRole = async () => {
         return null;
     }
 };
+
+export const updateFreezer = async (id, updatedData) => {
+    const response = await API.put(`/freezers/${id}`, updatedData);
+    return response.data;
+};
+
+export const deleteFreezer = async (id) => {
+    await API.delete(`/freezers/${id}`);
+};
+
+export const createFreezer = async (freezerData) => {
+    const response = await API.post('/freezers', freezerData);
+    return response.data;
+};
+

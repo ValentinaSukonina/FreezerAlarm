@@ -5,7 +5,6 @@ import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -76,5 +75,32 @@ public class FreezerController {
         freezerService.deleteFreezerByNumber(number);
         return ResponseEntity.noContent().build();
     }
+
+    //  Update freezer by ID (used by frontend)
+    @PutMapping("/{id}")
+    public ResponseEntity<Freezer> updateFreezerById(@PathVariable Long id, @RequestBody Freezer updatedData) {
+        return freezerRepository.findById(id)
+                .map(existing -> {
+                    existing.setNumber(updatedData.getNumber());
+                    existing.setRoom(updatedData.getRoom());
+                    existing.setAddress(updatedData.getAddress());
+                    existing.setType(updatedData.getType());
+                    existing.setFile(updatedData.getFile()); // if used
+                    Freezer updated = freezerRepository.save(existing);
+                    return ResponseEntity.ok(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    //  Delete freezer by ID (used by frontend)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFreezerById(@PathVariable Long id) {
+        if (!freezerRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        freezerRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
