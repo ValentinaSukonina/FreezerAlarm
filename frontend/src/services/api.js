@@ -112,8 +112,9 @@ export const deleteFreezer = async (id) => {
     await API.delete(`/freezers/${id}`);
 };
 
+
+
 export const createFreezer = async (freezerData) => {
     const response = await API.post('/freezers', freezerData);
     return response.data;
 };
-

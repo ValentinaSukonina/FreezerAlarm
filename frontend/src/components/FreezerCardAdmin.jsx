@@ -7,12 +7,15 @@ const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
     const [editing, setEditing] = useState(false);
     const [editData, setEditData] = useState({ ...freezer });
     const [notificationPrefs, setNotificationPrefs] = useState(
-        freezer.users.map((user) => ({
-            ...user,
-            selectedEmail: false,
-            selectedSms: false,
-        }))
+        Array.isArray(freezer?.users)
+            ? freezer.users.map((user) => ({
+                ...user,
+                selectedEmail: false,
+                selectedSms: false,
+            }))
+            : []
     );
+
 
     const [selectAllEmail, setSelectAllEmail] = useState(false);
     const [selectAllSms, setSelectAllSms] = useState(false);

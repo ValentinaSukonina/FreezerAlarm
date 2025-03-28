@@ -37,25 +37,21 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
-                            // Debug: print all available attributes
-                            oauthUser.getAttributes().forEach((k, v) -> System.out.println(k + ": " + v));
-
                             String name = oauthUser.getAttribute("name");
                             System.out.println("Logged in as (name): " + name);
 
-                            // Use findByName instead of email
                             userRepository.findByName(name).ifPresent(user -> {
                                 HttpSession session = request.getSession();
                                 session.setAttribute("isLoggedIn", "true");
-
-                                // Store the role (either 'admin' or 'user')
                                 session.setAttribute("role", user.getRole());
+                                session.setAttribute("username", user.getName());  //  NEW
                                 System.out.println("Stored role in session: " + user.getRole());
                             });
 
                             response.sendRedirect("http://localhost:5173/freezers");
                         })
                 )
+
                 .logout(logout -> logout
                         .logoutSuccessUrl("http://localhost:5173")
                         .invalidateHttpSession(true)
