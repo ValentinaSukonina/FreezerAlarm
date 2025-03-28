@@ -152,11 +152,11 @@ const PersonalContent = () => {
                 <div className="table-responsive mt-4">
                     <table
                         className="table table-bordered table-hover text-center"
-                        style={{
+                       /* style={{
                             backgroundColor: "#F4FFC3",
                             color: "#5D8736",
                             border: "2px solid #5D8736"
-                        }}
+                        }}*/
                     >
                         <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
