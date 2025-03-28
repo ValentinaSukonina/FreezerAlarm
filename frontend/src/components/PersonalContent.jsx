@@ -7,6 +7,7 @@ const PersonalContent = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [editingUserId, setEditingUserId] = useState(null);
+    const [expandedUserId, setExpandedUserId] = useState(null);
     const [newUser, setNewUser] = useState({
         name: "", email: "", phone_number: "", user_rank: "", role: ""
     });
@@ -101,6 +102,10 @@ const PersonalContent = () => {
         }
     };
 
+    const toggleExpand = (userId) => {
+        setExpandedUserId(expandedUserId === userId ? null : userId);
+    };
+
     if (role && role !== "admin") {
         return <Navigate to="/unauthorized" replace />;
     }
@@ -148,69 +153,93 @@ const PersonalContent = () => {
                     <table
                         className="table table-bordered table-hover text-center"
                         style={{
-                            backgroundColor: "#F4FFC3", // light greenish background
-                            color: "#5D8736",            // dark green text
+                            backgroundColor: "#F4FFC3",
+                            color: "#5D8736",
                             border: "2px solid #5D8736"
                         }}
                     >
-                        <thead style={{backgroundColor: "#A9C46C", color: "white"}}>
+                        <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
                             <th className="d-none d-md-table-cell">Phone</th>
                             <th className="d-none d-lg-table-cell">Rank</th>
                             <th className="d-none d-lg-table-cell">Role</th>
-                            <th>Actions</th>
+                            <th className="d-none d-md-table-cell">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {users.map((user) => (
-                            <tr key={user.id}>
-                                <td>{editingUserId === user.id ? <input name="name" value={user.name}
-                                                                        onChange={(e) => handleEditChange(e, user.id)}/> : user.name}</td>
-                                <td>{editingUserId === user.id ? <input name="email" value={user.email}
-                                                                        onChange={(e) => handleEditChange(e, user.id)}/> : user.email}</td>
-                                <td className="d-none d-md-table-cell">{editingUserId === user.id ?
-                                    <input name="phone_number" value={user.phone_number}
-                                           onChange={(e) => handleEditChange(e, user.id)}/> : user.phone_number}</td>
-                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ?
-                                    <input name="user_rank" value={user.user_rank}
-                                           onChange={(e) => handleEditChange(e, user.id)}/> : user.user_rank}</td>
-                                <td className="d-none d-lg-table-cell">{editingUserId === user.id ?
-                                    <input name="role" value={user.role}
-                                           onChange={(e) => handleEditChange(e, user.id)}/> : user.role}</td>
-                                <td>
-                                    {editingUserId === user.id ? (
-                                        <>
-                                            <button className="btn btn-sm me-2"
-                                                    style={{backgroundColor: "#7BAE3F", color: "white"}}
-                                                    onClick={() => handleSave(user.id)}>Save
-                                            </button>
-                                            <button className="btn btn-sm btn-secondary"
-                                                    onClick={() => setEditingUserId(null)}>Cancel
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button className="btn btn-sm me-2"
-                                                    style={{backgroundColor: "#5D8736", color: "white"}}
-                                                    onClick={() => setEditingUserId(user.id)}>Edit
-                                            </button>
-                                            <button className="btn btn-sm" style={{
-                                                backgroundColor: "#A9C46C",
-                                                color: "white",
-                                                border: "1px solid #c3e6cb",
-                                                fontWeight: "500"
-                                            }} onClick={() => handleDelete(user.id)}>Delete
-                                            </button>
-                                        </>
+                        {users.map((user) => {
+                            const isEditing = editingUserId === user.id;
+                            const isExpanded = expandedUserId === user.id;
+
+                            return (
+                                <>
+                                    <tr key={user.id}>
+                                        <td className="text-start d-flex justify-content-between align-items-center">
+                                            {isEditing ? (
+                                                <input name="name" value={user.name} onChange={(e) => handleEditChange(e, user.id)} />
+                                            ) : (
+                                                <>
+                                                    {user.name}
+                                                    <button
+                                                        className="btn btn-sm d-md-none ms-auto"
+                                                        onClick={() => toggleExpand(user.id)}
+                                                        style={{ backgroundColor: "#A9C46C", color: "white" }}
+                                                    >
+                                                        {isExpanded ? "▲" : "▼"}
+                                                    </button>
+                                                </>
+                                            )}
+                                        </td>
+                                        <td>{isEditing ? <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} /> : user.email}</td>
+                                        <td className="d-none d-md-table-cell">{isEditing ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
+                                        <td className="d-none d-lg-table-cell">{isEditing ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
+                                        <td className="d-none d-lg-table-cell">{isEditing ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
+                                        <td className="d-none d-md-table-cell">
+                                            {isEditing ? (
+                                                <>
+                                                    <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
+                                                    <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
+                                                    <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }} onClick={() => handleDelete(user.id)}>Delete</button>
+                                                </>
+                                            )}
+                                        </td>
+                                    </tr>
+
+                                    {/* Mobile-only expanded section with action buttons */}
+                                    {isExpanded && (
+                                        <tr className="d-md-none">
+                                            <td colSpan="6" className="text-start bg-light">
+                                                <div><strong>Phone:</strong> {user.phone_number}</div>
+                                                <div><strong>Rank:</strong> {user.user_rank}</div>
+                                                <div><strong>Role:</strong> {user.role}</div>
+
+                                                <div className="mt-2">
+                                                    {isEditing ? (
+                                                        <>
+                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
+                                                            <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
+                                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }} onClick={() => handleDelete(user.id)}>Delete</button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
                                     )}
-                                </td>
-                            </tr>
-                        ))}
+                                </>
+                            );
+                        })}
                         </tbody>
                     </table>
-
                 </div>
             ) : (!loading && <p className="text-center">No users found.</p>)}
         </main>
@@ -218,6 +247,9 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
+
+
 
 
 

@@ -87,21 +87,34 @@ const Header = () => {
                                 className={`nav-link text-white ${!isLoggedIn ? "disabled" : ""}`}
                                 href={isLoggedIn ? "/freezers" : "#"}
                                 onClick={(e) => !isLoggedIn && e.preventDefault()}
-                                style={!isLoggedIn ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                                style={!isLoggedIn ? {opacity: 0.5, cursor: "not-allowed"} : {}}
                             >
                                 Freezers
                             </a>
                         </li>
+
+                        <li className="nav-item">
+                            <a
+                                className={`nav-link text-white ${!isLoggedIn ? "disabled" : ""}`}
+                                href={isLoggedIn ? "/my-account" : "#"}
+                                onClick={(e) => !isLoggedIn && e.preventDefault()}
+                                style={!isLoggedIn ? {opacity: 0.5, cursor: "not-allowed"} : {}}
+                            >
+                                My Account
+                            </a>
+                        </li>
+
                         <li className="nav-item">
                             <a
                                 className={`nav-link text-white ${!isLoggedIn || role !== "admin" ? "disabled" : ""}`}
                                 href={isLoggedIn && role === "admin" ? "/personal" : "#"}
                                 onClick={(e) => (!isLoggedIn || role !== "admin") && e.preventDefault()}
-                                style={!isLoggedIn || role !== "admin" ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                                style={!isLoggedIn || role !== "admin" ? {opacity: 0.5, cursor: "not-allowed"} : {}}
                             >
                                 Personal
                             </a>
                         </li>
+
                         <li className="nav-item">
                             {isLoggedIn ? (
                                 <a className="nav-link text-white" href="#" onClick={handleLogout}>
@@ -115,6 +128,7 @@ const Header = () => {
                         </li>
                     </ul>
 
+
                     {/* Mobile Search */}
                     {isOpen && (
                         <form className="d-flex d-lg-none my-3 justify-content-center" onSubmit={handleSearch}>
@@ -125,13 +139,13 @@ const Header = () => {
                                 value={searchNumber}
                                 onChange={(e) => setSearchNumber(e.target.value)}
                                 disabled={!isLoggedIn}
-                                style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
+                                style={{backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px"}}
                             />
                             <button
                                 className="btn ms-2"
                                 type="submit"
                                 disabled={!isLoggedIn}
-                                style={{ backgroundColor: "#A9C46C", color: "#fff" }}
+                                style={{backgroundColor: "#A9C46C", color: "#fff"}}
                             >
                                 Search
                             </button>
