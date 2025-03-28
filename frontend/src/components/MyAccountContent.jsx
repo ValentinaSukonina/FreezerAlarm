@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {updateUser, fetchAllFreezersWithUsers, fetchUserByName} from "../services/api";
+import axios from "axios";
+import { fetchUsers, updateUser, fetchAllFreezersWithUsers, fetchUserByName } from "../services/api";
 
 const MyAccount = () => {
     const [user, setUser] = useState(null);
@@ -87,7 +88,9 @@ const MyAccount = () => {
         }
     };
 
-    if (loading) return <p className="text-center mt-5">Loading account...</p>;
+    // Directly return the content once data is loaded
+    if (loading) return null; // or just return a blank element like <></>
+
     if (!user) return <p className="text-danger text-center">User not found.</p>;
 
     return (
@@ -96,6 +99,7 @@ const MyAccount = () => {
 
             {message && <div className="alert alert-info text-center">{message}</div>}
 
+            {/* Main Content */}
             <div className="form-group mb-3">
                 <label><strong>Name</strong></label>
                 <input className="form-control" value={user.name} disabled />
@@ -152,6 +156,7 @@ const MyAccount = () => {
 };
 
 export default MyAccount;
+
 
 
 

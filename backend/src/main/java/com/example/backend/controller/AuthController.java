@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
