@@ -118,3 +118,11 @@ export const createFreezer = async (freezerData) => {
     const response = await API.post('/freezers', freezerData);
     return response.data;
 };
+
+export async function fetchUserByName(username) {
+    const response = await fetch(`http://localhost:8000/api/users/by-name/${username}`, {
+        credentials: "include"
+    });
+    if (!response.ok) throw new Error("Failed to fetch user");
+    return await response.json();
+}

@@ -2,6 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
+import com.example.backend.exception.Exceptions;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.UserService;
 import org.slf4j.Logger;
@@ -24,10 +26,12 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService, UserRepository userRepository, UserMapper userMapper) {
         this.userService = userService;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @PostMapping
@@ -61,7 +65,7 @@ public class UserController {
     }
 
 
-    @PutMapping("/{id}")
+   /* @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         if (!userRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -69,9 +73,11 @@ public class UserController {
         user.setId(id);
         userRepository.save(user);
         return ResponseEntity.ok(user);
-    }
+    }*/
 
-   @GetMapping
+
+
+    @GetMapping
    public ResponseEntity<?> getAllUsers() {
        try {
            List<UserDTO> users = userService.getAllUsers();
@@ -120,6 +126,15 @@ public class UserController {
         }
         return ResponseEntity.ok(principal);
     }
+
+    @GetMapping("/by-name/{username}")
+    public ResponseEntity<UserDTO> getUserByName(@PathVariable String username) {
+        return userService.findByName(username)
+                .map(userMapper::toUserDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }
 
 

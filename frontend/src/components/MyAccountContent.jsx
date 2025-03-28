@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { fetchUsers, updateUser, fetchAllFreezersWithUsers } from "../services/api";
+import {updateUser, fetchAllFreezersWithUsers, fetchUserByName} from "../services/api";
 
 const MyAccount = () => {
     const [user, setUser] = useState(null);
@@ -12,8 +11,7 @@ const MyAccount = () => {
 
     const loadData = async () => {
         try {
-            const users = await fetchUsers();
-            const currentUser = users.find(u => u.name === username);
+            const currentUser = await fetchUserByName(username);
             if (!currentUser) {
                 console.error("User not found.");
                 return;
