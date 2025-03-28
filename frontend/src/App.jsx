@@ -14,8 +14,6 @@ import AlertConfirmation from "./components/AlertConformation";
 import Unauthorized from "./components/Unauthorized";
 import MyAccount from "./pages/MyAccount";
 
-console.log('App.jsx: Rendering App component...');
-
 const App = () => {
     return (
         <Router>
@@ -25,12 +23,10 @@ const App = () => {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/create-account" element={<Login />} />
-                        <Route path="/freezers" element={<Freezers />} />
-                        <Route path="/freezers/:freezerNumber" element={<FreezerPage />} />
                         <Route path="/confirmation" element={<AlertConfirmation />} />
                         <Route path="/unauthorized" element={<Unauthorized />} />
 
-                        {/* Protected: Only for logged-in users */}
+                        {/* Protected: login required */}
                         <Route
                             path="/my-account"
                             element={
@@ -39,8 +35,24 @@ const App = () => {
                                 </ProtectedRoute>
                             }
                         />
+                        <Route
+                            path="/freezers"
+                            element={
+                                <ProtectedRoute>
+                                    <Freezers />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/freezers/:freezerNumber"
+                            element={
+                                <ProtectedRoute>
+                                    <FreezerPage />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                        {/* Protected: Only for logged-in admins */}
+                        {/* Protected: admin only */}
                         <Route
                             path="/personal"
                             element={
@@ -58,3 +70,4 @@ const App = () => {
 };
 
 export default App;
+
