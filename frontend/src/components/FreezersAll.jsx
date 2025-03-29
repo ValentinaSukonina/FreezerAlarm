@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { fetchAllFreezersWithUsers, createFreezer } from "../services/api";
+import React, {useEffect, useState} from "react";
+import {fetchAllFreezersWithUsers, createFreezer} from "../services/api";
 import FreezerCardUser from "../components/FreezerCardUser";
 import AddFreezerForm from "./AddFreezerForm";
 
@@ -56,8 +56,8 @@ const FreezersAll = () => {
     }, []);
 
     const handleNewFreezerChange = (e) => {
-        const { name, value } = e.target;
-        setNewFreezer((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setNewFreezer((prev) => ({...prev, [name]: value}));
     };
 
     const handleAddFreezer = async () => {
@@ -69,7 +69,7 @@ const FreezersAll = () => {
         try {
             const created = await createFreezer(newFreezer);
             setFreezers((prev) => [...prev, created]);
-            setNewFreezer({ number: "", room: "", address: "", type: "", file: "" });
+            setNewFreezer({number: "", room: "", address: "", type: "", file: ""});
 
             setSuccessMessage(`✅ Freezer ${created.number} added successfully!`);
             setTimeout(() => setSuccessMessage(""), 3000);
@@ -117,26 +117,17 @@ const FreezersAll = () => {
             )}
 
             {/* Updated Card Layout */}
-            <div className="container mt-4">
-                <div className="row">
-                    {freezers.map((freezer) => (
-                        <div key={freezer.id} className="col-12 col-md-6 col-lg-4 d-flex justify-content-center mb-4">
-                            <FreezerCardUser freezer={freezer} />
-                        </div>
-                    ))}
-                </div>
+            <div className="freezer-grid mt-4">
+
+                {freezers.map((freezer) => (
+                    <div key={freezer.id} className="freezer-card">
+                        <FreezerCardUser freezer={freezer}/>
+                    </div>
+                ))}
             </div>
+
         </div>
     );
 };
 
 export default FreezersAll;
-
-
-
-
-
-
-
-
-
