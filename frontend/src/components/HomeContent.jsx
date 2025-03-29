@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 
 const HomeContent = () => {
     const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(null);
 
     useEffect(() => {
         const checkLogin = () => {
@@ -30,6 +30,9 @@ const HomeContent = () => {
     const handleLogout = () => {
         sessionStorage.removeItem("isLoggedIn");
         sessionStorage.removeItem("role");
+        sessionStorage.removeItem("username");
+        sessionStorage.clear();
+        localStorage.setItem("logout", Date.now()); // sync across tabs
         window.location.href = "http://localhost:8000/logout";
     };
 

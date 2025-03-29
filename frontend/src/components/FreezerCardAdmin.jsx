@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { updateFreezer, deleteFreezer } from "../services/api";
+import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {updateFreezer, deleteFreezer} from "../services/api";
 import "../assets/styles.css";
 
-const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
+const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
     const [editing, setEditing] = useState(false);
-    const [editData, setEditData] = useState({ ...freezer });
+    const [editData, setEditData] = useState({...freezer});
     const [notificationPrefs, setNotificationPrefs] = useState(
         Array.isArray(freezer?.users)
             ? freezer.users.map((user) => ({
@@ -24,8 +24,8 @@ const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
     const role = sessionStorage.getItem("role");
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setEditData((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setEditData((prev) => ({...prev, [name]: value}));
     };
 
     const handleSave = async () => {
@@ -50,14 +50,14 @@ const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
     };
 
     const handleCancel = () => {
-        setEditData({ ...freezer });
+        setEditData({...freezer});
         setEditing(false);
     };
 
     const toggleUserSelection = (userId, type) => {
         setNotificationPrefs((prev) =>
             prev.map((user) =>
-                user.id === userId ? { ...user, [type]: !user[type] } : user
+                user.id === userId ? {...user, [type]: !user[type]} : user
             )
         );
     };
@@ -83,11 +83,11 @@ const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
         });
     };
 
-    const { number, room, address, type } = editData;
+    const {number, room, address, type} = editData;
 
     return (
         <div className="freezer-card mx-auto my-2 px-3 py-1">
-            <div className="row p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg">
+            <div className="p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg">
                 <div className="p-2 pt-lg-2 text-start">
 
                     {/* Top bar */}
@@ -114,13 +114,14 @@ const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
                     </div>
 
                     <p className="mb-1"><strong>Room:</strong> {editing ?
-                        <input name="room" className="form-control" value={room} onChange={handleChange} /> : room}
+                        <input name="room" className="form-control" value={room} onChange={handleChange}/> : room}
                     </p>
                     <p className="mb-1"><strong>Address:</strong> {editing ?
-                        <input name="address" className="form-control" value={address} onChange={handleChange} /> : address}
+                        <input name="address" className="form-control" value={address}
+                               onChange={handleChange}/> : address}
                     </p>
                     <p><strong>Type:</strong> {editing ?
-                        <input name="type" className="form-control" value={type} onChange={handleChange} /> : type}
+                        <input name="type" className="form-control" value={type} onChange={handleChange}/> : type}
                     </p>
 
                     {/* Assigned Users */}
@@ -180,7 +181,7 @@ const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
                             <>
                                 <button
                                     className="btn btn-sm me-2"
-                                    style={{ backgroundColor: "#5D8736", color: "white", border: "none" }}
+                                    style={{backgroundColor: "#5D8736", color: "white", border: "none"}}
                                     onClick={() => setEditing(true)}
                                 >
                                     Edit
@@ -201,14 +202,14 @@ const FreezerCardAdmin = ({ freezer, onFreezerUpdated, onFreezerDeleted }) => {
                             <>
                                 <button
                                     className="btn btn-sm me-2"
-                                    style={{ backgroundColor: "#7BAE3F", color: "white", border: "none" }}
+                                    style={{backgroundColor: "#7BAE3F", color: "white", border: "none"}}
                                     onClick={handleSave}
                                 >
                                     Save
                                 </button>
                                 <button
                                     className="btn btn-sm"
-                                    style={{ backgroundColor: "#6c757d", color: "white", border: "none" }}
+                                    style={{backgroundColor: "#6c757d", color: "white", border: "none"}}
                                     onClick={handleCancel}
                                 >
                                     Cancel

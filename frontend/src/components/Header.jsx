@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -9,24 +9,49 @@ const Header = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
-        const storedRole = sessionStorage.getItem("role");
+        const syncSession = async () => {
+            let loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+            let storedRole = sessionStorage.getItem("role");
 
-        setIsLoggedIn(loggedIn);
-        setRole(storedRole || "");
+            // If sessionStorage missing, fetch from backend
+            if (!loggedIn || !storedRole) {
+                try {
+                    const res = await fetch("http://localhost:8000/api/auth/session-user", {
+                        credentials: "include"
+                    });
 
-        // If logged in but no role in sessionStorage, fetch from backend
-        if (loggedIn && !storedRole) {
-            fetch("http://localhost:8000/api/auth/role", {
-                credentials: "include"
-            })
-                .then((res) => res.text())
-                .then((fetchedRole) => {
-                    sessionStorage.setItem("role", fetchedRole);
-                    setRole(fetchedRole);
-                })
-                .catch((err) => console.error("Failed to fetch role", err));
-        }
+                    if (res.ok) {
+                        const data = await res.json();
+
+                        if (data.isLoggedIn === "true") {
+                            sessionStorage.setItem("isLoggedIn", "true");
+                            sessionStorage.setItem("role", data.role || "");
+                            sessionStorage.setItem("username", data.username || "");
+                            sessionStorage.setItem("email", data.email || "");
+
+                            loggedIn = true;
+                            storedRole = data.role;
+                        }
+                    }
+                } catch (err) {
+                    console.error("❌ Failed to sync session from backend", err);
+                }
+            }
+
+            setIsLoggedIn(loggedIn);
+            setRole(storedRole || "");
+        };
+
+        syncSession();
+
+        // Optional: Keep watching for session changes (across tabs or async updates)
+        const interval = setInterval(syncSession, 1500);
+        window.addEventListener("storage", syncSession);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener("storage", syncSession);
+        };
     }, []);
 
     const handleSearch = (e) => {
@@ -41,11 +66,13 @@ const Header = () => {
     const handleLogout = () => {
         sessionStorage.removeItem("isLoggedIn");
         sessionStorage.removeItem("role");
+        sessionStorage.removeItem("username");
+        sessionStorage.clear();// removes everything
         window.location.href = "http://localhost:8000/logout";
     };
 
     return (
-        <nav className="navbar navbar-expand-lg fixed-top py-2" style={{ backgroundColor: "#5D8736" }}>
+        <nav className="navbar navbar-expand-lg fixed-top py-2" style={{backgroundColor: "#5D8736"}}>
             <div className="container-fluid px-3">
                 <a className="navbar-brand text-white fw-bold" href="/">
                     Freezer Alarm Management
@@ -61,13 +88,13 @@ const Header = () => {
                             value={searchNumber}
                             onChange={(e) => setSearchNumber(e.target.value)}
                             disabled={!isLoggedIn}
-                            style={{ backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px" }}
+                            style={{backgroundColor: "#F4FFC3", color: "#5D8736", width: "200px"}}
                         />
                         <button
                             className="btn"
                             type="submit"
                             disabled={!isLoggedIn}
-                            style={{ backgroundColor: "#A9C46C", color: "#fff" }}
+                            style={{backgroundColor: "#A9C46C", color: "#fff"}}
                         >
                             Search
                         </button>
@@ -158,14 +185,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-
-
-
-
-
-
-
-
-

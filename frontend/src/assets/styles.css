@@ -148,7 +148,7 @@ main {
 /* FreezerCard */
 .freezer-card {
     width: 100%; /* Take full width by default */
-    max-width: 500px;
+    max-width: 450px;
     min-width: 375px;
 }
 
@@ -177,7 +177,3 @@ main {
         padding: 1rem !important; /* shrink internal padding */
     }
 }
-
-
-
-

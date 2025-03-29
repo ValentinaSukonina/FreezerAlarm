@@ -1,17 +1,17 @@
 import React from "react";
 import "../assets/styles.css";
 
-const FreezerCardUser = ({ freezer }) => {
+const FreezerCardUser = ({freezer}) => {
     if (!freezer) {
         return <p>No freezer data available.</p>;
     }
 
-    const { number, room, address, type, users = [] } = freezer;
+    const {number, room, address, type, users = []} = freezer;
 
     return (
         <div className="freezer-card mx-auto my-2 px-3 py-1">
-            <div className="row p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg"
-                 style={{ width: "100%" }}>
+            <div className="p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg"
+                 style={{width: "100%"}}>
                 <div className="p-2 pt-lg-2 text-start">
                     {/* Freezer Info */}
                     <div className="d-flex justify-content-between align-items-center">
