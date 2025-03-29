@@ -126,3 +126,13 @@ export async function fetchUserByName(username) {
     if (!response.ok) throw new Error("Failed to fetch user");
     return await response.json();
 }
+
+export const fetchFreezers = async () => {
+    try {
+        const response = await API.get('/freezers'); // Adjust based on your Freezer endpoint
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching freezers:", error.response ? error.response.data : error.message);
+        throw new Error("Could not fetch freezers");
+    }
+};
