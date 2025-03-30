@@ -89,7 +89,7 @@ const MyAccount = () => {
     };
 
     // Directly return the content once data is loaded
-    if (loading) return null; // or just return a blank element like <></>
+    if (loading) return null;
 
     if (!user) return <p className="text-danger text-center">User not found.</p>;
 
