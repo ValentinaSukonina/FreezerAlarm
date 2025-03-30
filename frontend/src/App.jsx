@@ -1,8 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+
 import Header from './components/Header.jsx';
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
+
 import Home from "./pages/Home";
 import Personal from "./pages/Personal";
 import Login from "./pages/Login";
@@ -16,20 +18,20 @@ const App = () => {
     return (
         <Router>
             <div className="d-flex flex-column min-vh-100">
-                <Header />
+                <Header/>
                 <main className="flex-grow-1 d-flex flex-column">
                     <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/create-account" element={<Login />} />
-                        <Route path="/confirmation" element={<AlertConfirmation />} />
-                        <Route path="/unauthorized" element={<Unauthorized />} />
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/create-account" element={<Login/>}/>
+                        <Route path="/confirmation" element={<AlertConfirmation/>}/>
+                        <Route path="/unauthorized" element={<Unauthorized/>}/>
 
                         {/* Protected: login required */}
                         <Route
                             path="/my-account"
                             element={
                                 <ProtectedRoute>
-                                    <MyAccount />
+                                    <MyAccount/>
                                 </ProtectedRoute>
                             }
                         />
@@ -37,7 +39,7 @@ const App = () => {
                             path="/freezers"
                             element={
                                 <ProtectedRoute>
-                                    <Freezers />
+                                    <Freezers/>
                                 </ProtectedRoute>
                             }
                         />
@@ -45,7 +47,7 @@ const App = () => {
                             path="/freezers/:freezerNumber"
                             element={
                                 <ProtectedRoute>
-                                    <FreezerPage />
+                                    <FreezerPage/>
                                 </ProtectedRoute>
                             }
                         />
@@ -55,13 +57,13 @@ const App = () => {
                             path="/personal"
                             element={
                                 <ProtectedRoute requiredRole="admin">
-                                    <Personal />
+                                    <Personal/>
                                 </ProtectedRoute>
                             }
                         />
                     </Routes>
                 </main>
-                <Footer />
+                <Footer/>
             </div>
         </Router>
     );
