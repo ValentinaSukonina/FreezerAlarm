@@ -111,9 +111,25 @@ export const deleteFreezer = async (id) => {
 };
 
 export const createFreezer = async (freezerData) => {
-    const response = await API.post('/freezers/with-users', {
+    const payload = {
         ...freezerData,
-        users: freezerData.userIds.map(id => ({id}))
-    });
-    return response.data;
+        users: freezerData.userIds.map(id => ({id})) // Only send userId
+    };
+
+    console.log("📦 Payload being sent to backend:", payload);
+
+    try {
+        const response = await API.post('/freezers/with-users', payload);
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            console.error("❌ Backend error:", error.response.data);
+
+            // Re-throw to handle in the UI (e.g., FreezersAll)
+            throw new Error(error.response.data.message || "Failed to create freezer.");
+        } else {
+            console.error("❌ Network or unexpected error:", error.message);
+            throw new Error("Something went wrong while creating the freezer.");
+        }
+    }
 };

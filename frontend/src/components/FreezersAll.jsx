@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import {fetchAllFreezersWithUsers, createFreezer} from "../services/api";
 import FreezerCardUser from "../components/FreezerCardUser";
 import AddFreezerForm from "./AddFreezerForm";
@@ -18,6 +18,8 @@ const FreezersAll = () => {
         type: "",
         file: ""
     });
+
+    const formRef = useRef();
 
     useEffect(() => {
         const fetchRoleIfNeeded = async () => {
@@ -60,16 +62,17 @@ const FreezersAll = () => {
         setNewFreezer((prev) => ({...prev, [name]: value}));
     };
 
-    const handleAddFreezer = async () => {
-        if (!newFreezer.number || !newFreezer.room) {
+    const handleAddFreezer = async (freezerData) => {
+        if (!freezerData.number || !freezerData.room) {
             alert("Freezer number and room are required.");
             return;
         }
 
         try {
-            const created = await createFreezer(newFreezer);
+            const created = await createFreezer(freezerData);
             setFreezers((prev) => [...prev, created]);
             setNewFreezer({number: "", room: "", address: "", type: "", file: ""});
+            formRef.current?.resetCheckboxes(); //  Reset selected users
 
             setSuccessMessage(`✅ Freezer ${created.number} added successfully!`);
             setTimeout(() => setSuccessMessage(""), 3000);
@@ -89,6 +92,7 @@ const FreezersAll = () => {
                 <>
                     <div className="freezer-form-container">
                         <AddFreezerForm
+                            ref={formRef}
                             newFreezer={newFreezer}
                             onChange={handleNewFreezerChange}
                             onAdd={handleAddFreezer}
