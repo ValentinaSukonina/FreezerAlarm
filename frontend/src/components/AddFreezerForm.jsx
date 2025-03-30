@@ -78,6 +78,7 @@ const AddFreezerForm = ({newFreezer, onChange, onAdd}) => {
                             placeholder="Number"
                             value={newFreezer.number}
                             onChange={onChange}
+                            required
                         />
                         <input
                             name="room"
@@ -85,6 +86,7 @@ const AddFreezerForm = ({newFreezer, onChange, onAdd}) => {
                             placeholder="Room"
                             value={newFreezer.room}
                             onChange={onChange}
+                            required
                         />
                         <input
                             name="address"
@@ -93,13 +95,22 @@ const AddFreezerForm = ({newFreezer, onChange, onAdd}) => {
                             value={newFreezer.address}
                             onChange={onChange}
                         />
-                        <input
+                        <select
                             name="type"
                             className="form-control mb-3"
-                            placeholder="Type"
+                            style={{
+                                height: "32px",
+                                fontSize: "13px",
+                                border: "1px solid #c8dfb6"
+                            }}
                             value={newFreezer.type}
                             onChange={onChange}
-                        />
+                            required
+                        >
+                            <option value="" disabled>Select Freezer Type</option>
+                            <option value="-80C">-80°C</option>
+                            <option value="-150C">-150°C</option>
+                        </select>
                         {/* Assign Users Button */}
                         <div className="text-start mb-2">
                             <button

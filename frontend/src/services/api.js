@@ -111,6 +111,9 @@ export const deleteFreezer = async (id) => {
 };
 
 export const createFreezer = async (freezerData) => {
-    const response = await API.post('/freezers', freezerData);
+    const response = await API.post('/freezers/with-users', {
+        ...freezerData,
+        users: freezerData.userIds.map(id => ({id}))
+    });
     return response.data;
 };
