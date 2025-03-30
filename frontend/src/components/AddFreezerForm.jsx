@@ -73,7 +73,8 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
                     }}>
                         <h5 className="mb-3 text-start fw-bold">Add New Freezer</h5>
 
-                        <input name="number" className="form-control mb-2" placeholder="Number"
+                        <input name="number" className="form-control mb-2"
+                               placeholder="Enter unique 4-digit freezer code"
                                value={newFreezer.number} onChange={onChange} required/>
                         <input name="room" className="form-control mb-2" placeholder="Room" value={newFreezer.room}
                                onChange={onChange} required/>
@@ -95,7 +96,9 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
                         />
 
                         <div className="text-start mb-2 my-2">
-                            <button type="button" className="form-control text-start assign-users-toggle"
+                            <button type="button"
+                                    className="form-control text-start assign-users-toggle"
+                                    style={{backgroundColor: "#e6f2d9",}}
                                     onClick={() => setShowUserDropdown(prev => !prev)}>
                                 {showUserDropdown ? "Hide Users" : "Assign Users"}
                             </button>
