@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.entity.FreezerUser;
@@ -105,4 +106,6 @@ public class FreezerUserService {
                 .collect(Collectors.toList());
     }
 
+    public List<FreezerDTO> getFreezersByUserId(Long userId) {
+    }
 }

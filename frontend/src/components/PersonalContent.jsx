@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchUsers, updateUser, deleteUser, createUser } from '../services/api';
+import { fetchUsers, updateUser, deleteUser, createUser, fetchFreezersByUserId } from '../services/api';
 import { Navigate } from "react-router-dom";
 
 const PersonalContent = () => {
@@ -43,14 +43,24 @@ const PersonalContent = () => {
 
     const loadUsers = async () => {
         try {
-            const data = await fetchUsers();
-            setUsers(data);
+            const usersData = await fetchUsers();
+
+            // Fetch freezers for each user
+            const usersWithFreezers = await Promise.all(
+                usersData.map(async (user) => {
+                    const freezers = await fetchFreezersByUserId(user.id);
+                    return { ...user, freezers };
+                })
+            );
+
+            setUsers(usersWithFreezers);
         } catch (err) {
             setError("Failed to load users");
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleEditChange = (e, userId) => {
         const { name, value } = e.target;
@@ -61,15 +71,7 @@ const PersonalContent = () => {
         );
     };
 
-    const handleSave = async (userId) => {
-        const userToUpdate = users.find((user) => user.id === userId);
-        try {
-            await updateUser(userId, userToUpdate);
-            setEditingUserId(null);
-        } catch (err) {
-            alert("Failed to update user");
-        }
-    };
+
 
     const handleDelete = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
@@ -85,6 +87,25 @@ const PersonalContent = () => {
         const { name, value } = e.target;
         setNewUser((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleSave = async (userId) => {
+        const userToUpdate = users.find((user) => user.id === userId);
+        const allowedFields = {
+            name: userToUpdate.name,
+            email: userToUpdate.email,
+            phone_number: userToUpdate.phone_number,
+            user_rank: userToUpdate.user_rank,
+            role: userToUpdate.role
+        };
+
+        try {
+            await updateUser(userId, allowedFields);
+            setEditingUserId(null);
+        } catch (err) {
+            alert("Failed to update user");
+        }
+    };
+
 
     const handleAddUser = async () => {
         if (!newUser.name || !newUser.email || !newUser.role) {

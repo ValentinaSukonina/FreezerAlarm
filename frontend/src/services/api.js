@@ -136,3 +136,14 @@ export const fetchFreezers = async () => {
         throw new Error("Could not fetch freezers");
     }
 };
+
+export const fetchFreezersByUserId = async (userId) => {
+    try {
+        const response = await API.get(`/freezer-user/user/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching freezers for user ${userId}:`, error.response?.data || error.message);
+        return [];
+    }
+};
+

@@ -1,10 +1,11 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
-import com.example.backend.exception.Exceptions;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.FreezerUserService;
 import com.example.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +28,13 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final FreezerUserService freezerUserService;
 
-    public UserController(UserService userService, UserRepository userRepository, UserMapper userMapper) {
+    public UserController(UserService userService, UserRepository userRepository, UserMapper userMapper, FreezerUserService freezerUserService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.freezerUserService = freezerUserService;
     }
 
     @PostMapping
@@ -116,8 +119,29 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-}
 
+@PutMapping("/{id}")
+public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+    if (!userRepository.existsById(id)) {
+        return ResponseEntity.notFound().build();
+    }
+
+    try {
+        User updatedUser = userService.updateUser(id, user);
+        return ResponseEntity.ok(updatedUser);
+    } catch (Exception e) {
+        logger.error("Failed to update user with ID {}: {}", id, e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<FreezerDTO>> getFreezersByUserId(@PathVariable Long userId) {
+        List<FreezerDTO> freezers = freezerUserService.getFreezersByUserId(userId);
+        return ResponseEntity.ok(freezers);
+    }
+
+}
 
 
 
