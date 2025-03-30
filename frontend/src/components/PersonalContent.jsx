@@ -150,8 +150,7 @@ const PersonalContent = () => {
 
             {users.length > 0 ? (
                 <div className="table-responsive mt-4">
-                    <table
-                        className="table table-bordered table-hover text-center">
+                    <table className="table table-bordered table-hover text-center">
                         <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
                             <th>Name</th>
@@ -191,6 +190,13 @@ const PersonalContent = () => {
                                         <td className="d-none d-md-table-cell">{isEditing ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
                                         <td className="d-none d-lg-table-cell">{isEditing ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
                                         <td className="d-none d-lg-table-cell">{isEditing ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
+                                        <td className="d-none d-lg-table-cell">
+                                            {user.freezers?.map(freezer => (
+                                                <div key={freezer.id}>
+                                                    {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                                </div>
+                                            ))}
+                                        </td>
                                         <td className="d-none d-md-table-cell">
                                             {isEditing ? (
                                                 <>
@@ -213,9 +219,24 @@ const PersonalContent = () => {
                                                 <div><strong>Phone:</strong> {user.phone_number}</div>
                                                 <div><strong>Rank:</strong> {user.user_rank}</div>
                                                 <div><strong>Role:</strong> {user.role}</div>
-
+                                                <div><strong>Assigned Freezers:</strong></div>
+                                                {user.freezers?.map(freezer => (
+                                                    <div key={freezer.id}>
+                                                        {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                                    </div>
+                                                ))}
                                                 <div className="mt-2">
-
+                                                    {isEditing ? (
+                                                        <>
+                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
+                                                            <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
+                                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }} onClick={() => handleDelete(user.id)}>Delete</button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -232,6 +253,7 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
 
 
 
