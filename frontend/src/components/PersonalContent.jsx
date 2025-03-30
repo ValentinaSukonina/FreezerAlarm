@@ -159,6 +159,7 @@ const PersonalContent = () => {
                             <th className="d-none d-md-table-cell">Phone</th>
                             <th className="d-none d-lg-table-cell">Rank</th>
                             <th className="d-none d-lg-table-cell">Role</th>
+                            <th className="d-none d-lg-table-cell">Assigned freezers</th>
                             <th className="d-none d-md-table-cell">Actions</th>
                         </tr>
                         </thead>
