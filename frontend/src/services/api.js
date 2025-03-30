@@ -51,8 +51,6 @@ export const deleteUser = async (id) => {
     }
 };
 
-
-
 export async function fetchFreezerWithUsers(freezerNumber) {
     try {
         const response = await fetch(`http://localhost:8000/api/freezers/number/${freezerNumber}/with-users`, {
@@ -111,8 +109,6 @@ export const updateFreezer = async (id, updatedData) => {
 export const deleteFreezer = async (id) => {
     await API.delete(`/freezers/${id}`);
 };
-
-
 
 export const createFreezer = async (freezerData) => {
     const response = await API.post('/freezers', freezerData);

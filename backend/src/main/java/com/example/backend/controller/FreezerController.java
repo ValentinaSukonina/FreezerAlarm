@@ -102,5 +102,11 @@ public class FreezerController {
         return ResponseEntity.noContent().build();
     }
 
+    // CREATE FREEZER WITH USERS
+    @PostMapping("/with-users")
+    public ResponseEntity<FreezerWithUsersDTO> createFreezerWithUsers(@RequestBody FreezerWithUsersDTO dto) {
+        FreezerWithUsersDTO created = freezerService.createFreezerWithUsers(dto);
+        return ResponseEntity.created(URI.create("/api/freezers/number/" + created.number())).body(created);
+    }
 
 }

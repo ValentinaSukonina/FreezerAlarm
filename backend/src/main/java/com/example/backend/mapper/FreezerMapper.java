@@ -57,4 +57,21 @@ public class FreezerMapper {
                 userDTOs
         );
     }
+
+    public Freezer fromFreezerWithUsersDTO(FreezerWithUsersDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        Freezer freezer = new Freezer();
+        freezer.setId(dto.id()); // optional
+        freezer.setFile(dto.file());
+        freezer.setNumber(dto.number());
+        freezer.setAddress(dto.address());
+        freezer.setRoom(dto.room());
+        freezer.setType(dto.type());
+
+        return freezer;
+    }
+
 }

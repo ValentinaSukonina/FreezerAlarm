@@ -1,10 +1,45 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
+import {fetchUsers} from "../services/api";
 
-const AddFreezerForm = ({ newFreezer, onChange, onAdd }) => {
+const AddFreezerForm = ({newFreezer, onChange, onAdd}) => {
+    const [users, setUsers] = useState([]);
+    const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [showForm, setShowForm] = useState(false);
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
 
     const handleCancel = () => {
+        setSelectedUserIds([]);
         setShowForm(false);
+        setShowUserDropdown(false);
+    };
+
+    useEffect(() => {
+        const getUsers = async () => {
+            const fetched = await fetchUsers();
+            setUsers(fetched);
+        };
+        getUsers();
+    }, []);
+
+    const handleUserToggle = (userId) => {
+        setSelectedUserIds((prev) =>
+            prev.includes(userId)
+                ? prev.filter((id) => id !== userId)
+                : [...prev, userId]
+        );
+    };
+
+    const handleSubmit = () => {
+        const freezerData = {
+            ...newFreezer,
+            userIds: selectedUserIds,
+        };
+        onAdd(freezerData);
+
+        // Reset form & users
+        setSelectedUserIds([]);
+        setShowForm(false);
+        setShowUserDropdown(false);
     };
 
     return (
@@ -12,7 +47,7 @@ const AddFreezerForm = ({ newFreezer, onChange, onAdd }) => {
             {!showForm ? (
                 <button
                     className="btn"
-                    style={{ backgroundColor: "#5D8736", color: "white" }}
+                    style={{backgroundColor: "#5D8736", color: "white"}}
                     onClick={() => setShowForm(true)}
                 >
                     Add New Freezer
@@ -21,7 +56,7 @@ const AddFreezerForm = ({ newFreezer, onChange, onAdd }) => {
                 <>
                     <button
                         className="btn mb-3"
-                        style={{ backgroundColor: "#5D8736", color: "white" }}
+                        style={{backgroundColor: "#5D8736", color: "white"}}
                         onClick={() => setShowForm(false)}
                     >
                         Hide Form
@@ -65,12 +100,53 @@ const AddFreezerForm = ({ newFreezer, onChange, onAdd }) => {
                             value={newFreezer.type}
                             onChange={onChange}
                         />
+                        {/* Assign Users Button */}
+                        <div className="text-start mb-2">
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary btn-sm"
+                                onClick={() => setShowUserDropdown((prev) => !prev)}
+                            >
+                                {showUserDropdown ? "Hide Users" : "Assign Users"}
+                            </button>
+                        </div>
+
+                        {/* User Dropdown */}
+                        {showUserDropdown && (
+                            <div
+                                className="dropdown-menu show w-100 p-2 border"
+                                style={{
+                                    maxHeight: "200px",
+                                    overflowY: "auto",
+                                    backgroundColor: "white",
+                                }}
+                            >
+                                {users.map((user) => (
+                                    <div key={user.id} className="form-check text-start mb-1">
+                                        <input
+                                            type="checkbox"
+                                            className="form-check-input me-2"
+                                            id={`user-${user.id}`}
+                                            checked={selectedUserIds.includes(user.id)}
+                                            onChange={() => handleUserToggle(user.id)}
+                                        />
+                                        <label
+                                            htmlFor={`user-${user.id}`}
+                                            className="form-check-label"
+                                        >
+                                            {user.name}{" "}
+                                            <small className="text-muted">(Rank: {user.user_rank})</small>
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         <div className="d-flex justify-content-between">
                             <button
                                 className="btn"
-                                style={{ backgroundColor: "#5D8736", color: "white" }}
-                                onClick={onAdd}
+                                style={{backgroundColor: "#5D8736", color: "white"}}
+                                onClick={handleSubmit}
                             >
                                 Add
                             </button>
@@ -86,10 +162,3 @@ const AddFreezerForm = ({ newFreezer, onChange, onAdd }) => {
 };
 
 export default AddFreezerForm;
-
-
-
-
-
-
-
