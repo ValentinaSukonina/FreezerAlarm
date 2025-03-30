@@ -152,6 +152,55 @@ main {
     min-width: 375px;
 }
 
+/* Main control (border, height, padding, etc) */
+.freezer-type-select .ft__control {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    min-height: 38px;
+    height: 38px;
+    font-size: 14px;
+    box-shadow: none;
+    padding-left: 8px;
+}
+
+/* Placeholder text */
+.freezer-type-select .ft__placeholder {
+    color: #6c757d;
+    font-size: 14px;
+    padding-left: 2px;
+}
+
+/* Ensure placeholder and selected value are aligned left */
+.freezer-type-select .ft__value-container {
+    padding-left: 0;
+    justify-content: flex-start;
+}
+
+.freezer-type-select .ft__input-container {
+    margin: 0;
+    padding: 0;
+}
+
+/* Selected value */
+.freezer-type-select .ft__single-value {
+    color: #212529;
+    font-size: 14px;
+    padding-left: 2px;
+}
+
+/* Dropdown indicator (arrow icon) */
+.freezer-type-select .ft__dropdown-indicator {
+    padding: 4px;
+}
+
+/* Dropdown options menu */
+.freezer-type-select .ft__menu {
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
 /* Ensure single column on small screens */
 @media (max-width: 768px) {
     .freezer-grid {

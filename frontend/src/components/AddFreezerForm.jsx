@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import Select from "react-select";
 import {fetchUsers} from "../services/api";
 
 const AddFreezerForm = ({newFreezer, onChange, onAdd}) => {
@@ -6,6 +7,11 @@ const AddFreezerForm = ({newFreezer, onChange, onAdd}) => {
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+    const typeOptions = [
+        {value: "-80C", label: "-80°C"},
+        {value: "-150C", label: "-150°C"}
+    ];
 
     const handleCancel = () => {
         setSelectedUserIds([]);
@@ -95,24 +101,18 @@ const AddFreezerForm = ({newFreezer, onChange, onAdd}) => {
                             value={newFreezer.address}
                             onChange={onChange}
                         />
-                        <select
-                            name="type"
-                            className="form-control mb-3"
-                            style={{
-                                height: "32px",
-                                fontSize: "13px",
-                                border: "1px solid #c8dfb6"
-                            }}
-                            value={newFreezer.type}
-                            onChange={onChange}
-                            required
-                        >
-                            <option value="" disabled>Select Freezer Type</option>
-                            <option value="-80C">-80°C</option>
-                            <option value="-150C">-150°C</option>
-                        </select>
+                        <Select
+                            className="freezer-type-select"
+                            classNamePrefix="ft"
+                            options={typeOptions}
+                            placeholder="Select Freezer Type"
+                            value={typeOptions.find(opt => opt.value === newFreezer.type) || null}
+                            onChange={(selectedOption) =>
+                                onChange({target: {name: "type", value: selectedOption.value}})
+                            }
+                        />
                         {/* Assign Users Button */}
-                        <div className="text-start mb-2">
+                        <div className="text-start mb-2 my-2">
                             <button
                                 type="button"
                                 className="btn btn-outline-secondary btn-sm"
