@@ -41,25 +41,6 @@ const PersonalContent = () => {
         }
     }, [role]);
 
-    const loadUsers = async () => {
-        try {
-            const usersData = await fetchUsers();
-
-            // Fetch freezers for each user
-            const usersWithFreezers = await Promise.all(
-                usersData.map(async (user) => {
-                    const freezers = await fetchFreezersByUserId(user.id);
-                    return { ...user, freezers };
-                })
-            );
-
-            setUsers(usersWithFreezers);
-        } catch (err) {
-            setError("Failed to load users");
-        } finally {
-            setLoading(false);
-        }
-    };
 
 
     const handleEditChange = (e, userId) => {

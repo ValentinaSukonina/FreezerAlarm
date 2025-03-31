@@ -107,5 +107,26 @@ public class FreezerUserService {
     }
 
     public List<FreezerDTO> getFreezersByUserId(Long userId) {
+        List<Freezer> freezerUsers = freezerUserRepository.findFreezersByUserId(userId);
+
+        return freezerUsers.stream()
+                .map(fu -> {
+                    Freezer freezer = fu.getFreezer();
+                    return new FreezerDTO(
+                            freezer.getId(),
+                            freezer.getNumber(),
+                            freezer.getRoom(),
+                            freezer.getAddress(),
+                            freezer.getType(),
+                            fu.getFreezer().getNumber()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 }
+
+
+
+
+
+

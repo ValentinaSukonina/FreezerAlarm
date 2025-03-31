@@ -32,5 +32,8 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     @Query("DELETE FROM FreezerUser fu WHERE fu.user.id = :userId")
     void deleteByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT fu.freezer FROM FreezerUser fu WHERE fu.user.id = :userId")
+    List<Freezer> findFreezersByUserId(@Param("userId") Long userId);
+
 }
 

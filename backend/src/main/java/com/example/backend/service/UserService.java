@@ -1,7 +1,9 @@
 package com.example.backend.service;
 
 import com.example.backend.controller.UserController;
+import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.UserDTO;
+import com.example.backend.entity.Freezer;
 import com.example.backend.entity.User;
 import com.example.backend.exception.Exceptions;
 import com.example.backend.mapper.UserMapper;
@@ -90,5 +92,22 @@ public class UserService {
         return userRepository.findByName(name);
     }
 
+    public List<FreezerDTO> getFreezersByUserId(Long userId) {
+        List<Freezer> freezers = freezerUserRepository.findFreezersByUserId(userId);
+
+        // Convert List<Freezer> to List<FreezerDTO>
+        return freezers.stream()
+                .map(freezer -> new FreezerDTO(
+                        freezer.getId(),
+                        freezer.getNumber(),
+                        freezer.getRoom(),
+                        freezer.getAddress(),
+                        freezer.getType()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
 }
+
 
