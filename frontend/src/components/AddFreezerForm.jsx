@@ -112,7 +112,6 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
                                 onChange({target: {name: "address", value: sanitized}});
                             }}
                         />
-
                         <Select
                             className="freezer-type-select"
                             classNamePrefix="ft"
