@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
+import com.example.backend.exception.GlobalExceptionHandler;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
 import org.springframework.http.ResponseEntity;
@@ -102,5 +103,15 @@ public class FreezerController {
         return ResponseEntity.noContent().build();
     }
 
+    // CREATE FREEZER WITH USERS
+    @PostMapping("/with-users")
+    public ResponseEntity<?> createFreezerWithUsers(@RequestBody FreezerWithUsersDTO dto) {
+        try {
+            FreezerWithUsersDTO created = freezerService.createFreezerWithUsers(dto);
+            return ResponseEntity.created(URI.create("/api/freezers/number/" + created.number())).body(created);
+        } catch (GlobalExceptionHandler.BadRequestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }

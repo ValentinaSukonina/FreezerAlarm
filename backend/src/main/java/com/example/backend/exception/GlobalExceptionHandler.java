@@ -34,6 +34,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    // Handle UserAlreadyExistsException (409 Conflict)
+    @ExceptionHandler(Exceptions.UserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleUserAlreadyExistsException(Exceptions.UserAlreadyExistsException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     // Handle DataIntegrityViolationException (400 Bad Request)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
@@ -45,6 +51,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
+    }
+
+    public class BadRequestException extends RuntimeException {
+        public BadRequestException(String message) {
+            super(message);
+        }
     }
 
     // Helper Method to Build Error Response

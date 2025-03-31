@@ -9,7 +9,9 @@ public record FreezerWithUsersDTO(
         String address,
         String room,
         String type,
-        List<UserDTO> users // <--- "users" array in JSON
+        List<Long> userIds,     // for POST, Used when posting from frontend
+        List<UserDTO> users     // for GETUsed when returning from backend
 ) {
 }
+
 
