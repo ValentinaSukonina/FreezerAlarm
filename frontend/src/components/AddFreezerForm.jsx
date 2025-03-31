@@ -14,15 +14,6 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
         {value: "-150C", label: "-150°C"}
     ];
 
-    //Clear the input
-    const sanitizeInput = (value) => {
-        return value
-            .replace(/<script.*?>.*?<\/script>/gi, "")
-            .replace(/<\/?[^>]+(>|$)/g, "")
-            .replace(/[<>]/g, "")
-            .trim();
-    };
-
     // Expose a function to parent using the ref
     useImperativeHandle(ref, () => ({
         resetCheckboxes() {
