@@ -31,10 +31,10 @@ public class FreezerMapper {
         if (freezer == null) {
             return null;
         }
-        List<UserDTO> userDTOs = freezer.getFreezerUsers().stream()
-                .map(freezerUser -> {
-                    User user = freezerUser.getUser();
 
+        List<UserDTO> userDTOs = freezer.getFreezerUsers().stream()
+                .map(fu -> {
+                    User user = fu.getUser();
                     return new UserDTO(
                             user.getId(),
                             user.getName(),
@@ -46,7 +46,10 @@ public class FreezerMapper {
                 })
                 .toList();
 
-        // Return a FreezerDTO that includes the list of users
+        List<Long> userIds = freezer.getFreezerUsers().stream()
+                .map(fu -> fu.getUser().getId())
+                .toList();
+
         return new FreezerWithUsersDTO(
                 freezer.getId(),
                 freezer.getFile(),
@@ -54,6 +57,7 @@ public class FreezerMapper {
                 freezer.getAddress(),
                 freezer.getRoom(),
                 freezer.getType(),
+                userIds,
                 userDTOs
         );
     }

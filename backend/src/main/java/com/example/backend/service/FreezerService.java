@@ -14,6 +14,7 @@ import com.example.backend.repository.FreezerUserRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -98,25 +99,26 @@ public class FreezerService {
         }
     }
 
-    public FreezerWithUsersDTO createFreezerWithUsers(FreezerWithUsersDTO dto) {
-        // Use mapper to convert DTO → Entity
-        Freezer freezer = freezerMapper.fromFreezerWithUsersDTO(dto);
-        freezer = freezerRepository.save(freezer);
 
-        // Link users
-        Freezer finalFreezer = freezer;
-        dto.users().forEach(userDTO -> {
-            User user = userRepository.findById(userDTO.id())
-                    .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found: " + userDTO.id()));
+    public FreezerWithUsersDTO createFreezerWithUsers(FreezerWithUsersDTO dto) {
+        Freezer freezer = freezerMapper.fromFreezerWithUsersDTO(dto);
+
+        try {
+            freezer = freezerRepository.save(freezer);
+        } catch (DataIntegrityViolationException e) {
+            throw new Exceptions.FreezerAlreadyExistsException("Freezer with number " + freezer.getNumber() + " already exists.");
+        }
+
+        for (Long userId : dto.userIds()) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found: " + userId));
 
             FreezerUser link = new FreezerUser();
-            link.setFreezer(finalFreezer);
             link.setUser(user);
-
+            link.setFreezer(freezer);
             freezerUserRepository.save(link);
-        });
+        }
 
-        // Reload and convert to DTO again
         Freezer saved = freezerRepository.findByNumberWithUsers(freezer.getNumber());
         return freezerMapper.toFreezerWithUsersDTO(saved);
     }

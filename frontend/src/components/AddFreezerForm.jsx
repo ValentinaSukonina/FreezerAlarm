@@ -1,4 +1,4 @@
-import React, {useEffect, useImperativeHandle, useState, forwardRef} from "react";
+import React, {useImperativeHandle, useState, forwardRef} from "react";
 import Select from "react-select";
 import {fetchUsers} from "../services/api";
 
@@ -12,6 +12,15 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
         {value: "-80C", label: "-80°C"},
         {value: "-150C", label: "-150°C"}
     ];
+
+    //Clear the input
+    const sanitizeInput = (value) => {
+        return value
+            .replace(/<script.*?>.*?<\/script>/gi, "")
+            .replace(/<\/?[^>]+(>|$)/g, "")
+            .replace(/[<>]/g, "")
+            .trim();
+    };
 
     // Expose a function to parent using the ref
     useImperativeHandle(ref, () => ({
@@ -73,13 +82,36 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
                     }}>
                         <h5 className="mb-3 text-start fw-bold">Add New Freezer</h5>
 
-                        <input name="number" className="form-control mb-2"
-                               placeholder="Enter unique 4-digit freezer code"
-                               value={newFreezer.number} onChange={onChange} required/>
-                        <input name="room" className="form-control mb-2" placeholder="Room" value={newFreezer.room}
-                               onChange={onChange} required/>
-                        <input name="address" className="form-control mb-2" placeholder="Address"
-                               value={newFreezer.address} onChange={onChange}/>
+                        <input
+                            type="text"
+                            name="number"
+                            className="form-control mb-2"
+                            placeholder="Enter unique 4-digit freezer code"
+                            value={newFreezer.number}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d{0,4}$/.test(value)) {
+                                    onChange(e); // only update state if valid
+                                }
+                            }}
+                            maxLength={4}
+                            required
+                        /><input name="room" className="form-control mb-2" placeholder="Room"
+                                 value={newFreezer.room}
+                                 onChange={(e) => {
+                                     const sanitized = sanitizeInput(e.target.value);
+                                     onChange({target: {name: "room", value: sanitized}});
+                                 }} required/>
+                        <input
+                            name="address"
+                            className="form-control mb-2"
+                            placeholder="Address"
+                            value={newFreezer.address}
+                            onChange={(e) => {
+                                const sanitized = sanitizeInput(e.target.value);
+                                onChange({target: {name: "address", value: sanitized}});
+                            }}
+                        />
 
                         <Select
                             className="freezer-type-select"
