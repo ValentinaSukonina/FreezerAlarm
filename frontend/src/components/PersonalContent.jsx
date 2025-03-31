@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchUsers, updateUser, deleteUser, createUser, fetchFreezersByUserId } from '../services/api';
+import { fetchUsers, updateUser, deleteUser, createUser} from '../services/api';
 import { Navigate } from "react-router-dom";
 
 const PersonalContent = () => {
@@ -40,6 +40,16 @@ const PersonalContent = () => {
             loadUsers();
         }
     }, [role]);
+    const loadUsers = async () => {
+        try {
+            const data = await fetchUsers(); // Fetch users (and their freezers if provided in the backend response)
+            setUsers(data);  // Set the users state with the data, including the freezers
+        } catch (err) {
+            setError("Failed to load users");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
 

@@ -92,20 +92,6 @@ public class UserService {
         return userRepository.findByName(name);
     }
 
-    public List<FreezerDTO> getFreezersByUserId(Long userId) {
-        List<Freezer> freezers = freezerUserRepository.findFreezersByUserId(userId);
-
-        // Convert List<Freezer> to List<FreezerDTO>
-        return freezers.stream()
-                .map(freezer -> new FreezerDTO(
-                        freezer.getId(),
-                        freezer.getNumber(),
-                        freezer.getRoom(),
-                        freezer.getAddress(),
-                        freezer.getType()
-                ))
-                .collect(Collectors.toList());
-    }
 
 
 }

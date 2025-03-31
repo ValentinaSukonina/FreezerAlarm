@@ -135,11 +135,12 @@ public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User 
     }
     }
 
-    @GetMapping("/user/{userId}")
+   /* @GetMapping("/user/{userId}")
     public ResponseEntity<List<FreezerDTO>> getFreezersByUserId(@PathVariable Long userId) {
         List<FreezerDTO> freezers = freezerUserService.getFreezersByUserId(userId);
         return ResponseEntity.ok(freezers);
-    }
+    }*/
+
 
 }
 
