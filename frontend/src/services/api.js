@@ -51,8 +51,6 @@ export const deleteUser = async (id) => {
     }
 };
 
-
-
 export async function fetchFreezerWithUsers(freezerNumber) {
     try {
         const response = await fetch(`http://localhost:8000/api/freezers/number/${freezerNumber}/with-users`, {
@@ -112,9 +110,26 @@ export const deleteFreezer = async (id) => {
     await API.delete(`/freezers/${id}`);
 };
 
-
-
 export const createFreezer = async (freezerData) => {
-    const response = await API.post('/freezers', freezerData);
-    return response.data;
+    const payload = {
+        ...freezerData,
+        users: freezerData.userIds.map(id => ({id})) // Only send userId
+    };
+
+    console.log("📦 Payload being sent to backend:", payload);
+
+    try {
+        const response = await API.post('/freezers/with-users', payload);
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            console.error("❌ Backend error:", error.response.data);
+
+            // Re-throw to handle in the UI (e.g., FreezersAll)
+            throw new Error(error.response.data.message || "Failed to create freezer.");
+        } else {
+            console.error("❌ Network or unexpected error:", error.message);
+            throw new Error("Something went wrong while creating the freezer.");
+        }
+    }
 };
