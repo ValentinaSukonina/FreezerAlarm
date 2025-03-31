@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchUsers, updateUser, deleteUser, createUser } from '../services/api';
+import { fetchUsers, updateUser, deleteUser, createUser} from '../services/api';
 import { Navigate } from "react-router-dom";
 
 const PersonalContent = () => {
@@ -40,17 +40,18 @@ const PersonalContent = () => {
             loadUsers();
         }
     }, [role]);
-
     const loadUsers = async () => {
         try {
-            const data = await fetchUsers();
-            setUsers(data);
+            const data = await fetchUsers(); // Fetch users (and their freezers if provided in the backend response)
+            setUsers(data);  // Set the users state with the data, including the freezers
         } catch (err) {
             setError("Failed to load users");
         } finally {
             setLoading(false);
         }
     };
+
+
 
     const handleEditChange = (e, userId) => {
         const { name, value } = e.target;
@@ -61,15 +62,7 @@ const PersonalContent = () => {
         );
     };
 
-    const handleSave = async (userId) => {
-        const userToUpdate = users.find((user) => user.id === userId);
-        try {
-            await updateUser(userId, userToUpdate);
-            setEditingUserId(null);
-        } catch (err) {
-            alert("Failed to update user");
-        }
-    };
+
 
     const handleDelete = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
@@ -85,6 +78,25 @@ const PersonalContent = () => {
         const { name, value } = e.target;
         setNewUser((prev) => ({ ...prev, [name]: value }));
     };
+
+    const handleSave = async (userId) => {
+        const userToUpdate = users.find((user) => user.id === userId);
+        const allowedFields = {
+            name: userToUpdate.name,
+            email: userToUpdate.email,
+            phone_number: userToUpdate.phone_number,
+            user_rank: userToUpdate.user_rank,
+            role: userToUpdate.role
+        };
+
+        try {
+            await updateUser(userId, allowedFields);
+            setEditingUserId(null);
+        } catch (err) {
+            alert("Failed to update user");
+        }
+    };
+
 
     const handleAddUser = async () => {
         if (!newUser.name || !newUser.email || !newUser.role) {
@@ -150,14 +162,7 @@ const PersonalContent = () => {
 
             {users.length > 0 ? (
                 <div className="table-responsive mt-4">
-                    <table
-                        className="table table-bordered table-hover text-center"
-                        style={{
-                            backgroundColor: "#F4FFC3",
-                            color: "#5D8736",
-                            border: "2px solid #5D8736"
-                        }}
-                    >
+                    <table className="table table-bordered table-hover text-center">
                         <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
                             <th>Name</th>
@@ -165,6 +170,7 @@ const PersonalContent = () => {
                             <th className="d-none d-md-table-cell">Phone</th>
                             <th className="d-none d-lg-table-cell">Rank</th>
                             <th className="d-none d-lg-table-cell">Role</th>
+                            <th className="d-none d-lg-table-cell">Assigned freezers</th>
                             <th className="d-none d-md-table-cell">Actions</th>
                         </tr>
                         </thead>
@@ -196,6 +202,13 @@ const PersonalContent = () => {
                                         <td className="d-none d-md-table-cell">{isEditing ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
                                         <td className="d-none d-lg-table-cell">{isEditing ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
                                         <td className="d-none d-lg-table-cell">{isEditing ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
+                                        <td className="d-none d-lg-table-cell">
+                                            {user.freezers?.map(freezer => (
+                                                <div key={freezer.id}>
+                                                    {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                                </div>
+                                            ))}
+                                        </td>
                                         <td className="d-none d-md-table-cell">
                                             {isEditing ? (
                                                 <>
@@ -218,7 +231,12 @@ const PersonalContent = () => {
                                                 <div><strong>Phone:</strong> {user.phone_number}</div>
                                                 <div><strong>Rank:</strong> {user.user_rank}</div>
                                                 <div><strong>Role:</strong> {user.role}</div>
-
+                                                <div><strong>Assigned Freezers:</strong></div>
+                                                {user.freezers?.map(freezer => (
+                                                    <div key={freezer.id}>
+                                                        {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                                    </div>
+                                                ))}
                                                 <div className="mt-2">
                                                     {isEditing ? (
                                                         <>
@@ -247,6 +265,7 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
 
 
 
