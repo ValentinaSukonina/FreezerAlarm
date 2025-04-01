@@ -91,6 +91,11 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
     const {number, room, address, type} = editData;
 
+    const handleSanitizedFieldChange = (field) => (e) => {
+        const sanitized = sanitizeInput(e.target.value);
+        handleChange({target: {name: field, value: sanitized}});
+    };
+
     return (
         <div className="freezer-card mx-auto my-2 px-3 py-1">
             <div className="p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg">
@@ -110,13 +115,33 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
                         )}
                     </div>
 
-                    <p className="mb-1"><strong>Room:</strong> {editing ?
-                        <input name="room" className="form-control" value={room} onChange={handleChange}/> : room}
+                    <p className="mb-1">
+                        <strong>Room:</strong>{" "}
+                        {editing ? (
+                            <input
+                                name="room"
+                                className="form-control"
+                                value={room}
+                                onChange={handleSanitizedFieldChange("room")}
+                            />
+                        ) : (
+                            room
+                        )}
                     </p>
-                    <p className="mb-1"><strong>Address:</strong> {editing ?
-                        <input name="address" className="form-control" value={address}
-                               onChange={handleChange}/> : address}
+                    <p className="mb-1">
+                        <strong>Address:</strong>{" "}
+                        {editing ? (
+                            <input
+                                name="address"
+                                className="form-control"
+                                value={address}
+                                onChange={handleSanitizedFieldChange("address")}
+                            />
+                        ) : (
+                            address
+                        )}
                     </p>
+
                     <p><strong>Type:</strong> {type}</p>
                     {/* Assigned Users */}
                     <div className="d-flex justify-content-between align-items-center mt-3">
@@ -218,7 +243,3 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 };
 
 export default FreezerCardAdmin;
-
-
-
-

@@ -54,6 +54,11 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
         }
     };
 
+    const handleSanitizedChange = (name) => (e) => {
+        const sanitized = sanitizeInput(e.target.value);
+        onChange({target: {name, value: sanitized}});
+    };
+
     return (
         <div className="text-center mb-4">
             {!showForm ? (
@@ -91,19 +96,14 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
                         />
                         <input name="room" className="form-control mb-2" placeholder="Room"
                                value={newFreezer.room}
-                               onChange={(e) => {
-                                   const sanitized = sanitizeInput(e.target.value);
-                                   onChange({target: {name: "room", value: sanitized}});
-                               }} required/>
+                               onChange={handleSanitizedChange("room")}
+                               required/>
                         <input
                             name="address"
                             className="form-control mb-2"
                             placeholder="Address"
                             value={newFreezer.address}
-                            onChange={(e) => {
-                                const sanitized = sanitizeInput(e.target.value);
-                                onChange({target: {name: "address", value: sanitized}});
-                            }}
+                            onChange={handleSanitizedChange("address")}
                         />
                         <Select
                             className="freezer-type-select"
