@@ -1,6 +1,7 @@
 import React, {useImperativeHandle, useState, forwardRef} from "react";
 import Select from "react-select";
 import {fetchUsers} from "../services/api";
+import {sanitizeInput} from "../services/utils";
 
 const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
     const [users, setUsers] = useState([]);
@@ -96,12 +97,13 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
                             }}
                             maxLength={4}
                             required
-                        /><input name="room" className="form-control mb-2" placeholder="Room"
-                                 value={newFreezer.room}
-                                 onChange={(e) => {
-                                     const sanitized = sanitizeInput(e.target.value);
-                                     onChange({target: {name: "room", value: sanitized}});
-                                 }} required/>
+                        />
+                        <input name="room" className="form-control mb-2" placeholder="Room"
+                               value={newFreezer.room}
+                               onChange={(e) => {
+                                   const sanitized = sanitizeInput(e.target.value);
+                                   onChange({target: {name: "room", value: sanitized}});
+                               }} required/>
                         <input
                             name="address"
                             className="form-control mb-2"
