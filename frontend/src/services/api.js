@@ -103,6 +103,7 @@ export const fetchUserRole = async () => {
 
 export const updateFreezer = async (id, updatedData) => {
     const response = await API.put(`/freezers/${id}`, updatedData);
+    console.log("🔁 API updated response:", response.data);
     return response.data;
 };
 
@@ -134,13 +135,13 @@ export const createFreezer = async (freezerData) => {
     }
 };
 
-    export async function fetchUserByName(username) {
-        const response = await fetch(`http://localhost:8000/api/users/by-name/${username}`, {
-            credentials: "include"
-        });
-        if (!response.ok) throw new Error("Failed to fetch user");
-        return await response.json();
-    }
+export async function fetchUserByName(username) {
+    const response = await fetch(`http://localhost:8000/api/users/by-name/${username}`, {
+        credentials: "include"
+    });
+    if (!response.ok) throw new Error("Failed to fetch user");
+    return await response.json();
+}
 
 
 

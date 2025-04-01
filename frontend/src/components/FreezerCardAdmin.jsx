@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {updateFreezer, deleteFreezer} from "../services/api";
 import "../assets/styles.css";
+import {sanitizeInput} from "../services/utils";
 
 const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
     const [editing, setEditing] = useState(false);
@@ -16,7 +17,6 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
             : []
     );
 
-
     const [selectAllEmail, setSelectAllEmail] = useState(false);
     const [selectAllSms, setSelectAllSms] = useState(false);
 
@@ -30,7 +30,13 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
     const handleSave = async () => {
         try {
-            const updated = await updateFreezer(editData.id, editData);
+            const updatedFreezer = {
+                ...freezer,                // original data
+                room: editData.room,       // updated fields
+                address: editData.address,
+            };
+
+            const updated = await updateFreezer(freezer.id, updatedFreezer);
             setEditing(false);
             onFreezerUpdated?.(updated);
         } catch (err) {
@@ -92,16 +98,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
                     {/* Top bar */}
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                        {editing ? (
-                            <input
-                                name="number"
-                                className="form-control fw-bold"
-                                value={number}
-                                onChange={handleChange}
-                            />
-                        ) : (
-                            <h5 className="fw-bold mb-0">Freezer: {number}</h5>
-                        )}
+                        <h5 className="fw-bold mb-0">Freezer: {number}</h5>
 
                         {role === "admin" && (
                             <button
@@ -120,10 +117,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
                         <input name="address" className="form-control" value={address}
                                onChange={handleChange}/> : address}
                     </p>
-                    <p><strong>Type:</strong> {editing ?
-                        <input name="type" className="form-control" value={type} onChange={handleChange}/> : type}
-                    </p>
-
+                    <p><strong>Type:</strong> {type}</p>
                     {/* Assigned Users */}
                     <div className="d-flex justify-content-between align-items-center mt-3">
                         <h6 className="fw-bold mb-0">Assigned Users:</h6>

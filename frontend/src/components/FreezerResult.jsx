@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { fetchFreezerWithUsers } from "../services/api";
+import React, {useEffect, useState} from "react";
+import {fetchFreezerWithUsers} from "../services/api";
 import FreezerCardAdmin from "../components/FreezerCardAdmin";
 import FreezerCardUser from "../components/FreezerCardUser";
 
-const FreezerResult = ({ freezerNumber }) => {
+const FreezerResult = ({freezerNumber}) => {
     const [freezer, setFreezer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -34,8 +34,13 @@ const FreezerResult = ({ freezerNumber }) => {
     }, [freezerNumber]);
 
     const handleFreezerUpdated = (updated) => {
-        setFreezer(updated);
-        setMessage(`✅ Freezer ${updated.number} updated successfully!`);
+        const number = updated?.number ?? freezer?.number ?? "???";
+
+        setFreezer(prev => ({
+            ...prev,
+            ...updated
+        }));
+        setMessage(`✅ Freezer ${number} updated successfully!`);
         setTimeout(() => setMessage(""), 3000);
     };
 
@@ -77,7 +82,7 @@ const FreezerResult = ({ freezerNumber }) => {
                         onFreezerDeleted={handleFreezerDeleted}
                     />
                 ) : (
-                    <FreezerCardUser freezer={freezer} />
+                    <FreezerCardUser freezer={freezer}/>
                 )
             ) : null}
         </div>
