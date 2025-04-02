@@ -3,7 +3,7 @@ import Select from "react-select";
 import {fetchUsers} from "../services/api";
 import {sanitizeInput} from "../services/utils";
 
-const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
+const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd, onCancel, formError}, ref) => {
     const [users, setUsers] = useState([]);
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [showForm, setShowForm] = useState(false);
@@ -18,6 +18,10 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
     useImperativeHandle(ref, () => ({
         resetCheckboxes() {
             setSelectedUserIds([]);
+        },
+        closeForm() {
+            setShowForm(false);
+            setShowUserDropdown(false);
         }
     }));
 
@@ -25,7 +29,9 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
         setSelectedUserIds([]);
         setShowForm(false);
         setShowUserDropdown(false);
+        onCancel(); // clear form + error
     };
+
 
     const handleUserToggle = (userId) => {
         setSelectedUserIds((prev) =>
@@ -33,17 +39,20 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
         );
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const freezerData = {
             ...newFreezer,
             userIds: selectedUserIds,
         };
-        onAdd(freezerData);
 
-        // Reset form state
-        setSelectedUserIds([]);
-        setShowForm(false);
-        setShowUserDropdown(false);
+        const success = await onAdd(freezerData);
+
+        if (success) {
+            // only reset and close form if add succeeded
+            setSelectedUserIds([]);
+            setShowForm(false);
+            setShowUserDropdown(false);
+        }
     };
 
     const handleShowForm = async () => {
@@ -52,6 +61,10 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
             const fetched = await fetchUsers();
             setUsers(fetched);
         }
+    };
+
+    const handleHideForm = () => {
+        setShowForm(false); // no reset when form is closed
     };
 
     const handleSanitizedChange = (name) => (e) => {
@@ -68,7 +81,7 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
             ) : (
                 <>
                     <button className="btn mb-3" style={{backgroundColor: "#5D8736", color: "white"}}
-                            onClick={handleCancel}>
+                            onClick={handleHideForm}>
                         Hide Form
                     </button>
 
@@ -154,6 +167,19 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd}, ref) => {
                                 Cancel
                             </button>
                         </div>
+                        {formError && (
+                            <div className="text-center my-3" style={{
+                                backgroundColor: "#f8d7da",
+                                color: "#721c24",
+                                border: "1px solid #f5c6cb",
+                                padding: "10px 16px",
+                                borderRadius: "5px",
+                                maxWidth: "500px",
+                                margin: "0 auto"
+                            }}>
+                                {formError}
+                            </div>
+                        )}
                     </div>
                 </>
             )}

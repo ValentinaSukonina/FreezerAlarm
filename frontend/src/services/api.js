@@ -114,7 +114,7 @@ export const deleteFreezer = async (id) => {
 export const createFreezer = async (freezerData) => {
     const payload = {
         ...freezerData,
-        users: freezerData.userIds.map(id => ({id})) // Only send userId
+        users: freezerData.userIds.map(id => ({id}))
     };
 
     console.log("📦 Payload being sent to backend:", payload);
@@ -126,7 +126,7 @@ export const createFreezer = async (freezerData) => {
         if (error.response) {
             console.error("❌ Backend error:", error.response.data);
 
-            // Re-throw to handle in the UI (e.g., FreezersAll)
+            // Re-throw with backend message to be handled in the component
             throw new Error(error.response.data.message || "Failed to create freezer.");
         } else {
             console.error("❌ Network or unexpected error:", error.message);
