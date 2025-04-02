@@ -107,6 +107,14 @@ export const updateFreezer = async (id, updatedData) => {
     return response.data;
 };
 
+export const updateFreezerUserAssignments = async (freezerId, userIds) => {
+    const response = await API.put('/freezer-user/bulk-update', {
+        freezerId,
+        userIds
+    });
+    return response.data;
+};
+
 export const deleteFreezer = async (id) => {
     await API.delete(`/freezers/${id}`);
 };

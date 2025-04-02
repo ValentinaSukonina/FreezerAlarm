@@ -53,7 +53,13 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
     const handleSave = async () => {
         try {
-            const updated = await updateFreezer(editData.id, editData);
+            const updated = await updateFreezer(editData.id, {
+                ...editData
+            });
+
+            // update the user assignments
+            await updateFreezerUserAssignments(editData.id, selectedUserIds);
+
             setEditing(false);
             onFreezerUpdated?.(updated);
         } catch (err) {
@@ -163,39 +169,43 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
                     <p><strong>Type:</strong> {type} </p>
 
                     {editing && (
-                        <div className="text-start mb-2 my-2">
-                            <button
-                                type="button"
-                                className="form-control text-start assign-users-toggle"
-                                style={{backgroundColor: "#e6f2d9"}}
-                                onClick={handleToggleUserDropdown}
-                            >
-                                {showUserDropdown ? "Hide Users" : "Assign new users"}
-                            </button>
+                        <div style={{maxWidth: "300px"}}>
+                            <div className="text-start mb-2 my-2">
+                                <button
+                                    type="button"
+                                    className="form-control text-start assign-users-toggle"
+                                    style={{backgroundColor: "#e6f2d9"}}
+                                    onClick={handleToggleUserDropdown}
+                                >
+                                    {showUserDropdown ? "Hide Users" : "Assign new users"}
+                                </button>
+
+                                {showUserDropdown && (
+                                    <div className="user-dropdown-list mt-2" style={{
+                                        maxHeight: "200px",
+                                        overflowY: "auto",
+                                        border: "1px solid #ccc",
+                                        padding: "10px",
+                                        borderRadius: "6px"
+                                    }}>
+                                        {users.map((user) => (
+                                            <div key={user.id} className="user-checkbox">
+                                                <input
+                                                    type="checkbox"
+                                                    className="custom-checkbox me-2"
+                                                    id={`user-${user.id}`}
+                                                    checked={selectedUserIds.includes(user.id)}
+                                                    onChange={() => handleUserToggle(user.id)}
+                                                />
+                                                <label htmlFor={`user-${user.id}`}>{user.name}</label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
-                    {showUserDropdown && (
-                        <div className="user-dropdown-list mt-2" style={{
-                            maxHeight: "200px",
-                            overflowY: "auto",
-                            border: "1px solid #ccc",
-                            padding: "10px",
-                            borderRadius: "6px"
-                        }}>
-                            {users.map((user) => (
-                                <div key={user.id} className="user-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        className="custom-checkbox me-2"
-                                        id={`user-${user.id}`}
-                                        checked={selectedUserIds.includes(user.id)}
-                                        onChange={() => handleUserToggle(user.id)}
-                                    />
-                                    <label htmlFor={`user-${user.id}`}>{user.name}</label>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+
 
                     {/* Assigned Users */}
                     <div className="d-flex justify-content-between align-items-center mt-3">

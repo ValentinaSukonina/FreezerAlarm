@@ -7,11 +7,14 @@ import com.example.backend.entity.Freezer;
 import com.example.backend.entity.FreezerUser;
 import com.example.backend.entity.User;
 import com.example.backend.exception.Exceptions;
+import com.example.backend.mapper.FreezerUserMapper;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,13 +24,21 @@ public class FreezerUserService {
     private final FreezerUserRepository freezerUserRepository;
     private final UserRepository userRepository;
     private final FreezerRepository freezerRepository;
+    private final UserMapper userMapper;
+    private final FreezerUserMapper freezerUserMapper;
 
 
     @Autowired
-    public FreezerUserService(FreezerUserRepository freezerUserRepository, FreezerRepository freezerRepository, UserRepository userRepository) {
+    public FreezerUserService(FreezerUserRepository freezerUserRepository,
+                              FreezerRepository freezerRepository,
+                              UserRepository userRepository,
+                              UserMapper userMapper,
+                              FreezerUserMapper freezerUserMapper) {
         this.freezerUserRepository = freezerUserRepository;
         this.freezerRepository = freezerRepository;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.freezerUserMapper = freezerUserMapper;
     }
 
     public FreezerUser bindUserToFreezer(Long userId, Long freezerId) {
@@ -95,16 +106,7 @@ public class FreezerUserService {
             throw new Exceptions.ResourceNotFoundException("No users found for freezer number: " + freezerNumber);
         }
 
-        return users.stream()
-                .map(user -> new UserDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getPhoneNumber(),
-                        user.getEmail(),
-                        user.getUser_rank(),
-                        user.getRole()
-                ))
-                .collect(Collectors.toList());
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
 
@@ -134,10 +136,27 @@ public class FreezerUserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void updateFreezerAssignments(Long freezerId, List<Long> newUserIds) {
+        List<FreezerUser> existing = freezerUserRepository.findByFreezerId(freezerId);
+
+        // Remove old associations
+        for (FreezerUser fu : existing) {
+            if (!newUserIds.contains(fu.getUser().getId())) {
+                freezerUserRepository.delete(fu);
+            }
+        }
+
+        // Add new associations
+        for (Long userId : newUserIds) {
+            boolean alreadyExists = existing.stream()
+                    .anyMatch(fu -> fu.getUser().getId().equals(userId));
+            if (!alreadyExists) {
+                bindUserToFreezer(userId, freezerId);
+            }
+        }
+    }
+
 }
 
-
-
-
-
-
+}

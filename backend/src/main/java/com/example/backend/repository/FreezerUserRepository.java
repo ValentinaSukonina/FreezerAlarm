@@ -20,6 +20,8 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
 
     Optional<FreezerUser> findByFreezerAndUser(Freezer freezer, User user);
 
+    List<FreezerUser> findByFreezerId(Long freezerId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM FreezerUser f WHERE f.freezer = :freezer AND f.user = :user")

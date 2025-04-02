@@ -2,8 +2,11 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.FreezerUserDTO;
+import com.example.backend.dto.FreezerUserRequestDTO;
+import com.example.backend.dto.FreezerUserUpdateRequestDTO;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.FreezerUser;
+import com.example.backend.mapper.FreezerUserMapper;
 import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.service.FreezerUserService;
 import lombok.Getter;
@@ -18,54 +21,33 @@ import java.util.List;
 public class FreezerUserController {
     private final FreezerUserService freezerUserService;
     private final FreezerUserRepository freezerUserRepository;
+    private final FreezerUserMapper freezerUserMapper;
 
-    public FreezerUserController(FreezerUserService freezerUserService, FreezerUserRepository freezerUserRepository) {
+    public FreezerUserController(FreezerUserService freezerUserService,
+                                 FreezerUserRepository freezerUserRepository,
+                                 FreezerUserMapper freezerUserMapper) {
         this.freezerUserService = freezerUserService;
         this.freezerUserRepository = freezerUserRepository;
+        this.freezerUserMapper = freezerUserMapper;
     }
 
+    // POST - Bind user to freezer
     @PostMapping
-    public ResponseEntity<FreezerUserDTO> bindUserToFreezer(@RequestBody FreezerUserRequest request) {
+    public ResponseEntity<FreezerUserDTO> bindUserToFreezer(@RequestBody FreezerUserRequestDTO request) {
         FreezerUser freezerUser = freezerUserService.bindUserToFreezer(request.getUserId(), request.getFreezerId());
-        // Create the DTO record from the entity's fields.
-        FreezerUserDTO dto = new FreezerUserDTO(
-                freezerUser.getId(),
-                freezerUser.getUser().getId(),
-                freezerUser.getFreezer().getId()
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
-    }
-
-    // DTO class to receive JSON input
-    @Getter
-    public static class FreezerUserRequest {
-        private Long userId;
-        private Long freezerId;
-        private Long oldFreezerId; // Optional, only used for updates
-
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
-
-        public void setFreezerId(Long freezerId) {
-            this.freezerId = freezerId;
-        }
-
-        public void setOldFreezerId(Long oldFreezerId) {
-            this.oldFreezerId = oldFreezerId;
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(freezerUserMapper.toDTO(freezerUser));
     }
 
     // DELETE User-Freezer Association
     @DeleteMapping
-    public ResponseEntity<String> unbindUserFromFreezer(@RequestBody FreezerUserRequest request) {
+    public ResponseEntity<String> unbindUserFromFreezer(@RequestBody FreezerUserRequestDTO request) {
         freezerUserService.unbindUserFromFreezer(request.getUserId(), request.getFreezerId());
         return ResponseEntity.ok("User " + request.getUserId() + " unbound from Freezer " + request.getFreezerId());
     }
 
     //Update User-Freezer Association
     @PutMapping
-    public ResponseEntity<FreezerUserDTO> updateFreezerUser(@RequestBody FreezerUserRequest request) {
+    public ResponseEntity<FreezerUserDTO> updateFreezerUser(@RequestBody FreezerUserRequestDTO request) {
         if (request.getOldFreezerId() == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -73,15 +55,10 @@ public class FreezerUserController {
         FreezerUser updatedFreezerUser = freezerUserService.updateFreezerUser(
                 request.getUserId(), request.getOldFreezerId(), request.getFreezerId()
         );
-        FreezerUserDTO responseDto = new FreezerUserDTO(
-                updatedFreezerUser.getId(),
-                updatedFreezerUser.getUser().getId(),
-                updatedFreezerUser.getFreezer().getId()
-        );
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(freezerUserMapper.toDTO(updatedFreezerUser));
     }
 
-   /* @GetMapping("/{freezerNumber}")
+    /* @GetMapping("/{freezerNumber}")
     public ResponseEntity<List<UserDTO>> getUsersByFreezerNumber(@PathVariable String freezerNumber) {
         List<UserDTO> users = freezerUserService.getUsersByFreezerNumber(freezerNumber);
         return ResponseEntity.ok(users);
@@ -113,6 +90,12 @@ public class FreezerUserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing freezer");
         }
+    }
+
+    @PutMapping("/bulk-update")
+    public ResponseEntity<String> updateFreezerUserAssignments(@RequestBody FreezerUserUpdateRequestDTO request) {
+        freezerUserService.updateFreezerAssignments(request.getFreezerId(), request.getUserIds());
+        return ResponseEntity.ok("Freezer-user assignments updated.");
     }
 
 
