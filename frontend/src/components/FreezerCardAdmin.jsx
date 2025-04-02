@@ -1,8 +1,10 @@
 import React, {useState} from "react";
+import Select from "react-select";
 import {useNavigate} from "react-router-dom";
 import {updateFreezer, deleteFreezer} from "../services/api";
-import "../assets/styles.css";
 import {sanitizeInput} from "../services/utils";
+import {fetchUsers} from "../services/api";
+import "../assets/styles.css";
 
 const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
     const [editing, setEditing] = useState(false);
@@ -22,6 +24,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
     const navigate = useNavigate();
     const role = sessionStorage.getItem("role");
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -143,11 +146,38 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
                     </p>
 
                     <p><strong>Type:</strong> {type}</p>
+                    {editing && (
+                        <div className="text-start mb-2 my-2">
+                            <button type="button"
+                                    className="form-control text-start assign-users-toggle"
+                                    style={{backgroundColor: "#e6f2d9"}}
+                                    onClick={() => setShowUserDropdown(prev => !prev)}>
+                                {showUserDropdown ? "Hide" : "Assign new users"}
+                            </button>
+                        </div>
+                    )}
+                    {showUserDropdown && (
+                        <div className="user-dropdown-list mt-2">
+                            {users.map(user => (
+                                <div key={user.id} className="user-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        className="custom-checkbox"
+                                        id={`user-${user.id}`}
+                                        checked={selectedUserIds.includes(user.id)}
+                                        onChange={() => handleUserToggle(user.id)}
+                                    />
+                                    <label htmlFor={`user-${user.id}`}>{user.name}</label>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     {/* Assigned Users */}
                     <div className="d-flex justify-content-between align-items-center mt-3">
                         <h6 className="fw-bold mb-0">Assigned Users:</h6>
                         <span className="small fw-normal text-end">Email &nbsp;&nbsp; SMS</span>
                     </div>
+
 
                     <ul className="list-unstyled">
                         {notificationPrefs.map((user) => (

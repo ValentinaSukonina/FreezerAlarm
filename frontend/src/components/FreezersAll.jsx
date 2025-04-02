@@ -70,7 +70,10 @@ const FreezersAll = () => {
 
         try {
             const created = await createFreezer(freezerData);
-            setFreezers((prev) => [...prev, created]);
+            
+            const updatedFreezers = await fetchAllFreezersWithUsers();
+            setFreezers(updatedFreezers);
+
             setNewFreezer({number: "", room: "", address: "", type: "", file: ""});
             formRef.current?.resetCheckboxes(); //  Reset selected users
 
