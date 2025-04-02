@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {updateFreezer, deleteFreezer} from "../services/api";
+import {sanitizeInput} from "../services/utils";
+import {fetchUsers} from "../services/api";
 import "../assets/styles.css";
 
 const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
@@ -16,12 +18,33 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
             : []
     );
 
-
     const [selectAllEmail, setSelectAllEmail] = useState(false);
     const [selectAllSms, setSelectAllSms] = useState(false);
 
     const navigate = useNavigate();
     const role = sessionStorage.getItem("role");
+
+    const [users, setUsers] = useState([]);
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const [selectedUserIds, setSelectedUserIds] = useState(
+        Array.isArray(freezer?.users) ? freezer.users.map(u => u.id) : []
+    );
+
+    const handleToggleUserDropdown = async () => {
+        setShowUserDropdown(prev => !prev);
+        if (users.length === 0) {
+            const fetched = await fetchUsers();
+            setUsers(fetched);
+        }
+    };
+
+    const handleUserToggle = (userId) => {
+        setSelectedUserIds((prev) =>
+            prev.includes(userId)
+                ? prev.filter((id) => id !== userId)
+                : [...prev, userId]
+        );
+    };
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -85,6 +108,11 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
     const {number, room, address, type} = editData;
 
+    const handleSanitizedFieldChange = (field) => (e) => {
+        const sanitized = sanitizeInput(e.target.value);
+        handleChange({target: {name: field, value: sanitized}});
+    };
+
     return (
         <div className="freezer-card mx-auto my-2 px-3 py-1">
             <div className="p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg">
@@ -92,16 +120,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
                     {/* Top bar */}
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                        {editing ? (
-                            <input
-                                name="number"
-                                className="form-control fw-bold"
-                                value={number}
-                                onChange={handleChange}
-                            />
-                        ) : (
-                            <h5 className="fw-bold mb-0">Freezer: {number}</h5>
-                        )}
+                        <h5 className="fw-bold mb-0">Freezer: {number}</h5>
 
                         {role === "admin" && (
                             <button
@@ -113,16 +132,70 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
                         )}
                     </div>
 
-                    <p className="mb-1"><strong>Room:</strong> {editing ?
-                        <input name="room" className="form-control" value={room} onChange={handleChange}/> : room}
-                    </p>
-                    <p className="mb-1"><strong>Address:</strong> {editing ?
-                        <input name="address" className="form-control" value={address}
-                               onChange={handleChange}/> : address}
-                    </p>
-                    <p><strong>Type:</strong> {editing ?
-                        <input name="type" className="form-control" value={type} onChange={handleChange}/> : type}
-                    </p>
+                    <div className="d-flex align-items-center mb-2">
+                        <strong className="me-2" style={{minWidth: "70px"}}>Room:</strong>
+                        {editing ? (
+                            <input
+                                name="room"
+                                className="form-control"
+                                value={room}
+                                onChange={handleSanitizedFieldChange("room")}
+                                style={{maxWidth: "300px"}}
+                            />
+                        ) : (
+                            <span>{room}</span>
+                        )}
+                    </div>
+                    <div className="d-flex align-items-center mb-2">
+                        <strong className="me-2" style={{minWidth: "70px"}}>Address:</strong>
+                        {editing ? (
+                            <input
+                                name="address"
+                                className="form-control"
+                                value={address}
+                                onChange={handleSanitizedFieldChange("address")}
+                                style={{maxWidth: "300px"}}
+                            />
+                        ) : (
+                            <span>{address}</span>
+                        )}
+                    </div>
+                    <p><strong>Type:</strong> {type} </p>
+
+                    {editing && (
+                        <div className="text-start mb-2 my-2">
+                            <button
+                                type="button"
+                                className="form-control text-start assign-users-toggle"
+                                style={{backgroundColor: "#e6f2d9"}}
+                                onClick={handleToggleUserDropdown}
+                            >
+                                {showUserDropdown ? "Hide Users" : "Assign new users"}
+                            </button>
+                        </div>
+                    )}
+                    {showUserDropdown && (
+                        <div className="user-dropdown-list mt-2" style={{
+                            maxHeight: "200px",
+                            overflowY: "auto",
+                            border: "1px solid #ccc",
+                            padding: "10px",
+                            borderRadius: "6px"
+                        }}>
+                            {users.map((user) => (
+                                <div key={user.id} className="user-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        className="custom-checkbox me-2"
+                                        id={`user-${user.id}`}
+                                        checked={selectedUserIds.includes(user.id)}
+                                        onChange={() => handleUserToggle(user.id)}
+                                    />
+                                    <label htmlFor={`user-${user.id}`}>{user.name}</label>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Assigned Users */}
                     <div className="d-flex justify-content-between align-items-center mt-3">
