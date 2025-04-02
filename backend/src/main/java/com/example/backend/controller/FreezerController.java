@@ -6,6 +6,7 @@ import com.example.backend.entity.Freezer;
 import com.example.backend.exception.GlobalExceptionHandler;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
+import com.example.backend.mapper.FreezerMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,19 +22,22 @@ public class FreezerController {
     private static final Logger logger = LoggerFactory.getLogger(FreezerController.class);
     private final FreezerService freezerService;
     private final FreezerRepository freezerRepository;
-
+    private final FreezerMapper freezerMapper;
 
     public FreezerController(FreezerService freezerService,
-                             FreezerRepository freezerRepository) {
+                             FreezerRepository freezerRepository,
+                             FreezerMapper freezerMapper) {
         this.freezerService = freezerService;
         this.freezerRepository = freezerRepository;
+        this.freezerMapper = freezerMapper;
     }
 
     // CREATE FREEZER
     @PostMapping
-    public ResponseEntity<Freezer> createFreezer(@Validated @RequestBody Freezer freezer) {
+    public ResponseEntity<FreezerDTO> createFreezer(@Validated @RequestBody Freezer freezer) {
         Freezer createdFreezer = (Freezer) freezerService.createFreezer(freezer);
-        return ResponseEntity.created(URI.create("/api/freezers/" + ((Freezer) createdFreezer).getId())).body(createdFreezer);
+        return ResponseEntity.created(URI.create("/api/freezers/" + createdFreezer.getId()))
+                .body(freezerMapper.toFreezerDTO(createdFreezer));
     }
 
     // GET FREEZER BY NUMBER WITHOUT USERS
@@ -79,7 +83,7 @@ public class FreezerController {
 
     //  Update freezer by ID (used by frontend)
     @PutMapping("/{id}")
-    public ResponseEntity<Freezer> updateFreezerById(@PathVariable Long id, @RequestBody Freezer updatedData) {
+    public ResponseEntity<FreezerDTO> updateFreezerById(@PathVariable Long id, @RequestBody Freezer updatedData) {
         return freezerRepository.findById(id)
                 .map(existing -> {
                     existing.setNumber(updatedData.getNumber());
@@ -88,7 +92,7 @@ public class FreezerController {
                     existing.setType(updatedData.getType());
                     existing.setFile(updatedData.getFile()); // if used
                     Freezer updated = freezerRepository.save(existing);
-                    return ResponseEntity.ok(updated);
+                    return ResponseEntity.ok(freezerMapper.toFreezerDTO(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

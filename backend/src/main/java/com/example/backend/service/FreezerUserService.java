@@ -15,6 +15,8 @@ import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +29,8 @@ public class FreezerUserService {
     private final UserMapper userMapper;
     private final FreezerUserMapper freezerUserMapper;
 
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public FreezerUserService(FreezerUserRepository freezerUserRepository,
@@ -138,25 +142,14 @@ public class FreezerUserService {
 
     @Transactional
     public void updateFreezerAssignments(Long freezerId, List<Long> newUserIds) {
-        List<FreezerUser> existing = freezerUserRepository.findByFreezerId(freezerId);
+        System.out.println("🔥 Deleting all existing assignments for freezer " + freezerId);
+        freezerUserRepository.deleteByFreezerId(freezerId);
+        entityManager.flush(); // ✅ Force immediate DB sync
 
-        // Remove old associations
-        for (FreezerUser fu : existing) {
-            if (!newUserIds.contains(fu.getUser().getId())) {
-                freezerUserRepository.delete(fu);
-            }
-        }
-
-        // Add new associations
         for (Long userId : newUserIds) {
-            boolean alreadyExists = existing.stream()
-                    .anyMatch(fu -> fu.getUser().getId().equals(userId));
-            if (!alreadyExists) {
-                bindUserToFreezer(userId, freezerId);
-            }
+            System.out.println("➕ Reassigning user " + userId + " to freezer " + freezerId);
+            bindUserToFreezer(userId, freezerId);
         }
     }
-
-}
 
 }

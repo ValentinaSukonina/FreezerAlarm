@@ -45,3 +45,5 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     List<FreezerDTO> findFreezersByUserId(@Param("userId") Long userId);
 }
 
+
+

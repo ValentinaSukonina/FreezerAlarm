@@ -94,6 +94,9 @@ public class FreezerUserController {
 
     @PutMapping("/bulk-update")
     public ResponseEntity<String> updateFreezerUserAssignments(@RequestBody FreezerUserUpdateRequestDTO request) {
+        System.out.println("📩 This should print in IntelliJ");
+        System.out.println("➡️ Request: " + request.getFreezerId() + " → " + request.getUserIds());
+
         freezerUserService.updateFreezerAssignments(request.getFreezerId(), request.getUserIds());
         return ResponseEntity.ok("Freezer-user assignments updated.");
     }

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {updateFreezer, deleteFreezer} from "../services/api";
+import {updateFreezer, deleteFreezer, updateFreezerUserAssignments} from "../services/api";
 import {sanitizeInput} from "../services/utils";
 import {fetchUsers} from "../services/api";
 import "../assets/styles.css";
@@ -56,13 +56,17 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
             const updated = await updateFreezer(editData.id, {
                 ...editData
             });
+            console.log("✅ Freezer updated:", updated);
+            console.log("🟡 Sending user assignment payload:", selectedUserIds);
 
             // update the user assignments
             await updateFreezerUserAssignments(editData.id, selectedUserIds);
+            console.log("✅ Assigned users updated for freezer", editData.id, ":", selectedUserIds);
 
             setEditing(false);
             onFreezerUpdated?.(updated);
         } catch (err) {
+            console.error("❌ Failed to save changes:", err); // 🔥 Show the actual error
             alert("Failed to save changes.");
         }
     };
