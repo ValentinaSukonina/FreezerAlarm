@@ -94,12 +94,24 @@ const PersonalContent = () => {
     const handleDeleteFreezer = async (userId, freezerId) => {
         try {
             await deleteFreezerFromUser(userId, freezerId);  // Call the API to remove the freezer
+            // Update the local state to remove the freezer immediately
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.id === userId
+                        ? {
+                            ...user,
+                            freezers: user.freezers.filter((freezer) => freezer.id !== freezerId) // Remove the deleted freezer
+                        }
+                        : user
+                )
+            );
             alert("Freezer successfully deleted from user.");
         } catch (err) {
             alert("Failed to delete freezer.");
             console.error("Error deleting freezer from user:", err);
         }
     };
+
 
 
     const handleDelete = async (userId) => {
@@ -252,16 +264,13 @@ const PersonalContent = () => {
                                         <td className="d-none d-lg-table-cell freezer-numbers">
                                             {isEditing ? (
                                                 <div className="d-flex flex-column">
-                                                    {user.freezers?.map((freezer, index) => (
+                                                    {user.freezers?.map((freezer) => (
                                                         <div key={freezer.id}
                                                              className="d-flex align-items-center mb-2">
-                                                            <input
-                                                                type="text"
-                                                                name={`freezer-${index}`}
-                                                                value={freezer.number}
-                                                                onChange={(e) => handleFreezerChange(e, user.id, index)}
-                                                                className="form-control me-2"
-                                                            />
+                                                            {/* Remove input field and show freezer number as plain text */}
+                                                            <span className="form-control me-2" style={{width: '80px'}}>
+                        {freezer.number}
+                    </span>
                                                             <button
                                                                 className="btn btn-danger btn-sm"
                                                                 onClick={() => handleDeleteFreezer(user.id, freezer.id)}
@@ -272,8 +281,9 @@ const PersonalContent = () => {
                                                     ))}
                                                 </div>
                                             ) : (
-                                                user.freezers?.map((freezer) => (
+                                                (user.freezers || []).map((freezer) => (
                                                     <div key={freezer.id}>
+                                                        {/* Display freezer number as plain text */}
                                                         {freezer.number}
                                                     </div>
                                                 ))
