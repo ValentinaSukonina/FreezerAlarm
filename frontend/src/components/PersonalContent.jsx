@@ -8,8 +8,13 @@ import {
     deleteFreezerFromUser
 } from '../services/api';
 import { Navigate } from "react-router-dom";
+import Select from "react-select";
 
 const PersonalContent = () => {
+    const [successMessage, setSuccessMessage] = useState("");
+    const [formError, setFormError] = useState("");
+    const [deletingUserId, setDeletingUserId] = useState(null);
+
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -20,6 +25,10 @@ const PersonalContent = () => {
     });
     const [showAddForm, setShowAddForm] = useState(false);
     const [role, setRole] = useState(sessionStorage.getItem("role"));
+    const roleOptions = [
+        { value: "user", label: "user" },
+        { value: "admin", label: "admin" }
+    ];
 
     useEffect(() => {
         const fetchRoleIfNeeded = async () => {
@@ -47,24 +56,33 @@ const PersonalContent = () => {
             loadUsers();
         }
     }, [role]);
+
+    useEffect(() => {
+        if (successMessage || formError) {
+            const timer = setTimeout(() => {
+                setSuccessMessage("");
+                setFormError("");
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, formError]);
+
     const loadUsers = async () => {
         try {
             const data = await fetchUsers();
-            // For each user, fetch the freezers assigned to them
             const usersWithFreezers = await Promise.all(
                 data.map(async (user) => {
                     const freezers = await fetchFreezersByUser(user.id);
-                    return { ...user, freezers }; // Add freezers to the user object
+                    return { ...user, freezers: Array.isArray(freezers) ? freezers : [] };
                 })
             );
-            setUsers(usersWithFreezers);  // Set the users state with the users and their freezers
+            setUsers(usersWithFreezers);
         } catch (err) {
             setError("Failed to load users");
         } finally {
             setLoading(false);
         }
     };
-
 
     const handleEditChange = (e, userId) => {
         const { name, value } = e.target;
@@ -93,35 +111,45 @@ const PersonalContent = () => {
 
     const handleDeleteFreezer = async (userId, freezerId) => {
         try {
-            await deleteFreezerFromUser(userId, freezerId);  // Call the API to remove the freezer
-            // Update the local state to remove the freezer immediately
+            await deleteFreezerFromUser(userId, freezerId);
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
                     user.id === userId
                         ? {
                             ...user,
-                            freezers: user.freezers.filter((freezer) => freezer.id !== freezerId) // Remove the deleted freezer
+                            freezers: user.freezers.filter((freezer) => freezer.id !== freezerId)
                         }
                         : user
                 )
             );
-            alert("Freezer successfully deleted from user.");
+            setSuccessMessage("Freezer deleted.");
+            setFormError("");
         } catch (err) {
-            alert("Failed to delete freezer.");
+            setFormError("Failed to delete freezer.");
+            setSuccessMessage("");
             console.error("Error deleting freezer from user:", err);
         }
     };
 
+    const handleDelete = (userId) => {
+        setDeletingUserId(userId);
+    };
 
-
-    const handleDelete = async (userId) => {
-        if (!window.confirm("Are you sure you want to delete this user?")) return;
+    const confirmDelete = async (userId) => {
         try {
             await deleteUser(userId);
             setUsers((prev) => prev.filter((user) => user.id !== userId));
+            setSuccessMessage("User deleted.");
+            setFormError("");
+            setDeletingUserId(null);
         } catch (err) {
-            alert("Failed to delete user");
+            setFormError("Failed to delete user.");
+            setSuccessMessage("");
         }
+    };
+
+    const cancelDelete = () => {
+        setDeletingUserId(null);
     };
 
     const handleNewChange = (e) => {
@@ -137,21 +165,24 @@ const PersonalContent = () => {
             phone_number: userToUpdate.phone_number,
             user_rank: userToUpdate.user_rank,
             role: userToUpdate.role,
-            freezers: userToUpdate.freezers.map((freezer) => freezer.id)  // Assuming freezer ID should be saved
+            freezers: userToUpdate.freezers.map((freezer) => freezer.id)
         };
 
         try {
             await updateUser(userId, allowedFields);
             setEditingUserId(null);
+            setSuccessMessage("User updated.");
+            setFormError("");
         } catch (err) {
-            alert("Failed to update user");
+            setFormError("Failed to update user.");
+            setSuccessMessage("");
         }
     };
 
-
     const handleAddUser = async () => {
         if (!newUser.name || !newUser.email || !newUser.role) {
-            alert("Name, email, and role are required.");
+            setFormError("Name, email, and role are required.");
+            setSuccessMessage("");
             return;
         }
 
@@ -160,8 +191,11 @@ const PersonalContent = () => {
             setUsers((prev) => [...prev, created]);
             setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
             setShowAddForm(false);
+            setSuccessMessage("User created.");
+            setFormError("");
         } catch (err) {
-            alert("Failed to create user");
+            setFormError("Failed to create user.");
+            setSuccessMessage("");
         }
     };
 
@@ -176,6 +210,13 @@ const PersonalContent = () => {
     return (
         <main className="container mt-5">
             <h2 className="text-center mb-4">Registered Personnel</h2>
+
+            {successMessage && (
+                <div className="alert alert-success mx-auto text-center small" style={{ maxWidth: '400px' }}>{successMessage}</div>
+            )}
+            {formError && (
+                <div className="alert alert-danger mx-auto text-center small" style={{ maxWidth: '400px' }}>{formError}</div>
+            )}
 
             <div className="text-center mb-3">
                 <button
@@ -195,7 +236,19 @@ const PersonalContent = () => {
                         <input name="email" className="form-control" placeholder="Email" value={newUser.email} onChange={handleNewChange} />
                         <input name="phone_number" className="form-control" placeholder="Phone" value={newUser.phone_number} onChange={handleNewChange} />
                         <input name="user_rank" className="form-control" placeholder="Rank" value={newUser.user_rank} onChange={handleNewChange} />
-                        <input name="role" className="form-control" placeholder="Role" value={newUser.role} onChange={handleNewChange} />
+                        <Select
+                            className="role-type-select"
+                            classNamePrefix="ft"
+                            options={roleOptions}
+                            placeholder="Select role"
+                            value={roleOptions.find(opt => opt.value === newUser.role) || null}
+                            onChange={(selectedOption) =>
+                                setNewUser((prev) => ({
+                                    ...prev,
+                                    role: selectedOption.value
+                                }))
+                            }
+                        />
                     </div>
 
                     <div className="d-flex justify-content-between mt-3">
@@ -208,147 +261,76 @@ const PersonalContent = () => {
                 </div>
             )}
 
-            {loading && <p className="text-center">Loading users...</p>}
-            {error && <p className="text-center text-danger">{error}</p>}
-
-            {users.length > 0 ? (
-                <div className="table-responsive mt-4">
-                    <table className="table table-bordered table-hover text-center">
-                        <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th className="d-none d-md-table-cell">Phone</th>
-                            <th className="d-none d-lg-table-cell">Rank</th>
-                            <th className="d-none d-lg-table-cell">Role</th>
-                            <th className="d-none d-lg-table-cell">Assigned freezers</th>
-                            <th className="d-none d-md-table-cell">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {users.map((user) => {
-                            const isEditing = editingUserId === user.id;
-                            const isExpanded = expandedUserId === user.id;
-
-                            return (
-                                <>
-                                    <tr key={user.id}>
-                                        <td className="text-start d-flex justify-content-between align-items-center">
-                                            {isEditing ? (
-                                                <input name="name" value={user.name}
-                                                       onChange={(e) => handleEditChange(e, user.id)}/>
-                                            ) : (
-                                                <>
-                                                    {user.name}
-                                                    <button
-                                                        className="btn btn-sm d-md-none ms-auto"
-                                                        onClick={() => toggleExpand(user.id)}
-                                                        style={{backgroundColor: "#A9C46C", color: "white"}}
-                                                    >
-                                                        {isExpanded ? "▲" : "▼"}
-                                                    </button>
-                                                </>
+            <div className="table-responsive mt-4">
+                <table className="table table-bordered table-hover text-center">
+                    <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Rank</th>
+                        <th>Role</th>
+                        <th>Freezers</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {users.map((user) => {
+                        const isEditing = editingUserId === user.id;
+                        return (
+                            <tr key={user.id}>
+                                <td>{isEditing ? <input name="name" value={user.name} onChange={(e) => handleEditChange(e, user.id)} /> : user.name}</td>
+                                <td>{isEditing ? <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} /> : user.email}</td>
+                                <td>{isEditing ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
+                                <td>{isEditing ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
+                                <td>{isEditing ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
+                                <td>
+                                    {user.freezers?.map((freezer, index) => (
+                                        <div key={freezer.id || index} className="d-flex align-items-center justify-content-center mb-1">
+                                            <span className="form-control form-control-sm me-1" style={{ maxWidth: '80px' }}>{freezer.number}</span>
+                                            {isEditing && (
+                                                <button
+                                                    className="btn btn-sm"
+                                                    style={{ backgroundColor: "#A93226", color: "white" }}
+                                                    onClick={() => handleDeleteFreezer(user.id, freezer.id)}
+                                                >
+                                                    X
+                                                </button>
                                             )}
-                                        </td>
-                                        <td>{isEditing ? <input name="email" value={user.email}
-                                                                onChange={(e) => handleEditChange(e, user.id)}/> : user.email}  </td>
-                                        <td className="d-none d-md-table-cell">{isEditing ?
-                                            <input name="phone_number" value={user.phone_number}
-                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.phone_number}</td>
-                                        <td className="d-none d-lg-table-cell">{isEditing ?
-                                            <input name="user_rank" value={user.user_rank}
-                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.user_rank}</td>
-                                        <td className="d-none d-lg-table-cell">{isEditing ?
-                                            <input name="role" value={user.role}
-                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.role}</td>
-                                        <td className="d-none d-lg-table-cell freezer-numbers" style={{ width: '80px' }}>
-                                            {isEditing ? (
-                                                <div className="d-flex flex-column">
-                                                    {user.freezers?.map((freezer) => (
-                                                        <div key={freezer.id}
-                                                             className="d-flex align-items-center mb-2">
-                                                            {/* Remove input field and show freezer number as plain text */}
-                                                            <span className="form-control me-2" style={{width: '80px'}}>
-                        {freezer.number}
-                    </span>
-                                                            <button
-                                                                className="btn btn-danger btn-sm"
-                                                                onClick={() => handleDeleteFreezer(user.id, freezer.id)}
-                                                            >
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                (user.freezers || []).map((freezer) => (
-                                                    <div key={freezer.id}>
-                                                        {/* Display freezer number as plain text */}
-                                                        {freezer.number}
-                                                    </div>
-                                                ))
-                                            )}
-                                        </td>
-
-
-                                        <td className="d-none d-md-table-cell">
-                                            {isEditing ? (
+                                        </div>
+                                    ))}
+                                </td>
+                                <td>
+                                    {isEditing ? (
+                                        <>
+                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
+                                            <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
+                                            {deletingUserId === user.id ? (
                                                 <>
-                                                    <button className="btn btn-sm me-2"
-                                                            style={{backgroundColor: "#7BAE3F", color: "white"}}
-                                                            onClick={() => handleSave(user.id)}>Save
-                                                    </button>
-                                                    <button className="btn btn-sm btn-secondary"
-                                                            onClick={() => setEditingUserId(null)}>Cancel
-                                                    </button>
+                                                    <button className="btn btn-sm me-2" style={{ backgroundColor: "#A93226", color: "white" }} onClick={() => confirmDelete(user.id)}>Confirm</button>
+                                                    <button className="btn btn-sm btn-secondary" onClick={cancelDelete}>Cancel</button>
                                                 </>
                                             ) : (
-                                                <>
-                                                    <button className="btn btn-sm me-2"
-                                                            style={{backgroundColor: "#5D8736", color: "white"}}
-                                                            onClick={() => setEditingUserId(user.id)}>Edit
-                                                    </button>
-                                                    <button className="btn btn-sm" style={{
-                                                        backgroundColor: "#A9C46C",
-                                                        color: "white",
-                                                        border: "1px solid #c3e6cb"
-                                                    }} onClick={() => handleDelete(user.id)}>Delete
-                                                    </button>
-                                                </>
+                                                <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white" }} onClick={() => handleDelete(user.id)}>Delete</button>
                                             )}
-                                        </td>
-                                    </tr>
-
-                                    {/* Mobile-only expanded section with action buttons */}
-                                    {isExpanded && (
-                                        <tr className="d-md-none">
-                                            <td colSpan="6" className="text-start bg-light">
-                                                <div><strong>Phone:</strong> {user.phone_number}</div>
-                                                <div><strong>Rank:</strong> {user.user_rank}</div>
-                                                <div><strong>Role:</strong> {user.role}</div>
-                                                <div><strong>Assigned Freezers:</strong></div>
-                                                {user.freezers?.map(freezer => (
-                                                    <div key={freezer.id}>
-                                                        {freezer.number}
-                                                    </div>
-                                                ))}
-
-                                            </td>
-                                        </tr>
+                                        </>
                                     )}
-                                </>
-                            );
-                        })}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (!loading && <p className="text-center">No users found.</p>)}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                    </tbody>
+                </table>
+            </div>
         </main>
     );
 };
 
 export default PersonalContent;
-
 
 
 
