@@ -4,12 +4,12 @@ import FreezerCardUser from "../components/FreezerCardUser";
 import AddFreezerForm from "./AddFreezerForm";
 
 const FreezersAll = () => {
-    const [deleteMessage, setDeleteMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [freezers, setFreezers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [role, setRole] = useState(sessionStorage.getItem("role"));
+    const [formError, setFormError] = useState("");
 
     const [newFreezer, setNewFreezer] = useState({
         number: "",
@@ -64,21 +64,37 @@ const FreezersAll = () => {
 
     const handleAddFreezer = async (freezerData) => {
         if (!freezerData.number || !freezerData.room) {
-            alert("Freezer number and room are required.");
-            return;
+            setFormError("Freezer number and room are required.");
+            return false;
         }
 
         try {
             const created = await createFreezer(freezerData);
-            setFreezers((prev) => [...prev, created]);
-            setNewFreezer({number: "", room: "", address: "", type: "", file: ""});
-            formRef.current?.resetCheckboxes(); //  Reset selected users
 
+            const updatedFreezers = await fetchAllFreezersWithUsers();
+            setFreezers(updatedFreezers);
+
+            setNewFreezer({number: "", room: "", address: "", type: "", file: ""});
+            formRef.current?.resetCheckboxes();
+
+            setFormError("");
             setSuccessMessage(`✅ Freezer ${created.number} added successfully!`);
             setTimeout(() => setSuccessMessage(""), 3000);
+
+            return true; //  success
         } catch (err) {
-            alert("Failed to create freezer.");
+            setFormError(err.message);
+            setSuccessMessage("");
+            console.error("Failed to create freezer:", err);
+            return false; // error
         }
+    };
+
+    const handleCancelForm = () => {
+        setNewFreezer({number: "", room: "", address: "", type: "", file: ""});
+        setFormError("");
+        formRef.current?.resetCheckboxes();
+        formRef.current?.closeForm();
     };
 
     if (loading) return <p>Loading freezers...</p>;
@@ -96,24 +112,13 @@ const FreezersAll = () => {
                             newFreezer={newFreezer}
                             onChange={handleNewFreezerChange}
                             onAdd={handleAddFreezer}
+                            onCancel={handleCancelForm}
+                            formError={formError}
                         />
 
                         {successMessage && (
                             <div className="success-message text-center mx-auto my-3">
                                 {successMessage}
-                            </div>
-                        )}
-                        {deleteMessage && (
-                            <div className="text-center mb-3" style={{
-                                backgroundColor: "#f8d7da",
-                                color: "#721c24",
-                                border: "1px solid #f5c6cb",
-                                padding: "10px 16px",
-                                borderRadius: "5px",
-                                maxWidth: "500px",
-                                margin: "0 auto"
-                            }}>
-                                {deleteMessage}
                             </div>
                         )}
                     </div>

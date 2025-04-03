@@ -224,7 +224,3 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 };
 
 export default FreezerCardAdmin;
-
-
-
-
