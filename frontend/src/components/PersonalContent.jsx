@@ -251,7 +251,7 @@ const PersonalContent = () => {
                                             )}
                                         </td>
                                         <td>{isEditing ? <input name="email" value={user.email}
-                                                                onChange={(e) => handleEditChange(e, user.id)}/> : user.email}</td>
+                                                                onChange={(e) => handleEditChange(e, user.id)}/> : user.email} </td>
                                         <td className="d-none d-md-table-cell">{isEditing ?
                                             <input name="phone_number" value={user.phone_number}
                                                    onChange={(e) => handleEditChange(e, user.id)}/> : user.phone_number}</td>
@@ -261,7 +261,7 @@ const PersonalContent = () => {
                                         <td className="d-none d-lg-table-cell">{isEditing ?
                                             <input name="role" value={user.role}
                                                    onChange={(e) => handleEditChange(e, user.id)}/> : user.role}</td>
-                                        <td className="d-none d-lg-table-cell freezer-numbers">
+                                        <td className="d-none d-lg-table-cell freezer-numbers" style={{ width: '80px' }}>
                                             {isEditing ? (
                                                 <div className="d-flex flex-column">
                                                     {user.freezers?.map((freezer) => (
