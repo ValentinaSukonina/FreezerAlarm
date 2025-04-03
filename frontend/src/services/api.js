@@ -61,9 +61,9 @@ export async function fetchFreezerWithUsers(freezerNumber) {
             }
         });
 
-        if (response.status === 401) { // Unauthorized, needs login
+        if (response.status === 401) {
             alert("You must be logged in to view this content.");
-            window.location.href = "http://localhost:8000/oauth2/authorization/google"; // Redirect manually
+            window.location.href = "http://localhost:8000/oauth2/authorization/google";
             return;
         }
 
@@ -93,7 +93,7 @@ export const fetchAllFreezersWithUsers = async () => {
 // Fetch the authenticated user's role
 export const fetchUserRole = async () => {
     try {
-        const response = await API.get('/users/user'); // this hits your /api/users/user endpoint
+        const response = await API.get('/users/user');
         return response.data?.role || null;
     } catch (error) {
         console.error("Failed to fetch user role:", error.response ? error.response.data : error.message);
@@ -144,16 +144,18 @@ export async function fetchUserByName(username) {
 }
 
 
-// Fetch freezers assigned to a specific user
+
 export const fetchFreezersByUser = async (userId) => {
     try {
-        const response = await API.get(`/users/${userId}/freezers`); // Adjust based on your API endpoint
+        const response = await API.get(`/users/${userId}/freezers`);
+        console.log("Freezers fetched for user:", userId, response.data);
         return response.data; // Return the freezers list assigned to this user
     } catch (error) {
-        console.error("Error fetching freezers by user:", error);
-        throw error;
+        console.error("Error fetching freezers by user:", error.response ? error.response.data : error.message);
+        throw error; // Rethrow the error to be handled by the calling component
     }
 };
+
 
 
 

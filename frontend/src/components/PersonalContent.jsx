@@ -42,17 +42,21 @@ const PersonalContent = () => {
     }, [role]);
     const loadUsers = async () => {
         try {
-            const data = await fetchUsers(); // Fetch users (and their freezers if provided in the backend response)
-            setUsers(data);  // Set the users state with the data, including the freezers
+            const data = await fetchUsers();
+            // For each user, fetch the freezers assigned to them
+            const usersWithFreezers = await Promise.all(
+                data.map(async (user) => {
+                    const freezers = await fetchFreezersByUser(user.id);
+                    return { ...user, freezers }; // Add freezers to the user object
+                })
+            );
+            setUsers(usersWithFreezers);  // Set the users state with the users and their freezers
         } catch (err) {
             setError("Failed to load users");
         } finally {
             setLoading(false);
         }
     };
-
-
-
 
 
     const handleEditChange = (e, userId) => {
@@ -204,10 +208,10 @@ const PersonalContent = () => {
                                         <td className="d-none d-md-table-cell">{isEditing ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
                                         <td className="d-none d-lg-table-cell">{isEditing ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
                                         <td className="d-none d-lg-table-cell">{isEditing ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
-                                        <td className="d-none d-lg-table-cell">
+                                        <td className="d-none d-lg-table-cell freezer-numbers">
                                             {user.freezers?.map(freezer => (
                                                 <div key={freezer.id}>
-                                                    {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                                    {freezer.number} - {freezer.room}
                                                 </div>
                                             ))}
                                         </td>
@@ -236,22 +240,10 @@ const PersonalContent = () => {
                                                 <div><strong>Assigned Freezers:</strong></div>
                                                 {user.freezers?.map(freezer => (
                                                     <div key={freezer.id}>
-                                                        {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                                        {freezer.number} - {freezer.room}
                                                     </div>
                                                 ))}
-                                                <div className="mt-2">
-                                                    {isEditing ? (
-                                                        <>
-                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
-                                                            <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
-                                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }} onClick={() => handleDelete(user.id)}>Delete</button>
-                                                        </>
-                                                    )}
-                                                </div>
+
                                             </td>
                                         </tr>
                                     )}

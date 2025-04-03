@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.dto.FreezerDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.entity.FreezerUser;
 import com.example.backend.entity.User;
@@ -32,8 +33,13 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     @Query("DELETE FROM FreezerUser fu WHERE fu.user.id = :userId")
     void deleteByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT fu.freezer FROM FreezerUser fu WHERE fu.user.id = :userId")
-    List<Freezer> findFreezersByUserId(@Param("userId") Long userId);
+   /* @Query("SELECT fu.freezer FROM FreezerUser fu WHERE fu.user.id = :userId")
+    List<FreezerDTO> findFreezersByUserId(@Param("userId") Long userId);*/
 
+    List<FreezerUser> findByUserId(Long userID);
+    // Adjust this query to use FreezerDTO projection
+    @Query("SELECT new com.example.backend.dto.FreezerDTO(f.id, f.file, f.number, f.address, f.room, f.type) " +
+            "FROM FreezerUser fu JOIN fu.freezer f WHERE fu.user.id = :userId")
+    List<FreezerDTO> findFreezersByUserId(@Param("userId") Long userId);
 }
 

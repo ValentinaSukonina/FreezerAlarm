@@ -1,10 +1,12 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.FreezerUserDTO;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.FreezerUser;
 import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.service.FreezerUserService;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,29 +37,18 @@ public class FreezerUserController {
     }
 
     // DTO class to receive JSON input
+    @Getter
     public static class FreezerUserRequest {
         private Long userId;
         private Long freezerId;
         private Long oldFreezerId; // Optional, only used for updates
 
-        public Long getUserId() {
-            return userId;
-        }
-
         public void setUserId(Long userId) {
             this.userId = userId;
         }
 
-        public Long getFreezerId() {
-            return freezerId;
-        }
-
         public void setFreezerId(Long freezerId) {
             this.freezerId = freezerId;
-        }
-
-        public Long getOldFreezerId() {
-            return oldFreezerId;
         }
 
         public void setOldFreezerId(Long oldFreezerId) {
@@ -76,7 +67,7 @@ public class FreezerUserController {
     @PutMapping
     public ResponseEntity<FreezerUserDTO> updateFreezerUser(@RequestBody FreezerUserRequest request) {
         if (request.getOldFreezerId() == null) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().build();
         }
 
         FreezerUser updatedFreezerUser = freezerUserService.updateFreezerUser(
@@ -90,10 +81,28 @@ public class FreezerUserController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/{freezerNumber}")
+   /* @GetMapping("/{freezerNumber}")
     public ResponseEntity<List<UserDTO>> getUsersByFreezerNumber(@PathVariable String freezerNumber) {
         List<UserDTO> users = freezerUserService.getUsersByFreezerNumber(freezerNumber);
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{freezerNumber}")//modify path
+    public ResponseEntity<List<FreezerDTO>> getFreezersByUserId(@PathVariable Long userID) {
+        List<FreezerDTO> freezers = freezerUserService.getFreezersByUserId(userID);
+        return ResponseEntity.ok(freezers);
+    }*/
+
+    // Fetch freezers by user ID
+    @GetMapping("/freezers/{userId}")
+    public List<FreezerDTO> getFreezersByUserId(@PathVariable Long userId) {
+        return freezerUserService.getFreezersByUserId(userId);
+    }
+
+    // Fetch users by freezer number
+    @GetMapping("/users/{freezerNumber}")
+    public List<UserDTO> getUsersByFreezerNumber(@PathVariable String freezerNumber) {
+        return freezerUserService.getUsersByFreezerNumber(freezerNumber);
     }
 
 }
