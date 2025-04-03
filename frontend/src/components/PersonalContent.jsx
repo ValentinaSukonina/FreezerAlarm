@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { fetchUsers, updateUser, deleteUser, createUser} from '../services/api';
+import {
+    fetchUsers,
+    updateUser,
+    deleteUser,
+    createUser,
+    fetchFreezersByUser,
+    deleteFreezerFromUser
+} from '../services/api';
 import { Navigate } from "react-router-dom";
 
 const PersonalContent = () => {
@@ -42,15 +49,21 @@ const PersonalContent = () => {
     }, [role]);
     const loadUsers = async () => {
         try {
-            const data = await fetchUsers(); // Fetch users (and their freezers if provided in the backend response)
-            setUsers(data);  // Set the users state with the data, including the freezers
+            const data = await fetchUsers();
+            // For each user, fetch the freezers assigned to them
+            const usersWithFreezers = await Promise.all(
+                data.map(async (user) => {
+                    const freezers = await fetchFreezersByUser(user.id);
+                    return { ...user, freezers }; // Add freezers to the user object
+                })
+            );
+            setUsers(usersWithFreezers);  // Set the users state with the users and their freezers
         } catch (err) {
             setError("Failed to load users");
         } finally {
             setLoading(false);
         }
     };
-
 
 
     const handleEditChange = (e, userId) => {
@@ -60,6 +73,43 @@ const PersonalContent = () => {
                 user.id === userId ? { ...user, [name]: value } : user
             )
         );
+    };
+
+    const handleFreezerChange = (e, userId, index) => {
+        const { value } = e.target;
+        setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+                user.id === userId
+                    ? {
+                        ...user,
+                        freezers: user.freezers.map((freezer, i) =>
+                            i === index ? { ...freezer, number: value } : freezer
+                        )
+                    }
+                    : user
+            )
+        );
+    };
+
+    const handleDeleteFreezer = async (userId, freezerId) => {
+        try {
+            await deleteFreezerFromUser(userId, freezerId);  // Call the API to remove the freezer
+            // Update the local state to remove the freezer immediately
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.id === userId
+                        ? {
+                            ...user,
+                            freezers: user.freezers.filter((freezer) => freezer.id !== freezerId) // Remove the deleted freezer
+                        }
+                        : user
+                )
+            );
+            alert("Freezer successfully deleted from user.");
+        } catch (err) {
+            alert("Failed to delete freezer.");
+            console.error("Error deleting freezer from user:", err);
+        }
     };
 
 
@@ -86,7 +136,8 @@ const PersonalContent = () => {
             email: userToUpdate.email,
             phone_number: userToUpdate.phone_number,
             user_rank: userToUpdate.user_rank,
-            role: userToUpdate.role
+            role: userToUpdate.role,
+            freezers: userToUpdate.freezers.map((freezer) => freezer.id)  // Assuming freezer ID should be saved
         };
 
         try {
@@ -184,41 +235,85 @@ const PersonalContent = () => {
                                     <tr key={user.id}>
                                         <td className="text-start d-flex justify-content-between align-items-center">
                                             {isEditing ? (
-                                                <input name="name" value={user.name} onChange={(e) => handleEditChange(e, user.id)} />
+                                                <input name="name" value={user.name}
+                                                       onChange={(e) => handleEditChange(e, user.id)}/>
                                             ) : (
                                                 <>
                                                     {user.name}
                                                     <button
                                                         className="btn btn-sm d-md-none ms-auto"
                                                         onClick={() => toggleExpand(user.id)}
-                                                        style={{ backgroundColor: "#A9C46C", color: "white" }}
+                                                        style={{backgroundColor: "#A9C46C", color: "white"}}
                                                     >
                                                         {isExpanded ? "▲" : "▼"}
                                                     </button>
                                                 </>
                                             )}
                                         </td>
-                                        <td>{isEditing ? <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} /> : user.email}</td>
-                                        <td className="d-none d-md-table-cell">{isEditing ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} /> : user.phone_number}</td>
-                                        <td className="d-none d-lg-table-cell">{isEditing ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} /> : user.user_rank}</td>
-                                        <td className="d-none d-lg-table-cell">{isEditing ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} /> : user.role}</td>
-                                        <td className="d-none d-lg-table-cell">
-                                            {user.freezers?.map(freezer => (
-                                                <div key={freezer.id}>
-                                                    {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                        <td>{isEditing ? <input name="email" value={user.email}
+                                                                onChange={(e) => handleEditChange(e, user.id)}/> : user.email}  </td>
+                                        <td className="d-none d-md-table-cell">{isEditing ?
+                                            <input name="phone_number" value={user.phone_number}
+                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.phone_number}</td>
+                                        <td className="d-none d-lg-table-cell">{isEditing ?
+                                            <input name="user_rank" value={user.user_rank}
+                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.user_rank}</td>
+                                        <td className="d-none d-lg-table-cell">{isEditing ?
+                                            <input name="role" value={user.role}
+                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.role}</td>
+                                        <td className="d-none d-lg-table-cell freezer-numbers" style={{ width: '80px' }}>
+                                            {isEditing ? (
+                                                <div className="d-flex flex-column">
+                                                    {user.freezers?.map((freezer) => (
+                                                        <div key={freezer.id}
+                                                             className="d-flex align-items-center mb-2">
+                                                            {/* Remove input field and show freezer number as plain text */}
+                                                            <span className="form-control me-2" style={{width: '80px'}}>
+                        {freezer.number}
+                    </span>
+                                                            <button
+                                                                className="btn btn-danger btn-sm"
+                                                                onClick={() => handleDeleteFreezer(user.id, freezer.id)}
+                                                            >
+                                                                X
+                                                            </button>
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                            ))}
+                                            ) : (
+                                                (user.freezers || []).map((freezer) => (
+                                                    <div key={freezer.id}>
+                                                        {/* Display freezer number as plain text */}
+                                                        {freezer.number}
+                                                    </div>
+                                                ))
+                                            )}
                                         </td>
+
+
                                         <td className="d-none d-md-table-cell">
                                             {isEditing ? (
                                                 <>
-                                                    <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
-                                                    <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
+                                                    <button className="btn btn-sm me-2"
+                                                            style={{backgroundColor: "#7BAE3F", color: "white"}}
+                                                            onClick={() => handleSave(user.id)}>Save
+                                                    </button>
+                                                    <button className="btn btn-sm btn-secondary"
+                                                            onClick={() => setEditingUserId(null)}>Cancel
+                                                    </button>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
-                                                    <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }} onClick={() => handleDelete(user.id)}>Delete</button>
+                                                    <button className="btn btn-sm me-2"
+                                                            style={{backgroundColor: "#5D8736", color: "white"}}
+                                                            onClick={() => setEditingUserId(user.id)}>Edit
+                                                    </button>
+                                                    <button className="btn btn-sm" style={{
+                                                        backgroundColor: "#A9C46C",
+                                                        color: "white",
+                                                        border: "1px solid #c3e6cb"
+                                                    }} onClick={() => handleDelete(user.id)}>Delete
+                                                    </button>
                                                 </>
                                             )}
                                         </td>
@@ -234,22 +329,10 @@ const PersonalContent = () => {
                                                 <div><strong>Assigned Freezers:</strong></div>
                                                 {user.freezers?.map(freezer => (
                                                     <div key={freezer.id}>
-                                                        {freezer.number} - {freezer.room} - Rank: {freezer.rank}
+                                                        {freezer.number}
                                                     </div>
                                                 ))}
-                                                <div className="mt-2">
-                                                    {isEditing ? (
-                                                        <>
-                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#7BAE3F", color: "white" }} onClick={() => handleSave(user.id)}>Save</button>
-                                                            <button className="btn btn-sm btn-secondary" onClick={() => setEditingUserId(null)}>Cancel</button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button className="btn btn-sm me-2" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={() => setEditingUserId(user.id)}>Edit</button>
-                                                            <button className="btn btn-sm" style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }} onClick={() => handleDelete(user.id)}>Delete</button>
-                                                        </>
-                                                    )}
-                                                </div>
+
                                             </td>
                                         </tr>
                                     )}

@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.FreezerDTO;
+import com.example.backend.dto.FreezerUserDTO;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.entity.FreezerUser;
@@ -106,6 +107,32 @@ public class FreezerUserService {
                 .collect(Collectors.toList());
     }
 
+
+    public List<FreezerDTO> getFreezersByUserId(Long userID) {
+        // Step 1: Fetch the User by ID
+        User user = userRepository.findById(userID)
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found with ID: " + userID));
+
+        // Step 2: Fetch all the Freezers associated with the user
+        List<FreezerUser> freezerUsers = freezerUserRepository.findByUserId(userID);
+
+        // Step 3: If no freezers are associated with the user, throw an exception
+        if (freezerUsers.isEmpty()) {
+            throw new Exceptions.ResourceNotFoundException("No freezers found for user with ID: " + userID);
+        }
+
+        // Step 4: Map Freezer entities to FreezerDTO
+        return freezerUsers.stream()
+                .map(freezerUser -> new FreezerDTO(
+                        freezerUser.getFreezer().getId(),
+                        freezerUser.getFreezer().getNumber(),
+                        freezerUser.getFreezer().getRoom(),
+                        freezerUser.getFreezer().getType(),
+                        freezerUser.getFreezer().getAddress(),
+                        freezerUser.getFreezer().getFile()
+                ))
+                .collect(Collectors.toList());
+    }
 
 }
 

@@ -5,6 +5,7 @@ import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.FreezerService;
 import com.example.backend.service.FreezerUserService;
 import com.example.backend.service.UserService;
 import org.slf4j.Logger;
@@ -29,12 +30,14 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final FreezerUserService freezerUserService;
+    private final FreezerService freezerService;
 
-    public UserController(UserService userService, UserRepository userRepository, UserMapper userMapper, FreezerUserService freezerUserService) {
+    public UserController(UserService userService, UserRepository userRepository, UserMapper userMapper, FreezerUserService freezerUserService, FreezerService freezerService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.freezerUserService = freezerUserService;
+        this.freezerService = freezerService;
     }
 
     @PostMapping
@@ -135,14 +138,22 @@ public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User 
     }
     }
 
-   /* @GetMapping("/user/{userId}")
+    @GetMapping("/{userId}/freezers")
     public ResponseEntity<List<FreezerDTO>> getFreezersByUserId(@PathVariable Long userId) {
-        List<FreezerDTO> freezers = freezerUserService.getFreezersByUserId(userId);
-        return ResponseEntity.ok(freezers);
-    }*/
-
-
+        try {
+            List<FreezerDTO> freezers = freezerService.getFreezersByUserId(userId);
+            if (freezers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(freezers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
+
+
+
 
 
 

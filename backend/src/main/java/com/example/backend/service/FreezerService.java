@@ -123,4 +123,8 @@ public class FreezerService {
         return freezerMapper.toFreezerWithUsersDTO(saved);
     }
 
+    public List<FreezerDTO> getFreezersByUserId(Long userId) {
+        return freezerUserRepository.findFreezersByUserId(userId);
+    }
+
 }
