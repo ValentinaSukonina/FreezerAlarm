@@ -251,7 +251,7 @@ const PersonalContent = () => {
                                             )}
                                         </td>
                                         <td>{isEditing ? <input name="email" value={user.email}
-                                                                onChange={(e) => handleEditChange(e, user.id)}/> : user.email} </td>
+                                                                onChange={(e) => handleEditChange(e, user.id)}/> : user.email}  </td>
                                         <td className="d-none d-md-table-cell">{isEditing ?
                                             <input name="phone_number" value={user.phone_number}
                                                    onChange={(e) => handleEditChange(e, user.id)}/> : user.phone_number}</td>
