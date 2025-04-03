@@ -134,13 +134,25 @@ export const createFreezer = async (freezerData) => {
     }
 };
 
-    export async function fetchUserByName(username) {
+export async function fetchUserByName(username) {
         const response = await fetch(`http://localhost:8000/api/users/by-name/${username}`, {
             credentials: "include"
         });
         if (!response.ok) throw new Error("Failed to fetch user");
         return await response.json();
     }
+
+// Fetch freezers assigned to a specific user
+export const fetchFreezersByUser = async (userId) => {
+    try {
+        const response = await API.get(`/users/${userId}/freezers`); // Adjust based on your API endpoint
+        return response.data; // Return the freezers list assigned to this user
+    } catch (error) {
+        console.error("Error fetching freezers by user:", error);
+        throw error;
+    }
+};
+
 
 
 

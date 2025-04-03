@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchUsers, updateUser, deleteUser, createUser} from '../services/api';
+import {fetchUsers, updateUser, deleteUser, createUser, fetchFreezersByUser} from '../services/api';
 import { Navigate } from "react-router-dom";
 
 const PersonalContent = () => {
@@ -50,6 +50,8 @@ const PersonalContent = () => {
             setLoading(false);
         }
     };
+
+
 
 
 
