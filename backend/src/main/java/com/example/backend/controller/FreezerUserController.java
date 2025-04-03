@@ -105,4 +105,15 @@ public class FreezerUserController {
         return freezerUserService.getUsersByFreezerNumber(freezerNumber);
     }
 
+    @DeleteMapping("/users/{userId}/freezers/{freezerId}")
+    public ResponseEntity<?> removeFreezerFromUser(@PathVariable Long userId, @PathVariable Long freezerId) {
+        try {
+            freezerUserService.unbindUserFromFreezer(userId, freezerId);  // unbind user from the freezer
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing freezer");
+        }
+    }
+
+
 }

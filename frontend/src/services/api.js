@@ -156,6 +156,18 @@ export const fetchFreezersByUser = async (userId) => {
     }
 };
 
+// Delete a freezer from a user
+export const deleteFreezerFromUser = async (userId, freezerId) => {
+    try {
+        await API.delete(`/freezer-user/users/${userId}/freezers/${freezerId}`);
+        console.log("Freezer successfully deleted from user");
+    } catch (error) {
+        console.error("Error deleting freezer from user:", error.response ? error.response.data : error.message);
+        throw error;  // Handle error appropriately in your frontend
+    }
+};
+
+
 
 
 
