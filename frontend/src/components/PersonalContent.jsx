@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import React from "react";
 import {
     fetchUsers,
     updateUser,
@@ -8,6 +9,7 @@ import {
     deleteFreezerFromUser
 } from '../services/api';
 import { Navigate } from "react-router-dom";
+import Select from "react-select";
 
 const PersonalContent = () => {
     const [users, setUsers] = useState([]);
@@ -20,6 +22,10 @@ const PersonalContent = () => {
     });
     const [showAddForm, setShowAddForm] = useState(false);
     const [role, setRole] = useState(sessionStorage.getItem("role"));
+    const roleOptions = [
+        { value: "user", label: "user" },
+        { value: "admin", label: "admin" }
+    ];
 
     useEffect(() => {
         const fetchRoleIfNeeded = async () => {
@@ -47,7 +53,7 @@ const PersonalContent = () => {
             loadUsers();
         }
     }, [role]);
-    const loadUsers = async () => {
+  /*  const loadUsers = async () => {
         try {
             const data = await fetchUsers();
             // For each user, fetch the freezers assigned to them
@@ -58,6 +64,22 @@ const PersonalContent = () => {
                 })
             );
             setUsers(usersWithFreezers);  // Set the users state with the users and their freezers
+        } catch (err) {
+            setError("Failed to load users");
+        } finally {
+            setLoading(false);
+        }
+    };*/
+    const loadUsers = async () => {
+        try {
+            const data = await fetchUsers();
+            const usersWithFreezers = await Promise.all(
+                data.map(async (user) => {
+                    const freezers = await fetchFreezersByUser(user.id);
+                    return { ...user, freezers: Array.isArray(freezers) ? freezers : [] };
+                })
+            );
+            setUsers(usersWithFreezers);
         } catch (err) {
             setError("Failed to load users");
         } finally {
@@ -143,6 +165,8 @@ const PersonalContent = () => {
         try {
             await updateUser(userId, allowedFields);
             setEditingUserId(null);
+            console.log("Saving user:", allowedFields);
+
         } catch (err) {
             alert("Failed to update user");
         }
@@ -195,7 +219,19 @@ const PersonalContent = () => {
                         <input name="email" className="form-control" placeholder="Email" value={newUser.email} onChange={handleNewChange} />
                         <input name="phone_number" className="form-control" placeholder="Phone" value={newUser.phone_number} onChange={handleNewChange} />
                         <input name="user_rank" className="form-control" placeholder="Rank" value={newUser.user_rank} onChange={handleNewChange} />
-                        <input name="role" className="form-control" placeholder="Role" value={newUser.role} onChange={handleNewChange} />
+                        <Select
+                            className="role-type-select"
+                            classNamePrefix="ft"
+                            options={roleOptions}
+                            placeholder="Select role"
+                            value={roleOptions.find(opt => opt.value === newUser.role) || null}
+                            onChange={(selectedOption) =>
+                                setNewUser((prev) => ({
+                                    ...prev,
+                                    role: selectedOption.value
+                                }))
+                            }
+                        />
                     </div>
 
                     <div className="d-flex justify-content-between mt-3">
@@ -231,46 +267,51 @@ const PersonalContent = () => {
                             const isExpanded = expandedUserId === user.id;
 
                             return (
-                                <>
-                                    <tr key={user.id}>
+                                <React.Fragment key={user.id}>
+                                    <tr>
                                         <td className="text-start d-flex justify-content-between align-items-center">
                                             {isEditing ? (
                                                 <input name="name" value={user.name}
-                                                       onChange={(e) => handleEditChange(e, user.id)}/>
+                                                       onChange={(e) => handleEditChange(e, user.id)} />
                                             ) : (
                                                 <>
                                                     {user.name}
                                                     <button
                                                         className="btn btn-sm d-md-none ms-auto"
                                                         onClick={() => toggleExpand(user.id)}
-                                                        style={{backgroundColor: "#A9C46C", color: "white"}}
+                                                        style={{ backgroundColor: "#A9C46C", color: "white" }}
                                                     >
                                                         {isExpanded ? "▲" : "▼"}
                                                     </button>
                                                 </>
                                             )}
                                         </td>
-                                        <td>{isEditing ? <input name="email" value={user.email}
-                                                                onChange={(e) => handleEditChange(e, user.id)}/> : user.email}  </td>
-                                        <td className="d-none d-md-table-cell">{isEditing ?
-                                            <input name="phone_number" value={user.phone_number}
-                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.phone_number}</td>
-                                        <td className="d-none d-lg-table-cell">{isEditing ?
-                                            <input name="user_rank" value={user.user_rank}
-                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.user_rank}</td>
-                                        <td className="d-none d-lg-table-cell">{isEditing ?
-                                            <input name="role" value={user.role}
-                                                   onChange={(e) => handleEditChange(e, user.id)}/> : user.role}</td>
+                                        <td>
+                                            {isEditing
+                                                ? <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} />
+                                                : user.email}
+                                        </td>
+                                        <td className="d-none d-md-table-cell">
+                                            {isEditing
+                                                ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} />
+                                                : user.phone_number}
+                                        </td>
+                                        <td className="d-none d-lg-table-cell">
+                                            {isEditing
+                                                ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} />
+                                                : user.user_rank}
+                                        </td>
+                                        <td className="d-none d-lg-table-cell">
+                                            {isEditing
+                                                ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} />
+                                                : user.role}
+                                        </td>
                                         <td className="d-none d-lg-table-cell freezer-numbers" style={{ width: '80px' }}>
                                             {isEditing ? (
                                                 <div className="d-flex flex-column">
                                                     {user.freezers?.map((freezer) => (
-                                                        <div key={freezer.id}
-                                                             className="d-flex align-items-center mb-2">
-                                                            {/* Remove input field and show freezer number as plain text */}
-                                                            <span className="form-control me-2" style={{width: '80px'}}>
-                        {freezer.number}
-                    </span>
+                                                        <div key={freezer.id} className="d-flex align-items-center mb-2">
+                                                            <span className="form-control me-2" style={{ width: '80px' }}>{freezer.number}</span>
                                                             <button
                                                                 className="btn btn-danger btn-sm"
                                                                 onClick={() => handleDeleteFreezer(user.id, freezer.id)}
@@ -281,45 +322,49 @@ const PersonalContent = () => {
                                                     ))}
                                                 </div>
                                             ) : (
-                                                (user.freezers || []).map((freezer) => (
-                                                    <div key={freezer.id}>
-                                                        {/* Display freezer number as plain text */}
-                                                        {freezer.number}
-                                                    </div>
+                                                (user.freezers || []).map(freezer => (
+                                                    <div key={freezer.id}>{freezer.number}</div>
                                                 ))
                                             )}
                                         </td>
-
-
                                         <td className="d-none d-md-table-cell">
                                             {isEditing ? (
                                                 <>
-                                                    <button className="btn btn-sm me-2"
-                                                            style={{backgroundColor: "#7BAE3F", color: "white"}}
-                                                            onClick={() => handleSave(user.id)}>Save
+                                                    <button
+                                                        className="btn btn-sm me-2"
+                                                        style={{ backgroundColor: "#7BAE3F", color: "white" }}
+                                                        onClick={() => handleSave(user.id)}
+                                                    >
+                                                        Save
                                                     </button>
-                                                    <button className="btn btn-sm btn-secondary"
-                                                            onClick={() => setEditingUserId(null)}>Cancel
+                                                    <button
+                                                        className="btn btn-sm btn-secondary"
+                                                        onClick={() => setEditingUserId(null)}
+                                                    >
+                                                        Cancel
                                                     </button>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button className="btn btn-sm me-2"
-                                                            style={{backgroundColor: "#5D8736", color: "white"}}
-                                                            onClick={() => setEditingUserId(user.id)}>Edit
+                                                    <button
+                                                        className="btn btn-sm me-2"
+                                                        style={{ backgroundColor: "#5D8736", color: "white" }}
+                                                        onClick={() => setEditingUserId(user.id)}
+                                                    >
+                                                        Edit
                                                     </button>
-                                                    <button className="btn btn-sm" style={{
-                                                        backgroundColor: "#A9C46C",
-                                                        color: "white",
-                                                        border: "1px solid #c3e6cb"
-                                                    }} onClick={() => handleDelete(user.id)}>Delete
+                                                    <button
+                                                        className="btn btn-sm"
+                                                        style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }}
+                                                        onClick={() => handleDelete(user.id)}
+                                                    >
+                                                        Delete
                                                     </button>
                                                 </>
                                             )}
                                         </td>
                                     </tr>
 
-                                    {/* Mobile-only expanded section with action buttons */}
                                     {isExpanded && (
                                         <tr className="d-md-none">
                                             <td colSpan="6" className="text-start bg-light">
@@ -328,33 +373,25 @@ const PersonalContent = () => {
                                                 <div><strong>Role:</strong> {user.role}</div>
                                                 <div><strong>Assigned Freezers:</strong></div>
                                                 {user.freezers?.map(freezer => (
-                                                    <div key={freezer.id}>
-                                                        {freezer.number}
-                                                    </div>
+                                                    <div key={freezer.id}>{freezer.number}</div>
                                                 ))}
-
                                             </td>
                                         </tr>
                                     )}
-                                </>
+                                </React.Fragment>
                             );
                         })}
                         </tbody>
                     </table>
                 </div>
-            ) : (!loading && <p className="text-center">No users found.</p>)}
+            ) : (
+                !loading && <p className="text-center">No users found.</p>
+            )}
         </main>
-    );
+
+
+);
 };
 
 export default PersonalContent;
-
-
-
-
-
-
-
-
-
 

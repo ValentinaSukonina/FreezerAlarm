@@ -59,6 +59,7 @@ public class UserService {
             dbUser.setName(user.getName());
             dbUser.setEmail(user.getEmail());
             dbUser.setPhoneNumber(user.getPhoneNumber());
+            dbUser.setUser_rank(user.getUser_rank());
             dbUser.setRole(user.getRole());
             return userRepository.save(dbUser);
 
