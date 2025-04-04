@@ -39,11 +39,19 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     List<FreezerDTO> findFreezersByUserId(@Param("userId") Long userId);*/
 
     List<FreezerUser> findByUserId(Long userID);
+
     // Adjust this query to use FreezerDTO projection
     @Query("SELECT new com.example.backend.dto.FreezerDTO(f.id, f.file, f.number, f.address, f.room, f.type) " +
             "FROM FreezerUser fu JOIN fu.freezer f WHERE fu.user.id = :userId")
     List<FreezerDTO> findFreezersByUserId(@Param("userId") Long userId);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM FreezerUser fu WHERE fu.freezer.id = :freezerId")
+    void deleteByFreezerId(@Param("freezerId") Long freezerId);
 }
+
+
 
 
 
