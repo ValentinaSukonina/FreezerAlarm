@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
+import com.example.backend.exception.Exceptions;
 import com.example.backend.exception.GlobalExceptionHandler;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
@@ -66,8 +67,8 @@ public class FreezerController {
 
     // UPDATE FREEZER DETAILS BY FREEZER NUMBER
     @PutMapping("/number/{number}")
-    public ResponseEntity<Freezer> updateFreezerDetailsByNumber(@PathVariable String number, @Validated @RequestBody Freezer freezer) {
-        Freezer updatedFreezer = freezerService.updateFreezerDetailsByNumber(number, freezer);
+    public ResponseEntity<FreezerDTO> updateFreezerDetailsByNumber(@PathVariable String number, @Validated @RequestBody Freezer freezer) {
+        FreezerDTO updatedFreezer = freezerService.updateFreezerDetailsByNumber(number, freezer);
         return ResponseEntity.ok(updatedFreezer);
     }
 
@@ -78,19 +79,17 @@ public class FreezerController {
     }
 
     //  Update freezer by ID (used by frontend)
-    @PutMapping("/{id}")
-    public ResponseEntity<Freezer> updateFreezerById(@PathVariable Long id, @RequestBody Freezer updatedData) {
-        return freezerRepository.findById(id)
-                .map(existing -> {
-                    existing.setNumber(updatedData.getNumber());
-                    existing.setRoom(updatedData.getRoom());
-                    existing.setAddress(updatedData.getAddress());
-                    existing.setType(updatedData.getType());
-                    existing.setFile(updatedData.getFile()); // if used
-                    Freezer updated = freezerRepository.save(existing);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @PutMapping("/{id}/with-users")
+    public ResponseEntity<FreezerWithUsersDTO> updateFreezerWithUsers(
+            @PathVariable Long id,
+            @RequestBody FreezerWithUsersDTO dto
+    ) {
+        try {
+            FreezerWithUsersDTO updated = freezerService.updateFreezerAndUsers(id, dto);
+            return ResponseEntity.ok(updated);
+        } catch (Exceptions.ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     //  Delete freezer by ID (used by frontend)

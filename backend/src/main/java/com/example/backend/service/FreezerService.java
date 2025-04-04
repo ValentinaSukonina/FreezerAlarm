@@ -80,7 +80,7 @@ public class FreezerService {
                 .toList();
     }
 
-    public Freezer updateFreezerDetailsByNumber(String number, Freezer freezer) {
+    public FreezerDTO updateFreezerDetailsByNumber(String number, Freezer freezer) {
         int updatedRows = freezerRepository.updateFreezerDetailsByNumber(
                 freezer.getFile(), freezer.getAddress(), freezer.getRoom(), freezer.getType(), number
         );
@@ -88,8 +88,10 @@ public class FreezerService {
             throw new Exceptions.ResourceNotFoundException("Freezer with number " + number + " not found.");
         }
         // Fetch and return the updated freezer
-        return freezerRepository.findByNumber(number)
-                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Error retrieving updated freezer with number " + number));
+        return freezerMapper.toFreezerDTO(
+                freezerRepository.findByNumber(number)
+                        .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Error retrieving updated freezer with number " + number))
+        );
     }
 
     public void deleteFreezerByNumber(String number) {
@@ -98,7 +100,6 @@ public class FreezerService {
             throw new Exceptions.ResourceNotFoundException("Freezer with number " + number + " not found.");
         }
     }
-
 
     public FreezerWithUsersDTO createFreezerWithUsers(FreezerWithUsersDTO dto) {
         Freezer freezer = freezerMapper.fromFreezerWithUsersDTO(dto);
@@ -127,4 +128,33 @@ public class FreezerService {
         return freezerUserRepository.findFreezersByUserId(userId);
     }
 
+    public FreezerWithUsersDTO updateFreezerAndUsers(Long freezerId, FreezerWithUsersDTO dto) {
+        Freezer freezer = freezerRepository.findById(freezerId)
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer not found with ID: " + freezerId));
+
+        // Update basic fields using data from the DTO
+        freezer.setNumber(dto.number());
+        freezer.setRoom(dto.room());
+        freezer.setAddress(dto.address());
+        freezer.setType(dto.type());
+        freezer.setFile(dto.file());
+
+        freezerRepository.save(freezer);
+
+        // Reassign users
+        freezerUserRepository.deleteByFreezer(freezer);
+
+        for (Long userId : dto.userIds()) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found with ID: " + userId));
+
+            FreezerUser link = new FreezerUser();
+            link.setUser(user);
+            link.setFreezer(freezer);
+            freezerUserRepository.save(link);
+        }
+
+        Freezer updatedFreezer = freezerRepository.findByNumberWithUsers(freezer.getNumber());
+        return freezerMapper.toFreezerWithUsersDTO(updatedFreezer);
+    }
 }

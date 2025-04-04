@@ -101,9 +101,18 @@ export const fetchUserRole = async () => {
     }
 };
 
-export const updateFreezer = async (id, updatedData) => {
-    const response = await API.put(`/freezers/${id}`, updatedData);
-    console.log("🔁 API updated response:", response.data);
+export const updateFreezerWithUsers = async (id, updatedData, userIds) => {
+    const response = await API.put(`/freezers/${id}/with-users`, {
+        id,
+        number: updatedData.number,
+        address: updatedData.address,
+        room: updatedData.room,
+        type: updatedData.type,
+        file: updatedData.file,
+        userIds: userIds
+    });
+
+    console.log("🔁 Combined update response:", response.data);
     return response.data;
 };
 
@@ -144,7 +153,6 @@ export async function fetchUserByName(username) {
 }
 
 
-
 export const fetchFreezersByUser = async (userId) => {
     try {
         const response = await API.get(`/users/${userId}/freezers`);
@@ -166,10 +174,3 @@ export const deleteFreezerFromUser = async (userId, freezerId) => {
         throw error;  // Handle error appropriately in your frontend
     }
 };
-
-
-
-
-
-
-

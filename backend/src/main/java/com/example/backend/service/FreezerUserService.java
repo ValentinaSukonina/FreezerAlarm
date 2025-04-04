@@ -1,15 +1,19 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.FreezerDTO;
-import com.example.backend.dto.FreezerUserDTO;
 import com.example.backend.dto.UserDTO;
+import com.example.backend.dto.FreezerUserDTO;
 import com.example.backend.entity.Freezer;
-import com.example.backend.entity.FreezerUser;
 import com.example.backend.entity.User;
+import com.example.backend.entity.FreezerUser;
 import com.example.backend.exception.Exceptions;
+import com.example.backend.mapper.FreezerMapper;
+import com.example.backend.mapper.UserMapper;
+import com.example.backend.mapper.FreezerUserMapper;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +25,24 @@ public class FreezerUserService {
     private final FreezerUserRepository freezerUserRepository;
     private final UserRepository userRepository;
     private final FreezerRepository freezerRepository;
+    private final FreezerMapper freezerMapper;
+    private final UserMapper userMapper;
+    private final FreezerUserMapper freezerUserMapper;
 
 
     @Autowired
-    public FreezerUserService(FreezerUserRepository freezerUserRepository, FreezerRepository freezerRepository, UserRepository userRepository) {
+    public FreezerUserService(FreezerUserRepository freezerUserRepository,
+                              FreezerRepository freezerRepository,
+                              UserRepository userRepository,
+                              UserMapper userMapper,
+                              FreezerUserMapper freezerUserMapper,
+                              FreezerMapper freezerMapper) {
         this.freezerUserRepository = freezerUserRepository;
         this.freezerRepository = freezerRepository;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.freezerUserMapper = freezerUserMapper;
+        this.freezerMapper = freezerMapper;
     }
 
     public FreezerUser bindUserToFreezer(Long userId, Long freezerId) {
@@ -95,18 +110,8 @@ public class FreezerUserService {
             throw new Exceptions.ResourceNotFoundException("No users found for freezer number: " + freezerNumber);
         }
 
-        return users.stream()
-                .map(user -> new UserDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getPhoneNumber(),
-                        user.getEmail(),
-                        user.getUser_rank(),
-                        user.getRole()
-                ))
-                .collect(Collectors.toList());
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
-
 
     public List<FreezerDTO> getFreezersByUserId(Long userID) {
         // Step 1: Fetch the User by ID
@@ -123,17 +128,29 @@ public class FreezerUserService {
 
         // Step 4: Map Freezer entities to FreezerDTO
         return freezerUsers.stream()
-                .map(freezerUser -> new FreezerDTO(
-                        freezerUser.getFreezer().getId(),
-                        freezerUser.getFreezer().getNumber(),
-                        freezerUser.getFreezer().getRoom(),
-                        freezerUser.getFreezer().getType(),
-                        freezerUser.getFreezer().getAddress(),
-                        freezerUser.getFreezer().getFile()
-                ))
+                .map(fu -> freezerMapper.toFreezerDTO(fu.getFreezer()))
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void updateFreezerUserAssignments(Long freezerId, List<Long> userIds) {
+        Freezer freezer = freezerRepository.findById(freezerId)
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer not found with ID: " + freezerId));
+
+        // 1. Remove all existing associations for this freezer
+        freezerUserRepository.deleteByFreezer(freezer);
+
+        // 2. Add the new list of users
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found with ID: " + userId));
+
+            FreezerUser association = new FreezerUser();
+            association.setUser(user);
+            association.setFreezer(freezer);
+            freezerUserRepository.save(association);
+        }
+    }
 }
 
 
