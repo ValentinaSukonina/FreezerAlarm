@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {fetchFreezerWithUsers} from "../services/api";
 import FreezerCardAdmin from "../components/FreezerCardAdmin";
 import FreezerCardUser from "../components/FreezerCardUser";
@@ -9,6 +10,7 @@ const FreezerResult = ({freezerNumber}) => {
     const [error, setError] = useState(null);
     const [message, setMessage] = useState("");
     const role = sessionStorage.getItem("role");
+    const navigate = useNavigate();
 
     useEffect(() => {
         const getFreezer = async () => {
@@ -33,35 +35,48 @@ const FreezerResult = ({freezerNumber}) => {
         getFreezer();
     }, [freezerNumber]);
 
-    const handleFreezerUpdated = (updated) => {
-        const number = updated?.number ?? freezer?.number ?? "???";
+    const handleFreezerUpdated = async (updated, errorMessage) => {
+        if (updated === "refetch") {
+            try {
+                const freshData = await fetchFreezerWithUsers(freezerNumber);
+                setFreezer(freshData);
+                setMessage(`✅ Freezer ${freshData.number ?? "???"} updated successfully!`);
+            } catch (err) {
+                setMessage("❌ Failed to reload updated freezer.");
+            }
+        } else if (updated) {
+            setFreezer(updated);
+            setMessage(`✅ Freezer ${updated.number ?? "???"} updated successfully!`);
+        } else {
+            setMessage(errorMessage || "❌ Failed to update freezer.");
+        }
 
-        setFreezer(prev => ({
-            ...prev,
-            ...updated
-        }));
-        setMessage(`✅ Freezer ${number} updated successfully!`);
-        setTimeout(() => setMessage(""), 3000);
+        setTimeout(() => setMessage(""), 4000);
     };
 
     const handleFreezerDeleted = () => {
         setFreezer(null);
         setMessage("🗑️ Freezer deleted successfully.");
-        setTimeout(() => setMessage(""), 3000);
+
+        setTimeout(() => {
+            setMessage("");
+            navigate("/freezers"); // Redirect after delay
+        }, 2000);
     };
+
 
     if (loading) return <p>Loading freezer data...</p>;
 
     return (
         <div className="content-wrapper mx-2 my-1">
-            <h2 className="text-center my-4">Search Results</h2>
+            <h2 className="text-center my-3">Search Results</h2>
 
             {message && (
                 <div className="text-center mb-3"
                      style={{
-                         backgroundColor: "#d4edda",
-                         color: "#155724",
-                         border: "1px solid #c3e6cb",
+                         backgroundColor: message.startsWith("✅") ? "#d4edda" : "#f8d7da",
+                         color: message.startsWith("✅") ? "#155724" : "#721c24",
+                         border: message.startsWith("✅") ? "1px solid #c3e6cb" : "1px solid #f5c6cb",
                          padding: "10px 16px",
                          borderRadius: "5px",
                          maxWidth: "500px",
@@ -90,8 +105,3 @@ const FreezerResult = ({freezerNumber}) => {
 };
 
 export default FreezerResult;
-
-
-
-
-

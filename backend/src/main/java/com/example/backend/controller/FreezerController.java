@@ -7,6 +7,7 @@ import com.example.backend.exception.Exceptions;
 import com.example.backend.exception.GlobalExceptionHandler;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -89,6 +90,9 @@ public class FreezerController {
             return ResponseEntity.ok(updated);
         } catch (Exceptions.ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
