@@ -6,7 +6,6 @@ import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.FreezerUser;
 import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.service.FreezerUserService;
-import com.example.backend.dto.FreezerUserUpdateRequestDTO;
 import com.example.backend.mapper.FreezerUserMapper;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -121,13 +120,4 @@ public class FreezerUserController {
         }
     }
 
-    @PutMapping("/bulk-update")
-    public ResponseEntity<?> bulkUpdateFreezerUsers(@RequestBody FreezerUserUpdateRequestDTO dto) {
-        try {
-            freezerUserService.updateFreezerUserAssignments(dto.getFreezerId(), dto.getUserIds());
-            return ResponseEntity.ok("Freezer-user assignments updated");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update users assignments");
-        }
-    }
 }

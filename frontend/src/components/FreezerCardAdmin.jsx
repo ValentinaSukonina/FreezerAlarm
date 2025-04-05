@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {updateFreezerWithUsers, deleteFreezer,} from "../services/api";
 import {sanitizeInput} from "../services/utils";
@@ -8,6 +8,7 @@ import "../assets/styles.css";
 const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
     const [editing, setEditing] = useState(false);
     const [editData, setEditData] = useState({...freezer});
+    const [confirmingDelete, setConfirmingDelete] = useState(false);
     const [notificationPrefs, setNotificationPrefs] = useState(
         Array.isArray(freezer?.users)
             ? freezer.users.map((user) => ({
@@ -26,6 +27,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
     const [users, setUsers] = useState([]);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
+
     const [selectedUserIds, setSelectedUserIds] = useState(
         Array.isArray(freezer?.users) ? freezer.users.map(u => u.id) : []
     );
@@ -53,25 +55,23 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
     const handleSave = async () => {
         try {
-            const updated = await updateFreezerWithUsers(editData.id, editData, selectedUserIds);
-            console.log("✅ Freezer and user assignments updated:", updated);
+            await updateFreezerWithUsers(editData.id, editData, selectedUserIds);
+            console.log("✅ Freezer and user assignments updated");
             setEditing(false);
-            onFreezerUpdated?.(updated);
+            onFreezerUpdated?.("refetch"); // signal parent to reload
         } catch (err) {
             console.error("❌ Failed to save changes:", err);
-            alert("Failed to save changes.");
+            const message = err?.response?.data?.message || "An unexpected error occurred.";
+            onFreezerUpdated?.(null, `❌ Update failed: ${message}`);
         }
     };
 
-    const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete this freezer?")) {
-            try {
-                await deleteFreezer(freezer.id);
-                onFreezerDeleted?.(freezer.id);
-            } catch (err) {
-                alert("Failed to delete freezer.");
-            }
-        }
+    useEffect(() => {
+        setEditData({...freezer});
+    }, [freezer]);
+
+    const handleDelete = () => {
+        setConfirmingDelete(true);
     };
 
     const handleCancel = () => {
@@ -114,6 +114,19 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
         const sanitized = sanitizeInput(e.target.value);
         handleChange({target: {name: field, value: sanitized}});
     };
+
+    useEffect(() => {
+        if (Array.isArray(freezer?.users)) {
+            setNotificationPrefs(
+                freezer.users.map(user => ({
+                    ...user,
+                    selectedEmail: false,
+                    selectedSms: false,
+                }))
+            );
+            setSelectedUserIds(freezer.users.map(user => user.id));
+        }
+    }, [freezer.users]);
 
     return (
         <div className="freezer-card mx-auto my-2 px-3 py-1">
@@ -256,10 +269,10 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
 
                     {/* Bottom Buttons */}
                     <div className="d-flex justify-content-start align-items-center mt-4">
-                        {!editing ? (
+                        {!editing && !confirmingDelete ? (
                             <>
                                 <button
-                                    className="btn btn-sm me-2"
+                                    className="btn btn-sm me-2 px-3"
                                     style={{backgroundColor: "#5D8736", color: "white", border: "none"}}
                                     onClick={() => setEditing(true)}
                                 >
@@ -267,16 +280,41 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
                                 </button>
                                 <button
                                     className="btn btn-sm"
-                                    style={{
-                                        backgroundColor: "#A9C46C",
-                                        color: "#ffffff",
-                                        border: "1px solid #c3e6cb"
-                                    }}
+                                    style={{backgroundColor: "#A9C46C", color: "#ffffff", border: "1px solid #c3e6cb"}}
                                     onClick={handleDelete}
                                 >
                                     Delete
                                 </button>
                             </>
+                        ) : confirmingDelete ? (
+                            <div className="confirm-delete-section d-flex align-items-center">
+                                <span className="me-2 alert-circle">!</span>
+                                <span className="fw-bold text-danger me-2" style={{color: "#b00000"}}>
+            Confirm delete?
+        </span>
+                                <button
+                                    className="btn btn-sm me-2 px-3"
+                                    style={{backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb"}}
+                                    onClick={async () => {
+                                        try {
+                                            await deleteFreezer(freezer.id);
+                                            onFreezerDeleted?.(freezer.id);
+                                        } catch (err) {
+                                            console.error("❌ Failed to delete freezer:", err);
+                                            onFreezerUpdated?.(null, "❌ Failed to delete freezer.");
+                                        }
+                                    }}
+                                >
+                                    Yes
+                                </button>
+                                <button
+                                    className="btn btn-sm"
+                                    style={{backgroundColor: "#5D8736", color: "white", border: "none"}}
+                                    onClick={() => setConfirmingDelete(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         ) : (
                             <>
                                 <button

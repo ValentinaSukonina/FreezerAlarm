@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 
 const Header = () => {
@@ -7,6 +7,14 @@ const Header = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState("");
     const navigate = useNavigate();
+
+    const searchInputRef = useRef(null);
+
+    useEffect(() => {
+        if (isOpen && window.innerWidth < 992) {
+            searchInputRef.current?.focus();
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         const syncSession = async () => {
@@ -160,6 +168,7 @@ const Header = () => {
                     {isOpen && (
                         <form className="d-flex d-lg-none my-3 justify-content-center" onSubmit={handleSearch}>
                             <input
+                                ref={searchInputRef}
                                 className="form-control"
                                 type="search"
                                 placeholder={isLoggedIn ? "Search for freezer" : "Login to search"}
