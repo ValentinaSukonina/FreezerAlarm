@@ -6,6 +6,7 @@ import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.FreezerUser;
 import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.service.FreezerUserService;
+import com.example.backend.mapper.FreezerUserMapper;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,14 @@ import java.util.List;
 public class FreezerUserController {
     private final FreezerUserService freezerUserService;
     private final FreezerUserRepository freezerUserRepository;
+    private final FreezerUserMapper freezerUserMapper;
 
-    public FreezerUserController(FreezerUserService freezerUserService, FreezerUserRepository freezerUserRepository) {
+    public FreezerUserController(FreezerUserService freezerUserService,
+                                 FreezerUserRepository freezerUserRepository,
+                                 FreezerUserMapper freezerUserMapper) {
         this.freezerUserService = freezerUserService;
         this.freezerUserRepository = freezerUserRepository;
+        this.freezerUserMapper = freezerUserMapper;
     }
 
     @PostMapping
@@ -114,6 +119,5 @@ public class FreezerUserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing freezer");
         }
     }
-
 
 }
