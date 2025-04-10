@@ -26,10 +26,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // ✅ use this instead of empty curly braces
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/create-account", "/api/users/check-user", "/api/auth/**").permitAll()
+                        .requestMatchers("/",
+                                "/create-account",
+                                "/api/users/check-user",
+                                "/api/auth/**",
+                                "/api/email/send"
+                        ).permitAll()
                         .requestMatchers("/oauth2/**", "/login/**", "/error").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
