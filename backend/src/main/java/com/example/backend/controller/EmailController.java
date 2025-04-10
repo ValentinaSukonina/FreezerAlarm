@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.EmailRequestDto;
+import com.example.backend.dto.EmailRequestDTO;
 import com.example.backend.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ public class EmailController {
     }
 
     @PostMapping("/send")
-    public String send(@RequestBody EmailRequestDto request) {
+    public String send(@RequestBody EmailRequestDTO request) {
         try {
             emailService.sendEmail(request.getTo(), request.getSubject(), request.getBody());
             return "Email sent to " + request.getTo();

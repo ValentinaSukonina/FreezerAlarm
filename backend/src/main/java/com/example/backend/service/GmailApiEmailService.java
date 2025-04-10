@@ -6,6 +6,9 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,16 @@ public class GmailApiEmailService implements EmailService {
     @Autowired
     public GmailApiEmailService(GmailConfig gmailProps) {
         this.gmailProps = gmailProps;
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(GmailApiEmailService.class);
+
+    @PostConstruct
+    public void printGmailProps() {
+        logger.info("🔍 Gmail Client ID: {}", gmailProps.getClientId());
+        logger.info("🔍 Gmail Client Secret: {}", gmailProps.getClientSecret());
+        logger.info("🔍 Gmail Refresh Token: {}", gmailProps.getRefreshToken() != null ? "[OK]" : "[MISSING]");
+        logger.info("🔍 Gmail From: {}", gmailProps.getEmailFrom());
     }
 
     @Override
