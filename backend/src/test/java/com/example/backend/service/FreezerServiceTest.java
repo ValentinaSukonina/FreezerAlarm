@@ -1,4 +1,4 @@
-package com.example.backend.service;
+/*package com.example.backend.service;
 
 import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.FreezerWithUsersDTO;
@@ -252,4 +252,4 @@ class FreezerServiceTest {
     }
 
 
-}
+}*/

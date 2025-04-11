@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
+
 @ConfigurationProperties(prefix = "spring.gmail")
 public class GmailConfig {
     private String clientId;
