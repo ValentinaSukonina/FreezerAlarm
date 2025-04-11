@@ -152,7 +152,6 @@ export async function fetchUserByName(username) {
     return await response.json();
 }
 
-
 export const fetchFreezersByUser = async (userId) => {
     try {
         const response = await API.get(`/users/${userId}/freezers`);
@@ -171,6 +170,24 @@ export const deleteFreezerFromUser = async (userId, freezerId) => {
         console.log("Freezer successfully deleted from user");
     } catch (error) {
         console.error("Error deleting freezer from user:", error.response ? error.response.data : error.message);
-        throw error;  // Handle error appropriately in your frontend
+        throw error;
     }
 };
+
+export async function sendEmail(data) {
+    const response = await fetch("http://localhost:8000/api/email/send", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Email send failed");
+    }
+
+    return response.text();
+}

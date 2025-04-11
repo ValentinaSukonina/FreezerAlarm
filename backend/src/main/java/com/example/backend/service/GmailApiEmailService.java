@@ -6,7 +6,6 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
-import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +30,18 @@ public class GmailApiEmailService implements EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(GmailApiEmailService.class);
 
-    @PostConstruct
-    public void printGmailProps() {
-        logger.info("🔍 Gmail Client ID: {}", gmailProps.getClientId());
-        logger.info("🔍 Gmail Client Secret: {}", gmailProps.getClientSecret());
-        logger.info("🔍 Gmail Refresh Token: {}", gmailProps.getRefreshToken() != null ? "[OK]" : "[MISSING]");
-        logger.info("🔍 Gmail From: {}", gmailProps.getEmailFrom());
-    }
-
     @Override
     public void sendEmail(String to, String subject, String bodyText) throws Exception {
+        String[] emails = to.split(",");
+        for (String email : emails) {
+            try {
+                InternetAddress internetAddress = new InternetAddress(email.trim());
+                internetAddress.validate(); // throws AddressException if invalid
+            } catch (Exception ex) {
+                logger.error("❌ Invalid recipient email: {}", email);
+                throw new IllegalArgumentException("Invalid email address: " + email.trim());
+            }
+        }
         GoogleCredential credential = new GoogleCredential.Builder()
                 .setClientSecrets(gmailProps.getClientId(), gmailProps.getClientSecret())
                 .setTransport(GoogleNetHttpTransport.newTrustedTransport())
@@ -68,7 +69,7 @@ public class GmailApiEmailService implements EmailService {
 
         MimeMessage email = new MimeMessage(session);
         email.setFrom(new InternetAddress(from));
-        email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
+        email.setRecipients(javax.mail.Message.RecipientType.TO, InternetAddress.parse(to, true));
         email.setSubject(subject);
         email.setText(bodyText, StandardCharsets.UTF_8.name());
 

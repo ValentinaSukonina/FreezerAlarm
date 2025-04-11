@@ -1,9 +1,7 @@
 package com.example.backend.config;
 
 import com.example.backend.repository.UserRepository;
-import com.example.backend.entity.User;
 import jakarta.servlet.http.HttpSession;
-import org.apache.tomcat.util.modeler.OperationInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
