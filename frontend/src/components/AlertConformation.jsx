@@ -39,7 +39,7 @@ const AlertConfirmation = () => {
 
                 {/* ✅ Add note about email delivery */}
                 <div className="alert alert-warning mt-4" role="alert">
-                    <strong>Note:</strong> Email delivery cannot be guaranteed. If a recipient's email address is invalid, it may silently fail or bounce later.
+                    <strong>Note:</strong> Email was successfully sent. However, delivery isn't guaranteed — some invalid or unreachable addresses may fail without notification.
                 </div>
 
                 <button className="btn mt-3 btn-sm btn-home rounded-3 border shadow-lg" onClick={() => navigate("/")}>
