@@ -1,6 +1,5 @@
 package com.example.backend.repository;
 
-import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;

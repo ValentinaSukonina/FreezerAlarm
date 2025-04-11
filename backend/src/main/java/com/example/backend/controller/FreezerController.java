@@ -7,15 +7,16 @@ import com.example.backend.exception.Exceptions;
 import com.example.backend.exception.GlobalExceptionHandler;
 import com.example.backend.repository.FreezerRepository;
 import com.example.backend.service.FreezerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/freezers")

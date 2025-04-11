@@ -10,13 +10,11 @@ import com.example.backend.service.FreezerUserService;
 import com.example.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -113,6 +111,7 @@ public class UserController {
         }
         return ResponseEntity.ok(principal);
     }
+
 
     @GetMapping("/by-name/{username}")
     public ResponseEntity<UserDTO> getUserByName(@PathVariable String username) {
