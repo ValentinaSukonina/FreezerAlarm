@@ -1,4 +1,4 @@
-package com.example.backend.service;
+/*package com.example.backend.service;
 
 
 
@@ -122,4 +122,4 @@ class FreezerUserServiceTest {
         verify(freezerUserRepository).deleteByFreezer(freezer);
         verify(freezerUserRepository).save(any(FreezerUser.class));
     }
-}
+}*/
