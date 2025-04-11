@@ -95,6 +95,7 @@ const FreezerResult = ({freezerNumber}) => {
                         freezer={freezer}
                         onFreezerUpdated={handleFreezerUpdated}
                         onFreezerDeleted={handleFreezerDeleted}
+                        onMessage={setMessage}
                     />
                 ) : (
                     <FreezerCardUser freezer={freezer}/>

@@ -3,9 +3,10 @@ import {useNavigate} from "react-router-dom";
 import {updateFreezerWithUsers, deleteFreezer,} from "../services/api";
 import {sanitizeInput} from "../services/utils";
 import {fetchUsers} from "../services/api";
+import { sendEmail } from "../services/api";
 import "../assets/styles.css";
 
-const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
+const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessage }) => {
     const [editing, setEditing] = useState(false);
     const [editData, setEditData] = useState({...freezer});
     const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -98,14 +99,46 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted}) => {
         type === "selectedEmail" ? setSelectAllEmail(isSelectAll) : setSelectAllSms(isSelectAll);
     };
 
-    const handleSend = () => {
-        const selectedRecipients = notificationPrefs.filter(user => user.selectedEmail || user.selectedSms);
-        navigate("/confirmation", {
-            state: {
-                freezerNumber: editData.number,
-                recipients: selectedRecipients
+    const handleSend = async () => {
+        const selectedRecipients = notificationPrefs.filter(user => user.selectedEmail);
+
+        const adminName = sessionStorage.getItem("username");
+        const adminEmail = sessionStorage.getItem("email");
+
+        const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        const invalidEmails = selectedRecipients.filter(user => !isValidEmail(user.email));
+        const validRecipients = selectedRecipients.filter(user => isValidEmail(user.email));
+
+        if (invalidEmails.length > 0) {
+            onMessage(`❌ Invalid email address(es): ${invalidEmails.map(u => u.email).join(', ')}`);
+            return;
+        }
+
+        try {
+            if (validRecipients.length > 0) {
+                const emailList = validRecipients.map(u => u.email).join(", ");
+
+                await sendEmail({
+                    to: emailList,
+                    subject: `🚨 Alarm: for Freezer ${editData.number}`,
+                    body: "Attention!\n\n" +
+                        `A temperature increase was reported for freezer ${editData.number} (-150°C), located in room ${editData.room} at ${editData.address}.\n\n` +
+                        `This alert was sent by ${adminName} (${adminEmail}).`
+                });
             }
-        });
+
+            navigate("/confirmation", {
+                state: {
+                    freezerNumber: editData.number,
+                    recipients: validRecipients,
+                    message: `✅ Email sent to ${validRecipients.length} user(s).`
+                },
+            });
+        } catch (err) {
+            console.error("❌ Failed to send email:", err);
+            onMessage("Failed to send email notification.");
+        }
     };
 
     const {number, room, address, type} = editData;

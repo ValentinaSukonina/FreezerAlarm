@@ -53,7 +53,17 @@ public class AuthController {
         return ResponseEntity.ok(sessionData);
     }
 
-
+    @GetMapping("/oauth2callback")
+    public ResponseEntity<String> handleOAuthCallback(@RequestParam(required = false) String code,
+                                                      @RequestParam(required = false) String error) {
+        if (error != null) {
+            return ResponseEntity.badRequest().body("Error from Google: " + error);
+        }
+        if (code == null) {
+            return ResponseEntity.badRequest().body("No code received.");
+        }
+        return ResponseEntity.ok("Your auth code is: " + code);
+    }
 
 
 }

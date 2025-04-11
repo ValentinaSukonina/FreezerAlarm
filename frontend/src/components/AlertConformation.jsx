@@ -2,7 +2,6 @@ import React from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-
 const AlertConfirmation = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -21,14 +20,11 @@ const AlertConfirmation = () => {
                             <li key={index} className="border-bottom py-2">
                                 <p className="mb-0 fw-bold">{user.name}</p>
 
-                                {/* Show email with Bootstrap icon if selected */}
                                 {user.selectedEmail && (
                                     <p className="mb-0">
                                         <i className="bi bi-envelope me-1"></i> {user.email}
                                     </p>
                                 )}
-
-                                {/* Show phone with Bootstrap icon if selected */}
                                 {user.selectedSms && (
                                     <p>
                                         <i className="bi bi-phone me-1"></i> {user.phone_number}
@@ -40,6 +36,11 @@ const AlertConfirmation = () => {
                         <p>No recipients selected.</p>
                     )}
                 </ul>
+
+                {/* ✅ Add note about email delivery */}
+                <div className="alert alert-warning mt-4" role="alert">
+                    <strong>Note:</strong> Email was successfully sent. However, delivery isn't guaranteed — some invalid or unreachable addresses may fail without notification.
+                </div>
 
                 <button className="btn mt-3 btn-sm btn-home rounded-3 border shadow-lg" onClick={() => navigate("/")}>
                     Back to Home
