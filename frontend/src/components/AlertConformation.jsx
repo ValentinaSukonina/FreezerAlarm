@@ -39,12 +39,20 @@ const AlertConfirmation = () => {
 
                 {/* ✅ Add note about email delivery */}
                 <div className="alert alert-warning mt-4" role="alert">
-                    <strong>Note:</strong> Email was successfully sent. However, delivery isn't guaranteed — some invalid or unreachable addresses may fail without notification.
+                    <strong>Note:</strong> Email was successfully sent. However, delivery isn't guaranteed — some
+                    invalid or unreachable addresses may fail without notification.
                 </div>
 
-                <button className="btn mt-3 btn-sm btn-home rounded-3 border shadow-lg" onClick={() => navigate("/")}>
-                    Back to Home
-                </button>
+                <div className="text-center">
+                    <button
+                        className="btn btn-sm btn-home rounded-3 border shadow-lg mt-3"
+                        style={{padding: "6px 16px", fontSize: "0.9rem", width: "fit-content"}}
+                        onClick={() => navigate("/")}
+                    >
+                        Back to Home
+                    </button>
+                </div>
+
             </div>
         </div>
     );
