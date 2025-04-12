@@ -1,8 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { vitest } from 'vitest/config';
+
 
 export default defineConfig({
     plugins: [react()],
+    test: {
+        globals: true,
+        environment: 'jsdom', // Use jsdom for simulating the browser
+        setupFiles: './src/setupTests.js', // Optional setup file if needed
+    },
     resolve: {
         extensions: ['.js', '.jsx'], // Ensure these file types are resolved
     },
