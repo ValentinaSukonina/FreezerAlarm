@@ -35,4 +35,6 @@ describe("FreezerCard", () => {
         render(<FreezerCard freezer={null} />);
         expect(screen.getByText(/No freezer data available/i)).toBeInTheDocument();
     });
+
+
 });

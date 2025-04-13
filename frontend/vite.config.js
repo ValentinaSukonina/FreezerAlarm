@@ -1,32 +1,31 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-
-
 export default defineConfig({
     plugins: [react()],
     test: {
-        globals: true,          // Use global test functions like "it", "describe"
-        environment: 'jsdom',   // Set jsdom as the test environment
-        setupFiles: './setupTests.js', // Optional: path for a setup file if needed
-        include: ['**/*.{test,spec}.{js,jsx}'], // Ensure the test files are detected
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './setupTests.js',
+        include: ['**/*.{test,spec}.{js,jsx}'],
+        mockReset: true,
         coverage: {
-            provider: 'c8', // or 'istanbul'
-            reporter: ['text', 'lcov'], // this generates text in terminal + HTML report
+            enabled: true,
+            provider: 'v8',
             reportsDirectory: './coverage',
+            reporter: ['text', 'lcov'],
             exclude: ['node_modules/', 'tests/'],
         },
-        mockReset: true, // Automatically reset mocks between tests
     },
     resolve: {
-        extensions: ['.js', '.jsx'], // Ensure these file types are resolved
+        extensions: ['.js', '.jsx'],
     },
-    root: '.', // Root directory
+    root: '.',
     build: {
         copyPublicDir: true,
-        outDir: 'dist', // Output directory
+        outDir: 'dist',
         rollupOptions: {
-            input: './index.html', // Correct path to your index.html
+            input: './index.html',
         },
     },
     server: {
@@ -35,11 +34,12 @@ export default defineConfig({
             '/api': {
                 target: 'http://localhost:8000',
                 changeOrigin: true,
-                secure: false
-            }
-        }
-    }
+                secure: false,
+            },
+        },
+    },
 });
+
 
 
 
