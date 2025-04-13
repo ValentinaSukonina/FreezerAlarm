@@ -1,14 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { vitest } from 'vitest/config';
+
 
 
 export default defineConfig({
     plugins: [react()],
     test: {
-        globals: true,
-        environment: 'jsdom', // Use jsdom for simulating the browser
-        setupFiles: './src/setupTests.js', // Optional setup file if needed
+        globals: true,          // Use global test functions like "it", "describe"
+        environment: 'jsdom',   // Set jsdom as the test environment
+        setupFiles: './setupTests.js', // Optional: path for a setup file if needed
+        include: ['**/*.{test,spec}.{js,jsx}'], // Ensure the test files are detected
+        coverage: {
+            provider: 'c8', // or 'istanbul'
+            reporter: ['text', 'lcov'], // this generates text in terminal + HTML report
+            reportsDirectory: './coverage',
+            exclude: ['node_modules/', 'tests/'],
+        },
+        mockReset: true, // Automatically reset mocks between tests
     },
     resolve: {
         extensions: ['.js', '.jsx'], // Ensure these file types are resolved

@@ -10,7 +10,7 @@ import Personal from "./pages/Personal";
 import Login from "./pages/Login";
 import Freezers from "./pages/Freezers";
 import FreezerPage from "./pages/FreezerPage";
-import AlertConfirmation from "./components/AlertConformation";
+import AlertConfirmation from "./components/AlertConfirmation";
 import Unauthorized from "./components/Unauthorized";
 import MyAccount from "./pages/MyAccount";
 
