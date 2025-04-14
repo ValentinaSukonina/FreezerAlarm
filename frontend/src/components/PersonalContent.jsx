@@ -399,7 +399,7 @@ const PersonalContent = () => {
                                                 ))
                                             )}
                                         </td>
-                                        <td className="d-none d-md-table-cell">
+                                        <td className="d-none d-md-table-cell ">
                                             {isEditing ? (
                                                 <>
                                                     <button
