@@ -10,6 +10,12 @@ import {
 } from '../services/api';
 import { Navigate } from "react-router-dom";
 import Select from "react-select";
+import {sanitizeInputSec} from "../services/utils";
+
+
+
+
+
 
 const PersonalContent = () => {
     const [users, setUsers] = useState([]);
@@ -53,23 +59,7 @@ const PersonalContent = () => {
             loadUsers();
         }
     }, [role]);
-  /*  const loadUsers = async () => {
-        try {
-            const data = await fetchUsers();
-            // For each user, fetch the freezers assigned to them
-            const usersWithFreezers = await Promise.all(
-                data.map(async (user) => {
-                    const freezers = await fetchFreezersByUser(user.id);
-                    return { ...user, freezers }; // Add freezers to the user object
-                })
-            );
-            setUsers(usersWithFreezers);  // Set the users state with the users and their freezers
-        } catch (err) {
-            setError("Failed to load users");
-        } finally {
-            setLoading(false);
-        }
-    };*/
+
     const loadUsers = async () => {
         try {
             const data = await fetchUsers();
@@ -148,7 +138,8 @@ const PersonalContent = () => {
 
     const handleNewChange = (e) => {
         const { name, value } = e.target;
-        setNewUser((prev) => ({ ...prev, [name]: value }));
+        const sanitizedValue = sanitizeInputSec(value, name); // Sanitize based on field type
+        setNewUser((prev) => ({ ...prev, [name]: sanitizedValue }));
     };
 
     const handleSave = async (userId) => {
@@ -168,7 +159,7 @@ const PersonalContent = () => {
             console.log("Saving user:", allowedFields);
 
         } catch (err) {
-            alert("Failed to update user");
+            alert("Review the form input. Some fields are not valid");
         }
     };
 
@@ -249,7 +240,7 @@ const PersonalContent = () => {
 
             {users.length > 0 ? (
                 <div className="table-responsive mt-4">
-                    <table className="table table-bordered table-hover text-center">
+                    <table className="table table-bordered  text-center">
                         <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
                             <th>Name</th>
@@ -390,8 +381,9 @@ const PersonalContent = () => {
         </main>
 
 
-);
+    );
 };
 
 export default PersonalContent;
+
 
