@@ -150,8 +150,10 @@ const LoginContent = () => {
                     <div className="text-center mt-4">
                         <button
                             onClick={handleLogin}
+                            data-testid="google-login-btn"
                             className="google-btn"
                         >
+
                             <svg className="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3">
                                 <path fill="#4285f4"
                                       d="M533.5 278.4c0-17.4-1.6-34.1-4.7-50.4H272v95.4h147.1c-6.4 34.7-25.5 64-54.5 83.4v68h88.2c51.7-47.6 80.7-117.8 80.7-196.4z"/>
