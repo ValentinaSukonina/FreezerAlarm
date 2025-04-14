@@ -1,4 +1,3 @@
-// TestConfig.java
 package com.example.backend.config;
 
 import com.example.backend.entity.User;
