@@ -111,8 +111,8 @@ const MyAccount = () => {
             </div>
 
             <div className="form-group mb-3">
-                <label><strong>Phone Number</strong></label>
-                <input name="phone_number" className="form-control" value={user.phone_number || ""} onChange={handleChange} />
+                <label  htmlFor="phone_number" ><strong>Phone Number</strong></label>
+                <input  id="phone_number"  name="phone_number" className="form-control" value={user.phone_number || ""} onChange={handleChange} />
             </div>
 
             <div className="form-group mb-3">
