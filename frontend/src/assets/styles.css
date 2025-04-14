@@ -301,3 +301,29 @@ main {
         display: none;
     }
 }
+
+/* General alert style */
+.alert {
+    font-size: 14px; /* Make the text smaller */
+    text-align: center;
+    padding: 6px 12px; /* Reduced padding for smaller box */
+    margin-top: 15px; /* Position the message under the form */
+    border-radius: 4px; /* Optional: rounded corners */
+    width: 100%; /* Make the message span across the width of the form */
+    max-width: 500px; /* Limit the width for better appearance */
+    margin-left: auto;
+    margin-right: auto; /* Center the message box */
+}
+
+/* Success message styling */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Error message styling */
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+

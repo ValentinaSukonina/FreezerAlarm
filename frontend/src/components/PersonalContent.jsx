@@ -10,14 +10,11 @@ import {
 } from '../services/api';
 import { Navigate } from "react-router-dom";
 import Select from "react-select";
-import {sanitizeInputSec} from "../services/utils";
-
-
-
-
-
+import { sanitizeInputSec } from "../services/utils";
 
 const PersonalContent = () => {
+    const [message, setMessage] = useState(""); // To store the success/error message
+    const [fadeOut, setFadeOut] = useState(false); // To control fade-out effect
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -28,10 +25,22 @@ const PersonalContent = () => {
     });
     const [showAddForm, setShowAddForm] = useState(false);
     const [role, setRole] = useState(sessionStorage.getItem("role"));
+
     const roleOptions = [
         { value: "user", label: "user" },
         { value: "admin", label: "admin" }
     ];
+
+
+    useEffect(() => {
+        if (message) {
+            const hideTimer = setTimeout(() => {
+                setMessage(""); // Clear the message completely
+            }, 3000);
+
+            return () => clearTimeout(hideTimer); // Cleanup on unmount
+        }
+    }, [message]);
 
     useEffect(() => {
         const fetchRoleIfNeeded = async () => {
@@ -77,7 +86,6 @@ const PersonalContent = () => {
         }
     };
 
-
     const handleEditChange = (e, userId) => {
         const { name, value } = e.target;
         setUsers((prev) =>
@@ -105,40 +113,38 @@ const PersonalContent = () => {
 
     const handleDeleteFreezer = async (userId, freezerId) => {
         try {
-            await deleteFreezerFromUser(userId, freezerId);  // Call the API to remove the freezer
-            // Update the local state to remove the freezer immediately
+            await deleteFreezerFromUser(userId, freezerId);
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
                     user.id === userId
                         ? {
                             ...user,
-                            freezers: user.freezers.filter((freezer) => freezer.id !== freezerId) // Remove the deleted freezer
+                            freezers: user.freezers.filter((freezer) => freezer.id !== freezerId)
                         }
                         : user
                 )
             );
-            alert("Freezer successfully deleted from user.");
+            setMessage("✅ Freezer successfully deleted from user.");
         } catch (err) {
-            alert("Failed to delete freezer.");
+            setMessage("❌ Failed to delete freezer.");
             console.error("Error deleting freezer from user:", err);
         }
     };
-
-
 
     const handleDelete = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
         try {
             await deleteUser(userId);
             setUsers((prev) => prev.filter((user) => user.id !== userId));
+            setMessage("✅ User successfully deleted.");
         } catch (err) {
-            alert("Failed to delete user");
+            setMessage("❌ Failed to delete user.");
         }
     };
 
     const handleNewChange = (e) => {
         const { name, value } = e.target;
-        const sanitizedValue = sanitizeInputSec(value, name); // Sanitize based on field type
+        const sanitizedValue = sanitizeInputSec(value, name);
         setNewUser((prev) => ({ ...prev, [name]: sanitizedValue }));
     };
 
@@ -150,23 +156,21 @@ const PersonalContent = () => {
             phone_number: userToUpdate.phone_number,
             user_rank: userToUpdate.user_rank,
             role: userToUpdate.role,
-            freezers: userToUpdate.freezers.map((freezer) => freezer.id)  // Assuming freezer ID should be saved
+            freezers: userToUpdate.freezers.map((freezer) => freezer.id)
         };
 
         try {
             await updateUser(userId, allowedFields);
             setEditingUserId(null);
-            console.log("Saving user:", allowedFields);
-
+            setMessage("✅ User updated successfully!");
         } catch (err) {
-            alert("Review the form input. Some fields are not valid");
+            setMessage("❌ Review the form input. Some fields are not valid.");
         }
     };
 
-
     const handleAddUser = async () => {
         if (!newUser.name || !newUser.email || !newUser.role) {
-            alert("Name, email, and role are required.");
+            setMessage("❌ Name, email, and role are required.");
             return;
         }
 
@@ -175,8 +179,9 @@ const PersonalContent = () => {
             setUsers((prev) => [...prev, created]);
             setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
             setShowAddForm(false);
+            setMessage("✅ New user created successfully!");
         } catch (err) {
-            alert("Failed to create user");
+            setMessage("❌ Failed to create user.");
         }
     };
 
@@ -206,16 +211,40 @@ const PersonalContent = () => {
                 <div className="border p-3 rounded mb-4" style={{ backgroundColor: "#f8fff0", maxWidth: "500px", margin: "0 auto" }}>
                     <h5 className="mb-3">Add New User</h5>
                     <div className="d-flex flex-column gap-2">
-                        <input name="name" className="form-control" placeholder="Name" value={newUser.name} onChange={handleNewChange} />
-                        <input name="email" className="form-control" placeholder="Email" value={newUser.email} onChange={handleNewChange} />
-                        <input name="phone_number" className="form-control" placeholder="Phone" value={newUser.phone_number} onChange={handleNewChange} />
-                        <input name="user_rank" className="form-control" placeholder="Rank" value={newUser.user_rank} onChange={handleNewChange} />
+                        <input
+                            name="name"
+                            className="form-control"
+                            placeholder="Name"
+                            value={newUser.name}
+                            onChange={handleNewChange}
+                        />
+                        <input
+                            name="email"
+                            className="form-control"
+                            placeholder="Email"
+                            value={newUser.email}
+                            onChange={handleNewChange}
+                        />
+                        <input
+                            name="phone_number"
+                            className="form-control"
+                            placeholder="Phone"
+                            value={newUser.phone_number}
+                            onChange={handleNewChange}
+                        />
+                        <input
+                            name="user_rank"
+                            className="form-control"
+                            placeholder="Rank"
+                            value={newUser.user_rank}
+                            onChange={handleNewChange}
+                        />
                         <Select
                             className="role-type-select"
                             classNamePrefix="ft"
                             options={roleOptions}
                             placeholder="Select role"
-                            value={roleOptions.find(opt => opt.value === newUser.role) || null}
+                            value={roleOptions.find((opt) => opt.value === newUser.role) || null}
                             onChange={(selectedOption) =>
                                 setNewUser((prev) => ({
                                     ...prev,
@@ -226,12 +255,32 @@ const PersonalContent = () => {
                     </div>
 
                     <div className="d-flex justify-content-between mt-3">
-                        <button className="btn" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={handleAddUser}>Add</button>
-                        <button className="btn btn-secondary" onClick={() => {
-                            setShowAddForm(false);
-                            setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
-                        }}>Cancel</button>
+                        <button className="btn" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={handleAddUser}>
+                            Add
+                        </button>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => {
+                                setShowAddForm(false);
+                                setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
+                            }}
+                        >
+                            Cancel
+                        </button>
                     </div>
+                </div>
+            )}
+            {/* Message Display */}
+            {message && (
+                <div
+                    className="alert"
+                    style={{
+                        padding: "10px",
+                        backgroundColor: message.startsWith("✅") ? "#d4edda" : "#f8d7da",
+                        color: message.startsWith("✅") ? "#155724" : "#721c24",
+                    }}
+                >
+                    {message}
                 </div>
             )}
 
@@ -262,8 +311,7 @@ const PersonalContent = () => {
                                     <tr>
                                         <td className="text-start d-flex justify-content-between align-items-center">
                                             {isEditing ? (
-                                                <input name="name" value={user.name}
-                                                       onChange={(e) => handleEditChange(e, user.id)} />
+                                                <input name="name" value={user.name} onChange={(e) => handleEditChange(e, user.id)} />
                                             ) : (
                                                 <>
                                                     {user.name}
@@ -278,24 +326,32 @@ const PersonalContent = () => {
                                             )}
                                         </td>
                                         <td>
-                                            {isEditing
-                                                ? <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} />
-                                                : user.email}
+                                            {isEditing ? (
+                                                <input name="email" value={user.email} onChange={(e) => handleEditChange(e, user.id)} />
+                                            ) : (
+                                                user.email
+                                            )}
                                         </td>
                                         <td className="d-none d-md-table-cell">
-                                            {isEditing
-                                                ? <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} />
-                                                : user.phone_number}
+                                            {isEditing ? (
+                                                <input name="phone_number" value={user.phone_number} onChange={(e) => handleEditChange(e, user.id)} />
+                                            ) : (
+                                                user.phone_number
+                                            )}
                                         </td>
                                         <td className="d-none d-lg-table-cell">
-                                            {isEditing
-                                                ? <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} />
-                                                : user.user_rank}
+                                            {isEditing ? (
+                                                <input name="user_rank" value={user.user_rank} onChange={(e) => handleEditChange(e, user.id)} />
+                                            ) : (
+                                                user.user_rank
+                                            )}
                                         </td>
                                         <td className="d-none d-lg-table-cell">
-                                            {isEditing
-                                                ? <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} />
-                                                : user.role}
+                                            {isEditing ? (
+                                                <input name="role" value={user.role} onChange={(e) => handleEditChange(e, user.id)} />
+                                            ) : (
+                                                user.role
+                                            )}
                                         </td>
                                         <td className="d-none d-lg-table-cell freezer-numbers" style={{ width: '80px' }}>
                                             {isEditing ? (
@@ -379,11 +435,10 @@ const PersonalContent = () => {
                 !loading && <p className="text-center">No users found.</p>
             )}
         </main>
-
-
     );
 };
 
 export default PersonalContent;
+
 
 
