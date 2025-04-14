@@ -1,5 +1,6 @@
 package com.example.backend.config;
 
+import com.example.backend.controller.AuthController;
 import com.example.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Configuration
@@ -20,6 +23,8 @@ public class SecurityConfig {
     public SecurityConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,8 +51,8 @@ public class SecurityConfig {
                             HttpSession session = request.getSession();
                             String preAuthorizedEmail = (String) session.getAttribute("preAuthorizedEmail");
 
-                            System.out.println("Google login: " + name + " <" + email + ">");
-                            System.out.println("Pre-authorized email in session: " + preAuthorizedEmail);
+                            logger.info("Google login: " + name + " <" + email + ">");
+                            logger.info("Pre-authorized email in session: " + preAuthorizedEmail);
 
                             if (email == null) {
                                 System.out.println("Email not found in Google token.");
@@ -70,14 +75,14 @@ public class SecurityConfig {
                                 session.setAttribute("username", user.getName());
                                 session.setAttribute("email", user.getEmail());
 
-                                System.out.println("✅ Authenticated user: " + user.getName() + ", role: " + user.getRole());
+                                logger.info("✅ Authenticated user: " + user.getName() + ", role: " + user.getRole());
                                 try {
                                     response.sendRedirect("http://localhost:5173/freezers");
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }, () -> {
-                                System.out.println("❌ Email found in Google, but not in DB: " + email);
+                                logger.info("❌ Email found in Google, but not in DB: " + email);
                                 try {
                                     response.sendRedirect("http://localhost:5173/unauthorized");
                                 } catch (Exception e) {
@@ -96,10 +101,10 @@ public class SecurityConfig {
                             HttpSession session = request.getSession(false);
                             if (session != null) {
                                 session.invalidate(); // force clear everything
-                                System.out.println("Session invalidated on logout");
+                                logger.info("Session invalidated on logout");
                             }
                             if (authentication != null) {
-                                System.out.println("User logged out: " + authentication.getName());
+                                logger.info("User logged out: " + authentication.getName());
                             }
                         })
                 );
