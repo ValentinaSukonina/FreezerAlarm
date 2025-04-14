@@ -55,13 +55,21 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd, onCancel, formE
         }
     };
 
-    const handleShowForm = async () => {
+   /* const handleShowForm = async () => {
         setShowForm(true);
         if (users.length === 0) {
             const fetched = await fetchUsers();
             setUsers(fetched);
         }
+    };*/
+    const handleShowForm = async () => {
+        setShowForm(true);
+        if (!users || users.length === 0) {
+            const fetched = await fetchUsers();
+            setUsers(fetched);
+        }
     };
+
 
     const handleHideForm = () => {
         setShowForm(false); // no reset when form is closed
