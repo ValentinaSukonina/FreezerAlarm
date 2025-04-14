@@ -14,7 +14,7 @@ import { sanitizeInputSec } from "../services/utils";
 
 const PersonalContent = () => {
     const [message, setMessage] = useState(""); // To store the success/error message
-    const [fadeOut, setFadeOut] = useState(false); // To control fade-out effect
+    const [deletingUserId, setDeletingUserId] = useState(null); // Track the user being deleted
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -30,7 +30,6 @@ const PersonalContent = () => {
         { value: "user", label: "user" },
         { value: "admin", label: "admin" }
     ];
-
 
     useEffect(() => {
         if (message) {
@@ -131,14 +130,24 @@ const PersonalContent = () => {
         }
     };
 
-    const handleDelete = async (userId) => {
-        if (!window.confirm("Are you sure you want to delete this user?")) return;
+    // Handling Deletion with confirmation
+    const handleDelete = (userId) => {
+        setDeletingUserId(userId); // Show the confirmation UI
+    };
+
+    const cancelDelete = () => {
+        setDeletingUserId(null); // Hide the confirmation UI
+    };
+
+    const confirmDelete = async () => {
         try {
-            await deleteUser(userId);
-            setUsers((prev) => prev.filter((user) => user.id !== userId));
+            await deleteUser(deletingUserId);
+            setUsers((prev) => prev.filter((user) => user.id !== deletingUserId));
             setMessage("✅ User successfully deleted.");
+            setDeletingUserId(null); // Hide the confirmation UI after successful deletion
         } catch (err) {
             setMessage("❌ Failed to delete user.");
+            setDeletingUserId(null); // Hide the confirmation UI after error
         }
     };
 
@@ -270,6 +279,7 @@ const PersonalContent = () => {
                     </div>
                 </div>
             )}
+
             {/* Message Display */}
             {message && (
                 <div
@@ -284,12 +294,27 @@ const PersonalContent = () => {
                 </div>
             )}
 
+            {/* Deletion Confirmation UI */}
+            {deletingUserId !== null && (
+                <div className="alert" style={{ backgroundColor: "#f8d7da", color: "#721c24", marginTop: "20px" }}>
+                    <p>Are you sure you want to delete this user?</p>
+                    <div className="d-flex justify-content-center">
+                        <button className="btn btn-sm" style={{ backgroundColor: "#155724", color: "white" }} onClick={confirmDelete}>
+                            Yes, Delete
+                        </button>
+                        <button className="btn btn-sm ms-2" style={{ backgroundColor: "#721c24", color: "white" }} onClick={cancelDelete}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {loading && <p className="text-center">Loading users...</p>}
             {error && <p className="text-center text-danger">{error}</p>}
 
             {users.length > 0 ? (
                 <div className="table-responsive mt-4">
-                    <table className="table table-bordered  text-center">
+                    <table className="table table-bordered text-center">
                         <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
                             <th>Name</th>
@@ -439,6 +464,7 @@ const PersonalContent = () => {
 };
 
 export default PersonalContent;
+
 
 
 
