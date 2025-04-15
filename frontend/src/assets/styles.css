@@ -12,6 +12,7 @@ main {
 .content-wrapper {
     padding-top: 10px; /* Adjust based on your header height */
     margin-top: inherit;
+    overflow-x: hidden;
 }
 
 /* Title Hover Effect */
@@ -143,13 +144,16 @@ main {
     flex-wrap: wrap;
     justify-content: center; /* Centers the cards */
     gap: 5px; /* Space between cards */
+    max-width: 100%;
 }
 
 /* FreezerCard */
 .freezer-card {
-    width: 100%; /* Take full width by default */
+    width: 100%;
     max-width: 450px;
-    min-width: 375px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 1rem;
 }
 
 /* Main control (border, height, padding, etc) */
@@ -265,6 +269,13 @@ main {
         /* Centers the cards */
         gap: 1px; /* Space between cards */
     }
+
+    .google-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
 }
 
 @media (max-width: 375px) {
@@ -326,6 +337,3 @@ main {
     background-color: #f8d7da;
     color: #721c24;
 }
-
-
-

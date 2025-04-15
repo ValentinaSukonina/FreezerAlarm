@@ -69,7 +69,7 @@ const FreezerResult = ({freezerNumber}) => {
 
     return (
         <div className="content-wrapper mx-2 my-1">
-            <h2 className="text-center my-3">Search Results</h2>
+            <h2 className="text-center my-2 my-sm-3">Search Results</h2>
 
             {message && (
                 <div className="text-center mb-3"

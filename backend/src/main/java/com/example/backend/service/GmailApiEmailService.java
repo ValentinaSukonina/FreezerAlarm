@@ -1,21 +1,28 @@
 package com.example.backend.service;
 
 import com.example.backend.config.GmailConfig;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import com.google.auth.oauth2.UserCredentials;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.api.client.http.HttpRequestInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.Properties;
 
@@ -24,46 +31,63 @@ public class GmailApiEmailService implements EmailService {
     private final GmailConfig gmailProps;
 
     @Autowired
-    public GmailApiEmailService(GmailConfig gmailProps) {
+    public GmailApiEmailService(@Qualifier("gmailConfig") GmailConfig gmailProps) {
         this.gmailProps = gmailProps;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(GmailApiEmailService.class);
 
     @Override
-    public void sendEmail(String to, String subject, String bodyText) throws Exception {
+    public void sendEmail(String to, String subject, String bodyText)
+            throws MessagingException, IOException, GeneralSecurityException {
+        validateEmailAddresses(to);
+
+        GoogleCredentials credential = buildCredentials();
+        Gmail service = buildGmailService(credential);
+
+        MimeMessage email = createEmail(to, gmailProps.getEmailFrom(), subject, bodyText);
+        Message message = createMessageWithEmail(email);
+        
+        service.users().messages().send("me", message).execute();
+    }
+
+
+    protected void validateEmailAddresses(String to) {
         String[] emails = to.split(",");
         for (String email : emails) {
             try {
                 InternetAddress internetAddress = new InternetAddress(email.trim());
-                internetAddress.validate(); // throws AddressException if invalid
+                internetAddress.validate();
             } catch (Exception ex) {
                 logger.error("❌ Invalid recipient email: {}", email);
                 throw new IllegalArgumentException("Invalid email address: " + email.trim());
             }
         }
-        GoogleCredential credential = new GoogleCredential.Builder()
-                .setClientSecrets(gmailProps.getClientId(), gmailProps.getClientSecret())
-                .setTransport(GoogleNetHttpTransport.newTrustedTransport())
-                .setJsonFactory(JacksonFactory.getDefaultInstance())
-                .build()
-                .setRefreshToken(gmailProps.getRefreshToken());
-
-        credential.refreshToken();
-
-        Gmail service = new Gmail.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                JacksonFactory.getDefaultInstance(),
-                credential)
-                .setApplicationName("Spring Gmail Sender")
-                .build();
-
-        MimeMessage email = createEmail(to, gmailProps.getEmailFrom(), subject, bodyText);
-        Message message = createMessageWithEmail(email);
-        service.users().messages().send("me", message).execute();
     }
 
-    private MimeMessage createEmail(String to, String from, String subject, String bodyText) throws Exception {
+    protected GoogleCredentials buildCredentials() {
+        return UserCredentials.newBuilder()
+                .setClientId(gmailProps.getClientId())
+                .setClientSecret(gmailProps.getClientSecret())
+                .setRefreshToken(gmailProps.getRefreshToken())
+                .build()
+                .createScoped("https://www.googleapis.com/auth/gmail.send");
+    }
+
+    protected Gmail buildGmailService(GoogleCredentials credentials)
+            throws GeneralSecurityException, IOException {
+
+        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
+
+        return new Gmail.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
+                GsonFactory.getDefaultInstance(),
+                requestInitializer
+        ).setApplicationName("Spring Gmail Sender").build();
+    }
+
+    protected MimeMessage createEmail(String to, String from, String subject, String bodyText)
+            throws MessagingException {
         Properties props = new Properties();
         Session session = Session.getInstance(props, null);
 
@@ -76,7 +100,8 @@ public class GmailApiEmailService implements EmailService {
         return email;
     }
 
-    private Message createMessageWithEmail(MimeMessage email) throws Exception {
+    protected Message createMessageWithEmail(MimeMessage email)
+            throws IOException, MessagingException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         email.writeTo(buffer);
         byte[] rawMessageBytes = buffer.toByteArray();

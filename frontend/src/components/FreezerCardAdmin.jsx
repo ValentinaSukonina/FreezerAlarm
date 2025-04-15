@@ -162,7 +162,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
     }, [freezer.users]);
 
     return (
-        <div className="freezer-card mx-auto my-2 px-3 py-1">
+        <div className="freezer-card w-100 mx-auto mt-2 mb-1 px-2 px-sm-3">
             <div className="p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg">
                 <div className="p-2 pt-lg-2 text-start">
 
@@ -255,7 +255,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                         <span className="small fw-normal text-end">Email &nbsp;&nbsp; SMS</span>
                     </div>
 
-                    <ul className="list-unstyled">
+                    <ul className="list-unstyled mb-0" >
                         {notificationPrefs.map((user) => (
                             <li key={user.id} className="border-bottom py-2">
                                 <div className="d-flex justify-content-between align-items-center">
@@ -301,7 +301,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                     </div>
 
                     {/* Bottom Buttons */}
-                    <div className="d-flex justify-content-start align-items-center mt-4">
+                    <div className="d-flex justify-content-start align-items-center mt-2">
                         {!editing && !confirmingDelete ? (
                             <>
                                 <button
