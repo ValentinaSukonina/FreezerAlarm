@@ -27,7 +27,7 @@ const FreezerCardUser = ({freezer}) => {
                     </div>
 
                     {users.length > 0 ? (
-                        <ul className="list-unstyled">
+                        <ul className="list-unstyled mb-0">
                             {users.map(user => (
                                 <li key={user.id || user.name} className="border-bottom py-2">
                                     <p className="fw-bold mb-0">• {user.name} ({user.user_rank || "No rank"})</p>

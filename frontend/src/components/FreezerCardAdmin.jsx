@@ -255,7 +255,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                         <span className="small fw-normal text-end">Email &nbsp;&nbsp; SMS</span>
                     </div>
 
-                    <ul className="list-unstyled">
+                    <ul className="list-unstyled mb-0" >
                         {notificationPrefs.map((user) => (
                             <li key={user.id} className="border-bottom py-2">
                                 <div className="d-flex justify-content-between align-items-center">
