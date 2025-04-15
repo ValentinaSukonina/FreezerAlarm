@@ -1,15 +1,13 @@
 package com.example.backend.service;
 
 import com.example.backend.config.GmailConfig;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import com.google.auth.oauth2.GoogleCredentials;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.mail.internet.MimeMessage;
-
-import java.io.IOException;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,19 +39,15 @@ class GmailApiEmailServiceTest {
         when(users.messages()).thenReturn(messages);
         when(mockGmail.users()).thenReturn(users);
 
-        // Mocks refreshToken() and Gmail
+        // Override credential + Gmail builder
         service = new GmailApiEmailService(mockConfig) {
-
             @Override
-            protected GoogleCredential buildCredential()
-                    throws IOException {
-                GoogleCredential credential = mock(GoogleCredential.class);
-                when(credential.refreshToken()).thenReturn(true);
-                return credential;
+            protected GoogleCredentials buildCredentials() {
+                return mock(GoogleCredentials.class);
             }
 
             @Override
-            protected Gmail buildGmailService(GoogleCredential credential) {
+            protected Gmail buildGmailService(GoogleCredentials credential) {
                 return mockGmail;
             }
         };
@@ -108,12 +102,12 @@ class GmailApiEmailServiceTest {
 
         GmailApiEmailService apiService = new GmailApiEmailService(mockConfig) {
             @Override
-            protected GoogleCredential buildCredential() {
-                return mock(GoogleCredential.class);
+            protected GoogleCredentials buildCredentials() {
+                return mock(GoogleCredentials.class);
             }
 
             @Override
-            protected Gmail buildGmailService(GoogleCredential credential) {
+            protected Gmail buildGmailService(GoogleCredentials credential) {
                 return mock(Gmail.class);
             }
         };
@@ -128,8 +122,9 @@ class GmailApiEmailServiceTest {
 
     @Test
     void testValidateEmailAddresses_WithInvalidEmail_Throws() {
+        GmailApiEmailService apiService = new GmailApiEmailService(mockConfig);
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
-                new GmailApiEmailService(mockConfig).validateEmailAddresses("not-an-email")
+                apiService.validateEmailAddresses("not-an-email")
         );
         assertTrue(exception.getMessage().contains("Invalid email address"));
     }
@@ -153,13 +148,11 @@ class GmailApiEmailServiceTest {
     void testBuildCredentialAndBuildGmailService_CreatesInstancesSuccessfully() throws Exception {
         GmailApiEmailService realService = new GmailApiEmailService(mockConfig);
 
-        // Stub just enough config to call real method
         when(mockConfig.getClientId()).thenReturn("client-id");
         when(mockConfig.getClientSecret()).thenReturn("client-secret");
         when(mockConfig.getRefreshToken()).thenReturn("dummy-refresh-token");
 
-        // Act
-        GoogleCredential credential = realService.buildCredential();
+        GoogleCredentials credential = realService.buildCredentials();
         assertNotNull(credential);
 
         Gmail gmail = realService.buildGmailService(credential);
