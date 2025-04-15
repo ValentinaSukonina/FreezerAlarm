@@ -102,7 +102,7 @@ const FreezersAll = () => {
 
     return (
         <div className="content-wrapper mx-2 my-1">
-            <h2 className="text-center mt-3 mb-4">Freezers Biomedicine</h2>
+            <h2 className="text-center mt-2 mt-sm-3 mb-3 mb-sm-4">Freezers Biomedicine</h2>
 
             {role === "admin" && (
                 <>
