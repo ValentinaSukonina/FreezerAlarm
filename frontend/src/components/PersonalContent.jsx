@@ -314,7 +314,7 @@ const PersonalContent = () => {
 
             {users.length > 0 ? (
                 <div className="table-responsive mt-4">
-                    <table className="table table-bordered text-center">
+                    <table className="table table-bordered table-sm text-center">
                         <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
                             <th>Name</th>
