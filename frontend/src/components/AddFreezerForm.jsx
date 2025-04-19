@@ -55,13 +55,6 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd, onCancel, formE
         }
     };
 
-   /* const handleShowForm = async () => {
-        setShowForm(true);
-        if (users.length === 0) {
-            const fetched = await fetchUsers();
-            setUsers(fetched);
-        }
-    };*/
     const handleShowForm = async () => {
         setShowForm(true);
         if (!users || users.length === 0) {
@@ -69,7 +62,6 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd, onCancel, formE
             setUsers(fetched);
         }
     };
-
 
     const handleHideForm = () => {
         setShowForm(false); // no reset when form is closed
@@ -81,14 +73,14 @@ const AddFreezerForm = forwardRef(({newFreezer, onChange, onAdd, onCancel, formE
     };
 
     return (
-        <div className="text-center mb-4">
+        <div className="text-center mb-4 mb-sm-2">
             {!showForm ? (
                 <button className="btn" style={{backgroundColor: "#5D8736", color: "white"}} onClick={handleShowForm}>
                     Add New Freezer
                 </button>
             ) : (
                 <>
-                    <button className="btn mb-3" style={{backgroundColor: "#5D8736", color: "white"}}
+                    <button className="btn mb-4 mb-sm-2" style={{backgroundColor: "#5D8736", color: "white"}}
                             onClick={handleHideForm}>
                         Hide Form
                     </button>

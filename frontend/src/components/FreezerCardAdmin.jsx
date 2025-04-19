@@ -248,7 +248,6 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                         </div>
                     )}
 
-
                     {/* Assigned Users */}
                     <div className="d-flex justify-content-between align-items-center mt-3">
                         <h6 className="fw-bold mb-0">Assigned Users:</h6>

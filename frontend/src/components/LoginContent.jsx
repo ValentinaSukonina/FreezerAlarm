@@ -134,7 +134,7 @@ const LoginContent = () => {
 
                 {/* Message */}
                 {message && (
-                    <div className="alert mt-3 mt-sm-4 p-1 p-sm-3 text-center"
+                    <div className="alert my-3 my-sm-4 p-1 p-sm-3 text-center"
                          style={{
                              backgroundColor: isAuthorized ? "#D4EDDA" : "#F8D7DA",
                              color: isAuthorized ? "#155724" : "#721C24",

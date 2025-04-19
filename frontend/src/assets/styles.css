@@ -263,11 +263,16 @@ main {
     .freezer-grid {
         flex-direction: column; /* Stack in 1 column */
         align-items: center; /* Center the single column */
+        gap: 0px;
     }
 
-    .freezer-grid {
-        /* Centers the cards */
-        gap: 1px; /* Space between cards */
+    .freezer-card {
+        margin: 0 !important;
+        padding: 0.2rem 0.2rem !important;
+    }
+
+    .freezer-card + .freezer-card {
+        margin-top: 2px;
     }
 
     .google-btn {
@@ -338,4 +343,4 @@ main {
     color: #721c24;
 }
 
-
+* {    outline: 1px dashed red; /* REMOVE after debugging */}

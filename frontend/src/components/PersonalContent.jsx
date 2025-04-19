@@ -203,10 +203,10 @@ const PersonalContent = () => {
     }
 
     return (
-        <main className="container mt-5">
-            <h2 className="text-center mb-4">Registered Personnel</h2>
+        <main className="container mt-1 mt-sm-3">
+            <h2 className="text-center  mb-2 mb-sm-4">Registered Personnel</h2>
 
-            <div className="text-center mb-3">
+            <div className="text-center mt-3 mt-sm-4">
                 <button
                     className="btn"
                     style={{ backgroundColor: "#5D8736", color: "white" }}

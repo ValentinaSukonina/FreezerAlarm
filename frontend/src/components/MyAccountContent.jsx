@@ -94,45 +94,45 @@ const MyAccount = () => {
     if (!user) return <p className="text-danger text-center">User not found.</p>;
 
     return (
-        <div className="container mt-5" style={{ maxWidth: "600px" }}>
-            <h3 className="mb-4 text-center">My Account</h3>
+        <div className="container my-3 my-sm-4" style={{ maxWidth: "600px" }}>
+            <h3 className="mt-2 mt-sm-3 mb-2 text-center">My Account</h3>
 
             {message && <div className="alert alert-info text-center">{message}</div>}
 
             {/* Main Content */}
-            <div className="form-group mb-3">
+            <div className="form-group mb-2 ">
                 <label><strong>Name</strong></label>
-                <input className="form-control" value={user.name} disabled />
+                <input className="form-control py-1 py-sm-1.5" value={user.name} disabled />
             </div>
 
-            <div className="form-group mb-3">
+            <div className="form-group mb-2">
                 <label><strong>Email</strong></label>
-                <input className="form-control" value={user.email || ""} disabled />
+                <input className="form-control py-1 py-sm-1.5" value={user.email || ""} disabled />
             </div>
 
-            <div className="form-group mb-3">
+            <div className="form-group mb-2">
                 <label  htmlFor="phone_number" ><strong>Phone Number</strong></label>
-                <input  id="phone_number"  name="phone_number" className="form-control" value={user.phone_number || ""} onChange={handleChange} />
+                <input  id="phone_number"  name="phone_number" className="form-control py-1 py-sm-1.5" value={user.phone_number || ""} onChange={handleChange} />
             </div>
 
-            <div className="form-group mb-3">
+            <div className="form-group mb-2">
                 <label><strong>Rank</strong></label>
-                <input className="form-control" value={user.user_rank || ""} disabled />
+                <input className="form-control py-1 py-sm-1.5" value={user.user_rank || ""} disabled />
             </div>
 
-            <div className="form-group mb-3">
+            <div className="form-group mb-2">
                 <label><strong>Role</strong></label>
-                <input className="form-control" value={user.role} disabled />
+                <input className="form-control py-1 py-sm-1.5" value={user.role} disabled />
             </div>
 
-            <div className="form-group mb-3">
+            <div className="form-group mb-2">
                 <label><strong>Currently Assigned Freezers</strong></label>
                 {user.freezerIds.length > 0 ? (
                     <ul className="list-group">
                         {freezers
                             .filter(fz => user.freezerIds.includes(String(fz.id)))
                             .map(fz => (
-                                <li className="list-group-item" key={fz.id}>
+                                <li className="list-group-item list-group-item py-0 py-sm-1 px-1 px-sm-3" key={fz.id}>
                                     {fz.number} - {fz.room}
                                 </li>
                             ))}
@@ -142,7 +142,7 @@ const MyAccount = () => {
                 )}
             </div>
 
-            <div className="text-center mt-4">
+            <div className="text-center my-4 my-sm-2">
                 <button
                     className="btn"
                     style={{ backgroundColor: "#5D8736", color: "white" }}
