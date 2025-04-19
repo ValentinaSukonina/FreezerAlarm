@@ -9,13 +9,13 @@ const FreezerCardUser = ({freezer}) => {
     const {number, room, address, type, users = []} = freezer;
 
     return (
-        <div className="freezer-card mx-auto my-2 px-3 py-1">
+        <div className="freezer-card px-3 py-2">
             <div className="p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg"
                  style={{width: "100%"}}>
                 <div className="p-2 pt-lg-2 text-start">
                     {/* Freezer Info */}
-                    <div className="d-flex justify-content-between align-items-center">
-                        <h5 className="mb-2 fw-bold">Freezer: {number}</h5>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                        <h5 className="fw-bold mb-2">Freezer: {number}</h5>
                     </div>
                     <p className="mb-1"><strong>Room:</strong> {room}</p>
                     <p className="mb-1"><strong>Address:</strong> {address}</p>
@@ -29,10 +29,10 @@ const FreezerCardUser = ({freezer}) => {
                     {users.length > 0 ? (
                         <ul className="list-unstyled mb-0">
                             {users.map(user => (
-                                <li key={user.id || user.name} className="border-bottom py-2">
+                                <li key={user.id || user.name} className="border-bottom py-1 py-sm-2">
                                     <p className="fw-bold mb-0">• {user.name} ({user.user_rank || "No rank"})</p>
                                     <p className="mb-0 ms-2">{user.email}</p>
-                                    <p className="mb-1 ms-2">{user.phone_number}</p>
+                                    <p className="mb-0 ms-2">{user.phone_number}</p>
                                 </li>
                             ))}
                         </ul>
@@ -46,4 +46,3 @@ const FreezerCardUser = ({freezer}) => {
 };
 
 export default FreezerCardUser;
-

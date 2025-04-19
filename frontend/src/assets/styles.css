@@ -267,12 +267,18 @@ main {
     }
 
     .freezer-card {
-        margin: 0 !important;
-        padding: 0.2rem 0.2rem !important;
+        margin: 0 auto !important;   /* ensure centered */
+        padding: 0.2rem !important;  /* moderate padding */
+        max-width: 450px !important;
+        width: 100% !important;
     }
 
     .freezer-card + .freezer-card {
         margin-top: 2px;
+    }
+
+    .freezer-result-wrapper {
+        padding-top: 16px !important;  /* smaller than 40px */
     }
 
     .google-btn {
@@ -342,5 +348,3 @@ main {
     background-color: #f8d7da;
     color: #721c24;
 }
-
-* {    outline: 1px dashed red; /* REMOVE after debugging */}

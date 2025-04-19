@@ -162,13 +162,13 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
     }, [freezer.users]);
 
     return (
-        <div className="freezer-card w-100 mx-auto mt-2 mb-1 px-2 px-sm-3">
+        <div className="freezer-card px-3 py-2">
             <div className="p-3 p-md-3 p-lg-4 align-items-center rounded-3 border shadow-lg">
                 <div className="p-2 pt-lg-2 text-start">
 
                     {/* Top bar */}
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h5 className="fw-bold mb-0">Freezer: {number}</h5>
+                        <h5 className="fw-bold mb-2">Freezer: {number}</h5>
 
                         {role === "admin" && (
                             <button
@@ -256,7 +256,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
 
                     <ul className="list-unstyled mb-0" >
                         {notificationPrefs.map((user) => (
-                            <li key={user.id} className="border-bottom py-2">
+                            <li key={user.id} className="border-bottom py-1 py-sm-2">
                                 <div className="d-flex justify-content-between align-items-center">
                                     <p className="fw-bold mb-0">• {user.name} ({user.user_rank || "No rank"})</p>
                                     <div className="d-flex gap-4">
