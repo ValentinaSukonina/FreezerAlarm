@@ -68,8 +68,9 @@ const FreezerResult = ({freezerNumber}) => {
     if (loading) return <p>Loading freezer data...</p>;
 
     return (
-        <div className="content-wrapper mx-2 my-1">
-            <h2 className="text-center my-2 my-sm-3">Search Results</h2>
+        <main className="freezer-result-wrapper d-flex justify-content-center my-2 px-2">
+            <div style={{ width: "100%", maxWidth: "500px" }}>
+                <h2 className="text-center my-2 my-sm-3">Search Results</h2>
 
             {message && (
                 <div className="text-center mb-3"
@@ -101,7 +102,8 @@ const FreezerResult = ({freezerNumber}) => {
                     <FreezerCardUser freezer={freezer}/>
                 )
             ) : null}
-        </div>
+            </div>
+        </main>
     );
 };
 
