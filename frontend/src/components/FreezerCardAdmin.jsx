@@ -251,7 +251,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                     {/* Assigned Users */}
                     <div className="d-flex justify-content-between align-items-center mt-3">
                         <h6 className="fw-bold mb-0">Assigned Users:</h6>
-                        <span className="small fw-normal text-end">Email &nbsp;&nbsp; SMS</span>
+                        <span className="small fw-normal text-end">Email {/*&nbsp;&nbsp;  SMS*/}</span>
                     </div>
 
                     <ul className="list-unstyled mb-0" >
@@ -266,12 +266,14 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                                             checked={user.selectedEmail}
                                             onChange={() => toggleUserSelection(user.id, "selectedEmail")}
                                         />
+                                        {/*
                                         <input
                                             type="checkbox"
                                             className="custom-checkbox"
                                             checked={user.selectedSms}
                                             onChange={() => toggleUserSelection(user.id, "selectedSms")}
                                         />
+                                        */}
                                     </div>
                                 </div>
                                 <p className="mb-0 ms-2">{user.email}</p>
@@ -290,12 +292,14 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                                 checked={selectAllEmail}
                                 onChange={() => toggleAll("selectedEmail")}
                             />
+                            {/*
                             <input
                                 type="checkbox"
                                 className="custom-checkbox"
                                 checked={selectAllSms}
                                 onChange={() => toggleAll("selectedSms")}
                             />
+                            */}
                         </div>
                     </div>
 
