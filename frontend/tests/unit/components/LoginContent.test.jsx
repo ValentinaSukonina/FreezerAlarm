@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import LoginContent from "../../../src/components/LoginContent";
 import axios from "axios";
 import { vi } from "vitest";
@@ -13,17 +14,15 @@ vi.mock("axios");
 describe("LoginContent", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        axios.get.mockResolvedValue({ data: true });
+        axios.post.mockResolvedValue({});
+        vi.spyOn(console, "error").mockImplementation(() => {});
     });
 
     const fillAndSubmit = async ({ name = "", email = "" }) => {
-        fireEvent.change(screen.getByLabelText(/full name/i), {
-            target: { value: name },
-        });
-        fireEvent.change(screen.getByLabelText(/email/i), {
-            target: { value: email },
-        });
-
-        fireEvent.click(screen.getByRole("button", { name: /verify/i }));
+        await userEvent.type(screen.getByLabelText(/full name/i), name);
+        await userEvent.type(screen.getByLabelText(/email/i),email);
+        await userEvent.click(screen.getByRole("button", { name: /verify/i }));
     };
 
     test("renders form and help text", () => {
@@ -33,18 +32,12 @@ describe("LoginContent", () => {
         expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     });
 
-
     test("shows validation message if fields are empty", async () => {
         render(<LoginContent />);
-
-        const form = document.querySelector("form"); // ← fallback to raw DOM
+        const form = document.querySelector("form");
         fireEvent.submit(form);
 
-        await waitFor(() => {
-            expect(
-                screen.getByText((text) => text.includes("Please fill in all fields"))
-            ).toBeInTheDocument();
-        });
+        expect(await screen.findByRole('alert')).toHaveTextContent(/please fill in all fields/i);
     });
 
     test("handles successful authorization", async () => {
@@ -54,12 +47,7 @@ describe("LoginContent", () => {
         render(<LoginContent />);
         await fillAndSubmit({ name: "John Doe", email: "john@example.com" });
 
-        await waitFor(() =>
-            expect(
-                screen.getByText(/you are authorized/i)
-            ).toBeInTheDocument()
-        );
-
+        expect(await screen.findByText(/you are authorized/i)).toBeInTheDocument();
         expect(screen.getByRole("button", { name: /continue with google/i })).toBeInTheDocument();
     });
 
@@ -69,11 +57,7 @@ describe("LoginContent", () => {
         render(<LoginContent />);
         await fillAndSubmit({ name: "Jane", email: "wrong@email.com" });
 
-        await waitFor(() =>
-            expect(
-                screen.getByText(/do not match our records/i)
-            ).toBeInTheDocument()
-        );
+        expect(await screen.findByText(/do not match our records/i)).toBeInTheDocument();
     });
 
     test("handles API error", async () => {
@@ -82,38 +66,26 @@ describe("LoginContent", () => {
         render(<LoginContent />);
         await fillAndSubmit({ name: "Test", email: "test@test.com" });
 
-        await waitFor(() =>
-            expect(screen.getByText(/an error occurred/i)).toBeInTheDocument()
-        );
+        expect(await screen.getByText(/an error occurred/i)).toBeInTheDocument();
     });
 
     test("google login button redirects when clicked", async () => {
         delete window.location;
         window.location = { href: "" };
 
-        axios.get.mockResolvedValueOnce({ data: true }); // ✅ mock check-user
-        axios.post.mockResolvedValueOnce({}); // ✅ mock set-preauth-email
+        axios.get.mockResolvedValueOnce({ data: true });
+        axios.post.mockResolvedValueOnce({});
 
         render(<LoginContent />);
 
-        fireEvent.change(screen.getByLabelText(/full name/i), {
-            target: { value: "John Doe" },
-        });
+        await userEvent.type(screen.getByLabelText(/full name/i), "John Doe");
+        await userEvent.type(screen.getByLabelText(/email/i), "john@example.com");
+        await userEvent.click(screen.getByRole("button", { name: /verify/i }));
 
-        fireEvent.change(screen.getByLabelText(/email/i), {
-            target: { value: "john@example.com" },
-        });
+        expect(await screen.findByTestId("google-login-btn")).toBeInTheDocument();
 
-        fireEvent.click(
-            screen.getByRole("button", { name: /verify authorization/i })
-        );
+        await userEvent.click(screen.getByTestId("google-login-btn"));
 
-        // Wait for the Google login button to appear
-        await waitFor(() => {
-            expect(screen.getByTestId("google-login-btn")).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId("google-login-btn"));
         expect(window.location.href).toBe(
             "http://localhost:8000/oauth2/authorization/google"
         );

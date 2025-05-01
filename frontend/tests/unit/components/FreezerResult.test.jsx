@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { act } from 'react';
 import FreezerResult from "../../../src/components/FreezerResult";
 import * as api from "../../../src/services/api";
 
@@ -47,9 +48,11 @@ describe("FreezerResult", () => {
         sessionStorage.clear();
     });
 
-    test("displays loading state initially", () => {
+    test("displays loading state initially", async () => {
         render(<FreezerResult freezerNumber="1234" />, { wrapper: MemoryRouter });
-        expect(screen.getByText(/loading freezer data/i)).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText(/loading freezer data/i)).toBeInTheDocument();
+        });
     });
 
     test("displays error if freezer is not found", async () => {
@@ -108,10 +111,14 @@ describe("FreezerResult", () => {
         render(<FreezerResult freezerNumber="1234" />, { wrapper: MemoryRouter });
 
         // Wait for Admin card to render
-        await waitFor(() => screen.getByText(/admin card 1234/i));
+        await waitFor(() => {
+            expect(screen.getByText(/admin card 1234/i)).toBeInTheDocument();
+        });
 
         // Trigger the update via the mocked callback
-        mockUpdateHandler();
+        await act(async () => {
+            mockUpdateHandler();
+        });
 
         // Wait for success message to appear
         await waitFor(() =>

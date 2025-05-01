@@ -18,6 +18,17 @@ describe("Header", () => {
     beforeEach(() => {
         sessionStorage.clear();
         mockNavigate.mockReset();
+
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ user: { id: 1, name: "Test User" } }), // ✅ added missing }
+            })
+        );
+
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
     });
 
     const renderWithRouter = () =>
@@ -93,11 +104,13 @@ describe("Header", () => {
         });
     });
 
-    test("shows search input on mobile toggle", () => {
+    test("shows search input on mobile toggle", async () => {
         renderWithRouter();
         fireEvent.click(screen.getByRole("button", { name: "" })); // toggler has no name
 
         // Should now show the mobile form (it’s hidden by default)
-        expect(screen.getAllByPlaceholderText(/login to search/i).length).toBeGreaterThan(0);
+        await waitFor(() => {
+            expect(screen.getAllByPlaceholderText(/login to search/i).length).toBeGreaterThan(0);
+        });
     });
 });

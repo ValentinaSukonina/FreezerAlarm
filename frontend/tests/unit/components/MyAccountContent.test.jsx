@@ -1,5 +1,6 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
+import { act } from 'react';
 import MyAccount from "../../../src/components/MyAccountContent";
 import * as api from "../../../src/services/api";
 
@@ -13,6 +14,21 @@ beforeEach(() => {
     vi.restoreAllMocks();
     sessionStorage.clear();
     sessionStorage.setItem("username", "testuser");
+
+    global.fetch = vi.fn(() =>
+        Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({
+                username: "testuser",
+                role: "user",
+                isLoggedIn: "true",
+            }),
+        })
+    );
+});
+
+afterEach(() => {
+    vi.restoreAllMocks();
 });
 
 describe("MyAccountContent", () => {

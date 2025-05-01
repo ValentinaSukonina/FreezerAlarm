@@ -112,7 +112,9 @@ describe("AddFreezerForm", () => {
         );
 
         // Open form
-        fireEvent.click(screen.getByText("Add New Freezer"));
+        await waitFor(() => {
+            fireEvent.click(screen.getByText("Add New Freezer"));
+        });
 
         // Ensure field has initial value
         const numberInput = await screen.findByPlaceholderText(
@@ -121,7 +123,10 @@ describe("AddFreezerForm", () => {
         expect(numberInput.value).toBe("1234");
 
         // Click cancel
-        fireEvent.click(screen.getByText("Cancel"));
+        await waitFor(() => {
+            fireEvent.click(screen.getByText("Cancel"));
+        });
+
         expect(onCancelMock).toHaveBeenCalled();
 
         // Rerender with reset values
@@ -136,7 +141,9 @@ describe("AddFreezerForm", () => {
         );
 
         // Open form again and check values are reset
-        fireEvent.click(screen.getByText("Add New Freezer"));
+        await waitFor(() => {
+            fireEvent.click(screen.getByText("Add New Freezer"));
+        });
         expect(screen.getByPlaceholderText("Enter unique 4-digit freezer code").value).toBe("");
         expect(screen.getByPlaceholderText("Room").value).toBe("");
         expect(screen.getByPlaceholderText("Address").value).toBe("");
