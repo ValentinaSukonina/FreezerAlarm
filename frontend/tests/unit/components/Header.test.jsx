@@ -47,7 +47,7 @@ describe("Header", () => {
             expect(screen.getByText(/logout/i)).toBeInTheDocument();
             expect(screen.getByText(/freezers/i)).toBeInTheDocument();
             expect(screen.getByText(/my account/i)).toBeInTheDocument();
-            expect(screen.getByText(/personal/i)).toBeInTheDocument();
+            expect(screen.getByText(/staff/i)).toBeInTheDocument();
         });
     });
 

@@ -12,7 +12,7 @@ import { Navigate } from "react-router-dom";
 import Select from "react-select";
 import { sanitizeInputSec } from "../services/utils";
 
-const PersonalContent = () => {
+const StaffContent = () => {
     const [message, setMessage] = useState(""); // To store the success/error message
     const [deletingUserId, setDeletingUserId] = useState(null); // Track the user being deleted
     const [users, setUsers] = useState([]);
@@ -477,7 +477,7 @@ const PersonalContent = () => {
     );
 };
 
-export default PersonalContent;
+export default StaffContent;
 
 
 

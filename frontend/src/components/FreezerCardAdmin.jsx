@@ -99,6 +99,47 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
         type === "selectedEmail" ? setSelectAllEmail(isSelectAll) : setSelectAllSms(isSelectAll);
     };
 
+    // const handleSend = async () => {
+    //     const selectedRecipients = notificationPrefs.filter(user => user.selectedEmail);
+    //
+    //     const adminName = sessionStorage.getItem("username");
+    //     const adminEmail = sessionStorage.getItem("email");
+    //
+    //     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    //
+    //     const invalidEmails = selectedRecipients.filter(user => !isValidEmail(user.email));
+    //     const validRecipients = selectedRecipients.filter(user => isValidEmail(user.email));
+    //
+    //     if (invalidEmails.length > 0) {
+    //         onMessage(`❌ Invalid email address(es): ${invalidEmails.map(u => u.email).join(', ')}`);
+    //         return;
+    //     }
+    //
+    //     try {
+    //         if (validRecipients.length > 0) {
+    //             const emailList = validRecipients.map(u => u.email).join(", ");
+    //
+    //             await sendEmail({
+    //                 to: emailList,
+    //                 subject: `🚨 Alarm: for Freezer ${editData.number}`,
+    //                 body: "Attention!\n\n" +
+    //                     `A temperature increase was reported for freezer ${editData.number} (-150°C), located in room ${editData.room} at ${editData.address}.\n\n` +
+    //                     `This alert was sent by ${adminName} (${adminEmail}).`
+    //             });
+    //         }
+    //
+    //         navigate("/confirmation", {
+    //             state: {
+    //                 freezerNumber: editData.number,
+    //                 recipients: validRecipients,
+    //                 message: `✅ Email sent to ${validRecipients.length} user(s).`
+    //             },
+    //         });
+    //     } catch (err) {
+    //         console.error("❌ Failed to send email:", err);
+    //         onMessage("Failed to send email notification.");
+    //     }
+    // };
     const handleSend = async () => {
         const selectedRecipients = notificationPrefs.filter(user => user.selectedEmail);
 
@@ -115,31 +156,47 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
             return;
         }
 
-        try {
-            if (validRecipients.length > 0) {
-                const emailList = validRecipients.map(u => u.email).join(", ");
+        if (validRecipients.length === 0) {
+            onMessage("❌ No valid email recipients selected.");
+            return;
+        }
 
-                await sendEmail({
-                    to: emailList,
-                    subject: `🚨 Alarm: for Freezer ${editData.number}`,
-                    body: "Attention!\n\n" +
-                        `A temperature increase was reported for freezer ${editData.number} (-150°C), located in room ${editData.room} at ${editData.address}.\n\n` +
-                        `This alert was sent by ${adminName} (${adminEmail}).`
-                });
-            }
+        try {
+            const emailList = validRecipients.map(u => u.email).join(", ");
+
+            const result = await sendEmail({
+                to: emailList,
+                subject: `🚨 Alarm: for Freezer ${editData.number}`,
+                body:
+                    "Attention!\n\n" +
+                    `A temperature increase was reported for freezer ${editData.number} (-150°C), located in room ${editData.room} at ${editData.address}.\n\n` +
+                    `This alert was sent by ${adminName} (${adminEmail}).`,
+            });
 
             navigate("/confirmation", {
                 state: {
                     freezerNumber: editData.number,
                     recipients: validRecipients,
-                    message: `✅ Email sent to ${validRecipients.length} user(s).`
+                    emailStatus: result // contains ok, status, and message
                 },
             });
         } catch (err) {
             console.error("❌ Failed to send email:", err);
-            onMessage("Failed to send email notification.");
+
+            navigate("/confirmation", {
+                state: {
+                    freezerNumber: editData.number,
+                    recipients: [],
+                    emailStatus: {
+                        ok: false,
+                        status: err?.response?.status || 500,
+                        message: err?.message || "Email sending failed. Try again later."
+                    }
+                }
+            });
         }
     };
+
 
     const {number, room, address, type} = editData;
 

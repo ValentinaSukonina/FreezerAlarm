@@ -38,6 +38,7 @@ describe("AlertConfirmation", () => {
                         selectedSms: true,
                     },
                 ],
+                emailStatus: { ok: true, message: "sent" }
             },
         });
 
@@ -55,7 +56,11 @@ describe("AlertConfirmation", () => {
             state: {
                 freezerNumber: "5678",
                 recipients: [],
-            },
+                emailStatus: {
+                    ok: true,
+                    message: "Email sent",
+                }
+            }
         });
 
         render(<AlertConfirmation />);
@@ -71,7 +76,7 @@ describe("AlertConfirmation", () => {
         });
 
         render(<AlertConfirmation />);
-        fireEvent.click(screen.getByText(/Back to Home/i));
-        expect(mockNavigate).toHaveBeenCalledWith("/");
+        fireEvent.click(screen.getByText(/Back to Search/i));
+        expect(mockNavigate).toHaveBeenCalledWith(-1);
     });
 });

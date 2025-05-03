@@ -6,7 +6,7 @@ import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Home from "./pages/Home";
-import Personal from "./pages/Personal";
+import Personal from "./pages/Staff.jsx";
 import Login from "./pages/Login";
 import Freezers from "./pages/Freezers";
 import FreezerPage from "./pages/FreezerPage";
@@ -54,7 +54,7 @@ const App = () => {
 
                         {/* Protected: admin only */}
                         <Route
-                            path="/personal"
+                            path="/staff"
                             element={
                                 <ProtectedRoute requiredRole="admin">
                                     <Personal/>

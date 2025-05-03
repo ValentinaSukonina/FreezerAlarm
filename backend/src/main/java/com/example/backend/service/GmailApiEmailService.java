@@ -42,15 +42,28 @@ public class GmailApiEmailService implements EmailService {
             throws MessagingException, IOException, GeneralSecurityException {
         validateEmailAddresses(to);
 
-        GoogleCredentials credential = buildCredentials();
-        Gmail service = buildGmailService(credential);
+        Gmail service;
+        try {
+            GoogleCredentials credential = buildCredentials();
+            service = buildGmailService(credential);
+        } catch (Exception ex) {
+            logger.error("❌ Failed to authenticate with Google API: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Authentication failed. Refresh token may be invalid or expired.");
+        }
 
         MimeMessage email = createEmail(to, gmailProps.getEmailFrom(), subject, bodyText);
         Message message = createMessageWithEmail(email);
-        
-        service.users().messages().send("me", message).execute();
-    }
 
+        try {
+            service.users().messages().send("me", message).execute();
+        } catch (Exception e) {
+            String err = e.getMessage();
+            if (err != null && err.contains("invalid_grant")) {
+                logger.error("❌ Refresh token is invalid or expired.");
+            }
+            throw e;
+        }
+    }
 
     protected void validateEmailAddresses(String to) {
         String[] emails = to.split(",");
