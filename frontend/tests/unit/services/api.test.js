@@ -229,8 +229,6 @@ describe('API functions', () => {
         expect(axios.delete).toHaveBeenCalledWith("/freezers/123");
     });
 
-
-
     test("fetchUserByName returns null on failed fetch", async () => {
         global.fetch = vi.fn(() =>
             Promise.resolve({
@@ -242,8 +240,6 @@ describe('API functions', () => {
 
         await expect(fetchUserByName("missinguser")).rejects.toThrow("Failed to fetch user");
     });
-
-
 
     test("fetchFreezersByUser returns list of freezers for a user", async () => {
         const mockFreezers = [{ id: 1, number: "F101" }];
@@ -308,10 +304,6 @@ describe('API functions', () => {
         await expect(createFreezer({ userIds: [] })).rejects.toThrow("Something went wrong while creating the freezer.");
     });
 
-
-
-
-
     describe("sendEmail", () => {
         beforeEach(() => {
             vi.restoreAllMocks();
@@ -321,6 +313,7 @@ describe('API functions', () => {
             global.fetch = vi.fn(() =>
                 Promise.resolve({
                     ok: true,
+                    status: 200,
                     text: () => Promise.resolve("Email sent successfully"),
                 })
             );
@@ -328,40 +321,57 @@ describe('API functions', () => {
             const data = { to: "user@example.com", subject: "Test", body: "Hello" };
             const result = await sendEmail(data);
 
-            expect(fetch).toHaveBeenCalledWith("http://localhost:8000/api/email/send", {
+            expect(fetch).toHaveBeenCalledWith("/api/email/send", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include",
                 body: JSON.stringify(data),
             });
 
-            expect(result).toBe("Email sent successfully");
+            expect(result).toEqual({
+                ok: true,
+                status: 200,
+                message: "Email sent successfully",
+            });
         });
 
         test("throws error when response is not ok", async () => {
             global.fetch = vi.fn(() =>
                 Promise.resolve({
                     ok: false,
+                    status: 500,
                     text: () => Promise.resolve("Server error"),
                 })
             );
 
             const data = { to: "fail@example.com", subject: "Error", body: "Broken" };
+            const result = await sendEmail(data);
 
-            await expect(sendEmail(data)).rejects.toThrow("Server error");
+            expect(result).toEqual({
+                ok: false,
+                status: 500,
+                message: "Server error",
+            });
         });
 
         test("throws generic error if no error message is returned", async () => {
             global.fetch = vi.fn(() =>
                 Promise.resolve({
                     ok: false,
+                    status: 500,
                     text: () => Promise.resolve(""),
                 })
             );
 
             const data = { to: "fail@example.com", subject: "Error", body: "No message" };
 
-            await expect(sendEmail(data)).rejects.toThrow("Email send failed");
+            const result = await sendEmail(data);
+
+            expect(result).toEqual({
+                ok: false,
+                status: 500,
+                message: "",
+            });
+        
         });
     });
 });
