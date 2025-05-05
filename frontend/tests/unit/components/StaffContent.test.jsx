@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
-import PersonalContent from "../../../src/components/PersonalContent";
+import PersonalContent from "../../../src/components/StaffContent.jsx";
 import * as api from "../../../src/services/api";
 
 // Mock sessionStorage

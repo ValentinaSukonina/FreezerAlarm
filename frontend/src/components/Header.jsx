@@ -142,11 +142,11 @@ const Header = () => {
                         <li className="nav-item">
                             <a
                                 className={`nav-link text-white ${!isLoggedIn || role !== "admin" ? "disabled" : ""}`}
-                                href={isLoggedIn && role === "admin" ? "/personal" : "#"}
+                                href={isLoggedIn && role === "admin" ? "/staff" : "#"}
                                 onClick={(e) => (!isLoggedIn || role !== "admin") && e.preventDefault()}
                                 style={!isLoggedIn || role !== "admin" ? {opacity: 0.5, cursor: "not-allowed"} : {}}
                             >
-                                Personal
+                                Staff
                             </a>
                         </li>
 

@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-
 import com.example.backend.service.EmailService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,12 +33,12 @@ public class EmailControllerTest {
         doNothing().when(emailService).sendEmail("test@example.com", "Subject", "Hello");
 
         String json = """
-            {
-                "to": "test@example.com",
-                "subject": "Subject",
-                "body": "Hello"
-            }
-        """;
+                    {
+                        "to": "test@example.com",
+                        "subject": "Subject",
+                        "body": "Hello"
+                    }
+                """;
 
         mockMvc.perform(post("/api/email/send")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -55,18 +54,17 @@ public class EmailControllerTest {
                 .sendEmail("fail@example.com", "Oops", "Failure body");
 
         String json = """
-            {
-                "to": "fail@example.com",
-                "subject": "Oops",
-                "body": "Failure body"
-            }
-        """;
+                    {
+                        "to": "fail@example.com",
+                        "subject": "Oops",
+                        "body": "Failure body"
+                    }
+                """;
 
         mockMvc.perform(post("/api/email/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk()) // Controller still returns 200 with error message
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().string("Failed to send email: SMTP error"));
     }
 }
-

@@ -39,6 +39,7 @@ spring:
     client-secret: ${GMAIL_CLIENT_SECRET}
     refresh-token: ${GMAIL_REFRESH_TOKEN}
     email-from: ${GMAIL_EMAIL_FROM}
+    fallback-email: ${GMAIL_FALLBACK_EMAIL}
 
 server:
   port: 8000
