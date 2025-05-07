@@ -14,7 +14,7 @@ export default defineConfig({
             provider: 'v8',
             reportsDirectory: './coverage',
             reporter: ['text', 'lcov'],
-            exclude: ['node_modules/', 'tests/'],
+            exclude: ['node_modules/', 'tests/', 'vite.config.js', 'src/main.jsx', ],
         },
     },
     resolve: {

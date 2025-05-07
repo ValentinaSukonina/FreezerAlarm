@@ -38,6 +38,8 @@ target/
 
 # Environment Variables
 **/.env
+**/.env.production
+
 
 # Logs
 logs/

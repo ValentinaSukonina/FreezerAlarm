@@ -174,24 +174,6 @@ export const deleteFreezerFromUser = async (userId, freezerId) => {
     }
 };
 
-// export async function sendEmail(data) {
-//     const response = await fetch("http://localhost:8000/api/email/send", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         credentials: "include",
-//         body: JSON.stringify(data),
-//     });
-//
-//     if (!response.ok) {
-//         const errorText = await response.text();
-//         throw new Error(errorText || "Email send failed");
-//     }
-//
-//     return response.text();
-// }
-
 export async function sendEmail(payload) {
     const response = await fetch("/api/email/send", {
         method: "POST",
