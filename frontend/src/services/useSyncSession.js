@@ -34,4 +34,4 @@ export const useSyncSession = () => {
 
     return loading;
 };
-
+export default useSyncSession;
