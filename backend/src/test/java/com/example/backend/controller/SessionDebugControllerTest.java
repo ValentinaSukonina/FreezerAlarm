@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SessionDebugController.class)
 @AutoConfigureMockMvc(addFilters = false)  // Disable security filters if present
-public class SessionDebugControllerTest {
+class SessionDebugControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

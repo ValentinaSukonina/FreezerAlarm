@@ -29,17 +29,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("removal")
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class UserControllerTest {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
 
-    @MockBean private UserService userService;
-    @MockBean private UserRepository userRepository;
-    @MockBean private UserMapper userMapper;
-    @MockBean private FreezerUserService freezerUserService;
-    @MockBean private FreezerService freezerService;
+    @MockBean
+    private UserService userService;
+    @MockBean
+    private UserRepository userRepository;
+    @MockBean
+    private UserMapper userMapper;
+    @MockBean
+    private FreezerUserService freezerUserService;
+    @MockBean
+    private FreezerService freezerService;
 
     @Test
     @DisplayName("POST /api/users should create user")
@@ -53,10 +58,10 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "name": "John"
-                            }
-                        """))
+                                    {
+                                      "name": "John"
+                                    }
+                                """))
                 .andExpect(status().isCreated());
     }
 
@@ -94,10 +99,10 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users/check-user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "name": "Bob"
-                            }
-                        """))
+                                    {
+                                      "name": "Bob"
+                                    }
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.exists", is(true)));
     }
@@ -158,10 +163,10 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "name": "UpdatedName"
-                            }
-                        """))
+                                    {
+                                      "name": "UpdatedName"
+                                    }
+                                """))
                 .andExpect(status().isOk());
     }
 
@@ -238,10 +243,10 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users/check-user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {
-                          "name": "Alice"
-                        }
-                    """))
+                                    {
+                                      "name": "Alice"
+                                    }
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.exists").value(true));
     }
@@ -254,14 +259,13 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users/check-user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {
-                          "name": "Alice"
-                        }
-                    """))
+                                    {
+                                      "name": "Alice"
+                                    }
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.exists").value(false));
     }
-
 
 
     @Test
@@ -270,8 +274,6 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/user"))
                 .andExpect(status().isUnauthorized());
     }
-
-
 
 
     @Test
@@ -286,14 +288,14 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {
-                          "name": "Updated",
-                          "phone_number": "0712345678",
-                          "email": "updated@example.com",
-                          "user_rank": 1,
-                          "role": "user"
-                        }
-                    """))
+                                    {
+                                      "name": "Updated",
+                                      "phone_number": "0712345678",
+                                      "email": "updated@example.com",
+                                      "user_rank": 1,
+                                      "role": "user"
+                                    }
+                                """))
                 .andExpect(status().isOk());
     }
 
@@ -348,19 +350,5 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/1/freezers"))
                 .andExpect(status().isInternalServerError());
     }
-
-
-
-    /*@Test
-    @DisplayName("GET /api/users/user - authenticated")
-    void testGetAuthenticatedUser_authenticated() throws Exception {
-        Principal mockPrincipal = mock(Principal.class);
-        when(mockPrincipal.getName()).thenReturn("user123");
-        mockMvc.perform(get("/api/users/user").principal(mockPrincipal))
-                .andExpect(status().isOk())
-                .andExpect(content().string("user123"));
-        verifyNoInteractions(userService); // This confirms it's NOT called
-    }*/
-
 
 }

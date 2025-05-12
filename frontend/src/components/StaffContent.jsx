@@ -190,7 +190,12 @@ const StaffContent = () => {
             setShowAddForm(false);
             setMessage("✅ New user created successfully!");
         } catch (err) {
-            setMessage("❌ Failed to create user.");
+            const errorText = err?.response?.data;
+            if (typeof errorText === "string" && errorText.includes("Email already exists")) {
+                setMessage("❌ This email is already in use.");
+            } else {
+                setMessage("❌ Failed to create user.");
+            }
         }
     };
 
@@ -206,7 +211,7 @@ const StaffContent = () => {
         <main className="container mt-1 mt-sm-3">
             <h2 className="text-center  mb-2 mb-sm-4">Registered Personnel</h2>
 
-            <div className="text-center mt-3 mt-sm-4">
+            <div className="text-center mt-2 mt-sm-3 mb-2">
                 <button
                     className="btn"
                     style={{ backgroundColor: "#5D8736", color: "white" }}

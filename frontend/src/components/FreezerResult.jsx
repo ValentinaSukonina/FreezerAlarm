@@ -24,6 +24,10 @@ const FreezerResult = ({freezerNumber}) => {
                 if (!data) {
                     throw new Error("No freezer found for this number.");
                 }
+                // Sort users by rank in ascending order
+                if (data.users && Array.isArray(data.users)) {
+                    data.users.sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity));
+                }
                 setFreezer(data);
             } catch (err) {
                 setError("No freezer found for this number.");
