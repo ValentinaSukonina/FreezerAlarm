@@ -27,11 +27,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-
 @SuppressWarnings("removal")
 @AutoConfigureMockMvc(addFilters = false)  // <--- disable Spring Security
 @WebMvcTest(FreezerController.class)
-public class FreezerControllerTest {
+class FreezerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -146,14 +145,14 @@ public class FreezerControllerTest {
         mockMvc.perform(put("/api/freezers/number/1111")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {
-                          "file": "updated.png",
-                          "number": "1111",
-                          "address": "Updated Address",
-                          "room": "Room Z",
-                          "type": "-60"
-                        }
-                    """))
+                                    {
+                                      "file": "updated.png",
+                                      "number": "1111",
+                                      "address": "Updated Address",
+                                      "room": "Room Z",
+                                      "type": "-60"
+                                    }
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.address").value("Updated Address"));
     }
@@ -204,7 +203,6 @@ public class FreezerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.number").value("F456"));
     }
-
 
 
     @Test

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
 @RestController
 @RequestMapping("api/users")
 public class UserController {
@@ -41,11 +40,17 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User savedUser = userService.createUser(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toUserDTO(savedUser));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Failed to create user: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred.");
+        }
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
@@ -62,35 +67,29 @@ public class UserController {
         }
     }
 
-
-
     @GetMapping
-   public ResponseEntity<?> getAllUsers() {
-       try {
-           List<UserDTO> users = userService.getAllUsers();
-           return ResponseEntity.ok(users);
-       } catch (Exception e) {
-           logger.error("Error fetching users", e);
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body("An unexpected error occurred.");
-       }
-   }
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            List<UserDTO> users = userService.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            logger.error("Error fetching users", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred.");
+        }
+    }
 
-
-
-
-   @GetMapping("/{id}")
-   public ResponseEntity<?> getUserById(@PathVariable Long id) {
-       try {
-           UserDTO userDTO = userService.getUserById(id);
-           return ResponseEntity.ok(userDTO);
-       } catch (Exception e) {
-           logger.error("Error fetching user with ID {}", id, e);
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body("An unexpected error occurred.");
-       }
-   }
-
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            UserDTO userDTO = userService.getUserById(id);
+            return ResponseEntity.ok(userDTO);
+        } catch (Exception e) {
+            logger.error("Error fetching user with ID {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred.");
+        }
+    }
 
     @PostMapping("/check-user")
     public ResponseEntity<?> checkUser(@RequestBody UserRequest request) {
@@ -104,7 +103,6 @@ public class UserController {
 
     public record UserRequest(String name) {
     }
-
 
     @GetMapping("/user")
     public ResponseEntity<?> getAuthenticatedUser(Principal principal) {
@@ -122,20 +120,19 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
+        if (!userRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
 
-@PutMapping("/{id}")
-public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-    if (!userRepository.existsById(id)) {
-        return ResponseEntity.notFound().build();
-    }
-
-    try {
-        User updatedUser = userService.updateUser(id, user);
-        return ResponseEntity.ok(updatedUser);
-    } catch (Exception e) {
-        logger.error("Failed to update user with ID {}: {}", id, e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+        try {
+            User updatedUser = userService.updateUser(id, user);
+            return ResponseEntity.ok(userMapper.toUserDTO(updatedUser));
+        } catch (Exception e) {
+            logger.error("Failed to update user with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{userId}/freezers")

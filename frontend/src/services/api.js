@@ -22,9 +22,10 @@ export const createUser = async (userData) => {
         const response = await API.post('/users', userData);
         console.log("User created successfully:", response.data);
         return response.data;
-    } catch (error) {
-        console.error("Error creating user:", error.response ? error.response.data : error.message);
-        throw error;  // Handle error appropriately in your frontend
+    } catch (err) {
+        // Log for debugging
+        console.error("Error creating user:", err.response?.data || err.message);
+        throw err; // Pass the error to the component
     }
 };
 

@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("removal")
 @AutoConfigureMockMvc(addFilters = false)  // <--- disable Spring Security
 @WebMvcTest(EmailController.class)
-public class EmailControllerTest {
+class EmailControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

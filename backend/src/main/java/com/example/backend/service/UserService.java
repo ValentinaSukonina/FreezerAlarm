@@ -25,8 +25,6 @@ public class UserService {
 
     private final FreezerUserRepository freezerUserRepository;
 
-
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -38,12 +36,16 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists in the system");
+        }
         return userRepository.save(user);
     }
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
     @Transactional
     public void deleteUserById(Long userId) {
         // First, delete all freezer-user bindings for this user
@@ -52,7 +54,6 @@ public class UserService {
         // Then, delete the user
         userRepository.deleteById(userId);
     }
-
 
     public User updateUser(Long id, User user) {
         return userRepository.findById(id).map(dbUser -> {
@@ -65,7 +66,6 @@ public class UserService {
 
         }).orElseThrow(() -> new Exceptions.ResourceNotFoundException("User with id " + id + " not found"));
     }
-
 
     @Cacheable("allUsers")
     public List<UserDTO> getAllUsers() {
@@ -93,8 +93,4 @@ public class UserService {
         return userRepository.findByName(name);
     }
 
-
-
 }
-
-

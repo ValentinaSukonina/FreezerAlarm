@@ -7,6 +7,7 @@ import com.example.backend.entity.Freezer;
 import com.example.backend.entity.User;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -33,7 +34,10 @@ public class FreezerMapper {
         }
 
         List<UserDTO> userDTOs = freezer.getFreezerUsers().stream()
-                .map(fu -> {
+                .sorted(Comparator.comparingInt(fu -> {
+                    Integer rank = fu.getUser().getUser_rank();
+                    return rank != null ? rank : Integer.MAX_VALUE;
+                })).map(fu -> {
                     User user = fu.getUser();
                     return new UserDTO(
                             user.getId(),

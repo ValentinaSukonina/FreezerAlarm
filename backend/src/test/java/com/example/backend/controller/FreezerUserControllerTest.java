@@ -26,11 +26,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-
 @SuppressWarnings("removal")
 @AutoConfigureMockMvc(addFilters = false)  // <--- disable Spring Security
 @WebMvcTest(FreezerUserController.class)
-public class FreezerUserControllerTest {
+class FreezerUserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -62,11 +61,11 @@ public class FreezerUserControllerTest {
         when(freezerUserService.bindUserToFreezer(2L, 3L)).thenReturn(freezerUser);
 
         String json = """
-            {
-                "userId": 2,
-                "freezerId": 3
-            }
-        """;
+                    {
+                        "userId": 2,
+                        "freezerId": 3
+                    }
+                """;
 
         mockMvc.perform(post("/api/freezer-user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,12 +92,12 @@ public class FreezerUserControllerTest {
         when(freezerUserService.updateFreezerUser(2L, 3L, 4L)).thenReturn(updated);
 
         String json = """
-            {
-                "userId": 2,
-                "freezerId": 4,
-                "oldFreezerId": 3
-            }
-        """;
+                    {
+                        "userId": 2,
+                        "freezerId": 4,
+                        "oldFreezerId": 3
+                    }
+                """;
 
         mockMvc.perform(put("/api/freezer-user")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,11 +150,11 @@ public class FreezerUserControllerTest {
     @DisplayName("PUT /api/freezer-user without oldFreezerId should return 400")
     void testUpdateFreezerUser_badRequest() throws Exception {
         String json = """
-        {
-            "userId": 2,
-            "freezerId": 4
-        }
-    """;
+                    {
+                        "userId": 2,
+                        "freezerId": 4
+                    }
+                """;
 
         mockMvc.perform(put("/api/freezer-user")
                         .contentType(MediaType.APPLICATION_JSON)
