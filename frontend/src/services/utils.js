@@ -6,22 +6,24 @@ export const sanitizeInput = (value) => {
         .trim();
 }
 
-// Sanitize input to only allow specific characters
- export const sanitizeInputSec = (value, type) => {
-    switch (type) {
+// Sanitize input
+export const sanitizeInputSec = (value, field) => {
+    const trimmed = value.trim();
+
+    switch (field) {
         case "name":
-            // Only allow letters and spaces in the name
-            return value.replace(/[^a-zA-Z\s]/g, "").trim();
+            return trimmed.replace(/[^a-zA-Z\s]/g, ""); // letters & spaces
+
         case "email":
-            // For email, check that the value is a valid email format
-            return value.trim();
+            return trimmed.replace(/[^\w.@+-]/g, ""); // allow user@domain.com format
+
         case "phone_number":
-            // Only allow numbers for the phone number
-            return value.replace(/[^0-9]/g, "").trim();
-        case "rank":
-            // Only allow numbers for rank
-            return value.replace(/[^0-9]/g, "").trim();
+            return trimmed.replace(/[^\d+]/g, ""); // allow numbers and plus sign
+
+        case "user_rank":
+            return trimmed.replace(/[^0-9]/g, ""); // digits only
+
         default:
-            return value;
+            return trimmed;
     }
 };

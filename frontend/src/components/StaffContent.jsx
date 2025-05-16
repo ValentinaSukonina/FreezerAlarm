@@ -21,7 +21,7 @@ const StaffContent = () => {
     const [editingUserId, setEditingUserId] = useState(null);
     const [expandedUserId, setExpandedUserId] = useState(null);
     const [newUser, setNewUser] = useState({
-        name: "", email: "", phone_number: "", user_rank: "", role: ""
+        name: "", email: "", phone_number: "+46", user_rank: "", role: ""
     });
     const [showAddForm, setShowAddForm] = useState(false);
     const [role, setRole] = useState(sessionStorage.getItem("role"));
@@ -153,7 +153,14 @@ const StaffContent = () => {
 
     const handleNewChange = (e) => {
         const { name, value } = e.target;
-        const sanitizedValue = sanitizeInputSec(value, name);
+        let sanitizedValue = sanitizeInputSec(value, name);
+
+        if (name === "phone_number") {
+            if (!sanitizedValue.startsWith("+46")) {
+                sanitizedValue = "+46" + sanitizedValue.replace(/^\+*/, "").replace(/^46*/, "");
+            }
+        }
+
         setNewUser((prev) => ({ ...prev, [name]: sanitizedValue }));
     };
 
@@ -178,15 +185,32 @@ const StaffContent = () => {
     };
 
     const handleAddUser = async () => {
+        const phonePattern = /^\+46\d{9}$/;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,24}$/;
+
+        if (!phonePattern.test(newUser.phone_number)) {
+            setMessage("❌ Phone number must start with +46 and be followed by exactly 9 digits.");
+            return;
+        }
+
+        if (!emailPattern.test(newUser.email)) {
+            setMessage("❌ Please enter a valid email address.");
+            return;
+        }
+
         if (!newUser.name || !newUser.email || !newUser.role) {
             setMessage("❌ Name, email, and role are required.");
+            return;
+        }
+        if (!newUser.email) {
+            setMessage("❌ Please enter a valid email address.");
             return;
         }
 
         try {
             const created = await createUser(newUser);
             setUsers((prev) => [...prev, created]);
-            setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
+            setNewUser({ name: "", email: "", phone_number: "+46", user_rank: "", role: "" });
             setShowAddForm(false);
             setMessage("✅ New user created successfully!");
         } catch (err) {
@@ -240,11 +264,14 @@ const StaffContent = () => {
                             onChange={handleNewChange}
                         />
                         <input
+                            type="tel"
                             name="phone_number"
                             className="form-control"
-                            placeholder="Phone"
+                            placeholder="+46123456789"
                             value={newUser.phone_number}
                             onChange={handleNewChange}
+                            maxLength={12}
+                            title="Phone number must start with +46 and be followed by exactly 9 digits"
                         />
                         <input
                             name="user_rank"
@@ -276,7 +303,7 @@ const StaffContent = () => {
                             className="btn btn-secondary"
                             onClick={() => {
                                 setShowAddForm(false);
-                                setNewUser({ name: "", email: "", phone_number: "", user_rank: "", role: "" });
+                                setNewUser({ name: "", email: "", phone_number: "+46", user_rank: "", role: "" });
                             }}
                         >
                             Cancel
