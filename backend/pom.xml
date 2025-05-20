@@ -19,6 +19,7 @@
         <lombok.version>1.18.36</lombok.version>
         <hibernate.version>6.5.2.Final</hibernate.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <jacoco.agent.argLine></jacoco.agent.argLine>
     </properties>
 
     <dependencies>
@@ -141,6 +142,22 @@
             <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>6.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>5.2.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -152,6 +169,7 @@
                 <configuration>
                     <argLine>${jacoco.agent.argLine}
                         -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/1.15.11/byte-buddy-agent-1.15.11.jar
+                        -Djdk.disableShareForTest=true
                         -Djdk.disableShareForTest=true
                         -Dorg.mockito.debug=true
                     </argLine>

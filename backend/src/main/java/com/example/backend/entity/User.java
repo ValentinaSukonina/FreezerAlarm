@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.example.backend.converter.AttributeEncryptor;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -32,11 +33,13 @@ public class User {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "phone_number", nullable = false, length = 20)
+    @Column(name = "phone_number", nullable = false, length = 200)
+    @Convert(converter = AttributeEncryptor.class)
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 200)
+    @Convert(converter = AttributeEncryptor.class)
     @Email(message = "Invalid email format")
     private String email;
 
@@ -62,3 +65,4 @@ public class User {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }
+
