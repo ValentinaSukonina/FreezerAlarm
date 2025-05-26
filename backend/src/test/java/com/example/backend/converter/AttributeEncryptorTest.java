@@ -1,38 +1,47 @@
 package com.example.backend.converter;
 
 import com.example.backend.util.EncryptionUtil;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AttributeEncryptorTest {
 
     private AttributeEncryptor encryptor;
 
+    @BeforeAll
+    static void disableLogging() {
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.OFF);
+    }
+
     @BeforeEach
     void setUp() {
-        // Use test-safe AES key (16 characters)
-        String testKey = "TESTKEY123456789";
-        AttributeEncryptor.setEncryptionUtil(new EncryptionUtil(testKey));
-        encryptor = new AttributeEncryptor();
+        EncryptionUtil encryptionUtil = new EncryptionUtil("MySecretKey12345");
+        encryptor = new AttributeEncryptor(encryptionUtil);
     }
 
     @Test
-    void encryptAndDecrypt_shouldReturnOriginalValue() {
-        String original = "secret@example.com";
+    void testEncryptionDecryption() {
+        String original = "test@example.com";
         String encrypted = encryptor.convertToDatabaseColumn(original);
-        String decrypted = encryptor.convertToEntityAttribute(encrypted);
+        assertNotNull(encrypted);
+        assertNotEquals(original, encrypted);
 
-        assertThat(encrypted).isNotEqualTo(original);
-        assertThat(decrypted).isEqualTo(original);
+        String decrypted = encryptor.convertToEntityAttribute(encrypted);
+        assertEquals(original, decrypted);
     }
 
     @Test
-    void nullValues_shouldStayNull() {
-        assertThat(encryptor.convertToDatabaseColumn(null)).isNull();
-        assertThat(encryptor.convertToEntityAttribute(null)).isNull();
+    void testNullInput() {
+        assertNull(encryptor.convertToDatabaseColumn(null));
+        assertNull(encryptor.convertToEntityAttribute(null));
     }
 
     @Test
@@ -43,18 +52,7 @@ public class AttributeEncryptorTest {
             encryptor.convertToEntityAttribute(invalidEncryptedValue);
         })
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Decryption failed");
+                .hasMessageContaining("Could not decrypt data");
     }
 
-    @Test
-    void encryptWithMissingUtil_shouldThrowException() {
-        // Simulate missing EncryptionUtil
-        AttributeEncryptor.setEncryptionUtil(null);
-
-        assertThatThrownBy(() -> {
-            new AttributeEncryptor().convertToDatabaseColumn("test@example.com");
-        })
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Encryption failed");
-    }
 }

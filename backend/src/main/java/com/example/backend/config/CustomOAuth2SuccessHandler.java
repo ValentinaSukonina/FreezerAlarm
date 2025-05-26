@@ -34,9 +34,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         HttpSession session = request.getSession();
         String preAuthorizedEmail = (String) session.getAttribute("preAuthorizedEmail");
 
-        logger.info("Google login: " + name + " <" + email + ">");
-        logger.info("Pre-authorized email in session: " + preAuthorizedEmail);
-
         if (email == null || preAuthorizedEmail == null || !preAuthorizedEmail.equalsIgnoreCase(email)) {
             logger.warn("❌ Email mismatch or missing.");
             session.invalidate();
@@ -50,7 +47,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             session.setAttribute("username", user.getName());
             session.setAttribute("email", user.getEmail());
 
-            logger.info("✅ Authenticated user: " + user.getName() + ", role: " + user.getRole());
             try {
                 response.sendRedirect("http://localhost:5173/freezers");
             } catch (Exception e) {

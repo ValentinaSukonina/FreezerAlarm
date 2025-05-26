@@ -1,0 +1,51 @@
+# example of json file / save as json and update path in DatabaseSeeder
+[
+  {
+    "id": 1,
+    "file": "file 1",
+    "number": "1111",
+    "address": "Street 1",
+    "room": "1111C",
+    "type": "-80C",
+    "users": [
+      {
+        "name": "John Smith",
+        "phone_number": "0700-000000",
+        "email": "user1@gmail.com",
+        "rank": 1,
+        "role": "admin"
+      },
+      {
+        "name": "George Svensson",
+        "phone_number": "0700-111111",
+        "email": "user2@gmaiul.com",
+        "rank": 2,
+        "role": "user"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "file": "file 2",
+    "number": "2222",
+    "address": "Street 2",
+    "room": "1111C",
+    "type": "-80C",
+    "users": [
+      {
+        "name": "John Smith",
+        "phone_number": "0700-000000",
+        "email": "user1@gmail.com",
+        "rank": 1,
+        "role": "admin"
+      },
+      {
+        "name": "George Svensson",
+        "phone_number": "0700-111111",
+        "email": "user2@gmaiul.com",
+        "rank": 2,
+        "role": "user"
+      }
+    ]
+  }
+]

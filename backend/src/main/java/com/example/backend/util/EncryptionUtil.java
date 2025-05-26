@@ -8,20 +8,26 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class EncryptionUtil {
 
+    private static final Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
     private final SecretKeySpec keySpec;
 
+
     public EncryptionUtil(@Value("${data.encryption.key:}") String key) {
-        System.out.println("🔐 Resolved encryption key: '" + key + "' (length=" + (key != null ? key.length() : "null") + ")");
+        System.out.println("🔐 Encryption key resolved. ");
 
         if (key == null || key.length() != 16) {
-            throw new IllegalArgumentException("❌ AES key must be 16 characters. Got: '" + key + "' (length=" + (key != null ? key.length() : "null") + ")");
-
+            throw new IllegalArgumentException("❌ AES key must be exactly 16 characters long (got length=" + (key != null ? key.length() : "null") + ")");
         }
 
         this.keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+        log.info("🔐 EncryptionUtil initialized with valid encryption key of length {}", key.length());
+
     }
 
     public String encrypt(String input) throws Exception {
@@ -36,28 +42,5 @@ public class EncryptionUtil {
         cipher.init(Cipher.DECRYPT_MODE, keySpec);
         byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encrypted));
         return new String(decrypted, StandardCharsets.UTF_8);
-    }
-
-    public static void main(String[] args) {
-        try {
-            String key = "MySecretKey12345"; // Must be 16 chars
-            EncryptionUtil util = new EncryptionUtil(key);
-
-            String email = "valentina.sukonina@medgen.gu.se";
-            String phone = "+46707499133";
-
-            String encryptedEmail = util.encrypt(email);
-            String encryptedPhone = util.encrypt(phone);
-
-            System.out.println("📧 Encrypted Email: " + encryptedEmail);
-            System.out.println("📞 Encrypted Phone: " + encryptedPhone);
-
-            // Optional: decrypt to verify
-            System.out.println("📧 Decrypted Email: " + util.decrypt(encryptedEmail));
-            System.out.println("📞 Decrypted Phone: " + util.decrypt(encryptedPhone));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

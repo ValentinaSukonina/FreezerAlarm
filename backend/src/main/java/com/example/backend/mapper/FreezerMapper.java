@@ -82,4 +82,16 @@ public class FreezerMapper {
         return freezer;
     }
 
+    public Freezer toEntity(FreezerWithUsersDTO dto) {
+        if (dto == null) return null;
+        Freezer freezer = new Freezer();
+        freezer.setId(dto.id());
+        freezer.setFile(dto.file());
+        freezer.setNumber(dto.number());
+        freezer.setAddress(dto.address());
+        freezer.setRoom(dto.room());
+        freezer.setType(dto.type());
+        return freezer;
+    }
+
 }

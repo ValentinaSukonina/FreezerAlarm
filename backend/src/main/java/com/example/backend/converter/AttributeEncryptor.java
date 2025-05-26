@@ -1,46 +1,40 @@
 package com.example.backend.converter;
 
 import com.example.backend.util.EncryptionUtil;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-@Component
-@Converter(autoApply = false) // or true, depending on your need
+@Converter(autoApply = true)
 public class AttributeEncryptor implements AttributeConverter<String, String> {
 
+    private static final Logger logger = LoggerFactory.getLogger(AttributeEncryptor.class);
     private final EncryptionUtil encryptionUtil;
 
-    @Autowired
     public AttributeEncryptor(EncryptionUtil encryptionUtil) {
         this.encryptionUtil = encryptionUtil;
     }
 
-    @PostConstruct
-    public void postConstruct() {
-        System.out.println("✅ AttributeEncryptor initialized with key");
-    }
-
     @Override
     public String convertToDatabaseColumn(String attribute) {
+        if (attribute == null) return null;
         try {
-            return attribute == null ? null : encryptionUtil.encrypt(attribute);
+            return encryptionUtil.encrypt(attribute);
         } catch (Exception e) {
-            System.err.println("❌ Encryption failed for value: " + e.getMessage());
-            throw new IllegalStateException("Encryption failed", e);
+            logger.debug("Encryption failed", e);
+            throw new IllegalStateException("Could not encrypt data", e);
         }
     }
 
     @Override
     public String convertToEntityAttribute(String dbData) {
+        if (dbData == null) return null;
         try {
-            return dbData == null ? null : encryptionUtil.decrypt(dbData);
+            return encryptionUtil.decrypt(dbData);
         } catch (Exception e) {
-            System.err.println("❌ Decryption failed: " + e.getMessage());
-            throw new IllegalStateException("Decryption failed", e);
+            logger.error("Decryption failed", e);
+            throw new IllegalStateException("Could not decrypt data", e);
         }
     }
 }

@@ -29,4 +29,16 @@ public class UserMapper {
                 .map(this::toUserDTO)
                 .collect(Collectors.toList());
     }
+
+    public User toEntity(UserDTO dto) {
+        if (dto == null) return null;
+        return User.builder()
+                .id(dto.id())
+                .name(dto.name())
+                .phoneNumber(dto.phone_number())
+                .email(dto.email())
+                .user_rank(dto.user_rank())
+                .role(dto.role())
+                .build();
+    }
 }

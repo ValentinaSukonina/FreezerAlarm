@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: populate-db
   application:
     name: backend
   main:
@@ -43,16 +45,16 @@ spring:
 server:
   port: 8000
 
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#        SQL: DEBUG
-#      type:
-#        descriptor:
-#          sql: TRACE
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+      type:
+        descriptor:
+          sql: TRACE
 data:
   encryption:
-    #enabled: true
     key: ${ENCRYPTION_KEY}
-    #key: TESTKEY123456789
+
+
