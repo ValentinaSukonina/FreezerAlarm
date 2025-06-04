@@ -51,7 +51,7 @@ public class DatabaseSeeder {
         this.objectMapper = objectMapper;
     }
 
-    @PostConstruct
+   /* @PostConstruct
     public void init() {
         Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
 
@@ -100,5 +100,5 @@ public class DatabaseSeeder {
             logger.error("❌ Error during database seeding: {}", e.getMessage(), e);
             throw new IllegalStateException("Failed to seed database", e);
         }
-    }
+    }*/
 }

@@ -77,3 +77,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Json file with database entries
+**/src/main/resources/Freezers_Biomedicine_complete.json
