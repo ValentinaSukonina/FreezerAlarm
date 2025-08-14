@@ -6,7 +6,7 @@ import jakarta.persistence.Converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Converter(autoApply = true)
+@Converter(autoApply = false)
 public class AttributeEncryptor implements AttributeConverter<String, String> {
 
     private static final Logger logger = LoggerFactory.getLogger(AttributeEncryptor.class);

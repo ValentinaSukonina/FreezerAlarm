@@ -49,10 +49,12 @@ logging:
   level:
     org:
       hibernate:
-        SQL: DEBUG
-      type:
-        descriptor:
-          sql: TRACE
+        SQL: DEBUG                 # prints SQL
+
+        orm:
+          jdbc:
+            bind: TRACE            # shows bound parameter values (the “?”)
+            extract: TRACE         # shows values read from ResultSet
 data:
   encryption:
     key: ${ENCRYPTION_KEY}
