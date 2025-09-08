@@ -10,6 +10,7 @@ const FreezersAll = () => {
     const [error, setError] = useState(null);
     const [role, setRole] = useState(sessionStorage.getItem("role"));
     const [formError, setFormError] = useState("");
+    const formRef = useRef();
 
     const [newFreezer, setNewFreezer] = useState({
         number: "",
@@ -19,7 +20,7 @@ const FreezersAll = () => {
         file: ""
     });
 
-    const formRef = useRef();
+
 
     useEffect(() => {
         const fetchRoleIfNeeded = async () => {
@@ -114,6 +115,7 @@ const FreezersAll = () => {
                             onAdd={handleAddFreezer}
                             onCancel={handleCancelForm}
                             formError={formError}
+                            onClearFormError={() => setFormError("")}
                         />
 
                         {successMessage && (

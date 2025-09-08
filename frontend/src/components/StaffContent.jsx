@@ -6,38 +6,115 @@ import {
     deleteUser,
     createUser,
     fetchFreezersByUser,
-    deleteFreezerFromUser
-} from '../services/api';
+    deleteFreezerFromUser,
+} from "../services/api";
 import { Navigate } from "react-router-dom";
 import Select from "react-select";
-import { sanitizeInputSec } from "../services/utils";
+import { sanitizeByField } from "../services/utils";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+
+// helper so .map/.filter never crash if freezers is not an array
+const asArray = (v) => (Array.isArray(v) ? v : []);
 
 const StaffContent = () => {
-    const [message, setMessage] = useState(""); // To store the success/error message
-    const [deletingUserId, setDeletingUserId] = useState(null); // Track the user being deleted
+    // -------- state --------
+    //const [message, setMessage] = useState(""); // TOP banner (Add form only)
+    const [message, setMessage] = useState({ text: "", kind: "" });
+    const [deletingUserId, setDeletingUserId] = useState(null);
     const [users, setUsers] = useState([]);
+    const [rowMessages, setRowMessages] = useState({}); // { [userId]: { text, kind } }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [editingUserId, setEditingUserId] = useState(null);
     const [expandedUserId, setExpandedUserId] = useState(null);
-    const [newUser, setNewUser] = useState({
-        name: "", email: "", phone_number: "+46", user_rank: "", role: ""
-    });
+
+    // Inline confirm for removing a freezer from a user
+    // shape: { userId, freezerId } | null
+    const [confirmingFreezer, setConfirmingFreezer] = useState(null);
+
     const [showAddForm, setShowAddForm] = useState(false);
-    const [role, setRole] = useState(sessionStorage.getItem("role"));
+    const [newUser, setNewUser] = useState({
+        firstname: "",
+        surname: "",
+        name: "",
+        email: "",
+        phone_number: "+46",
+        user_rank: "",
+        role: "",
+    });
+
+    // field-level errors for Add form
+    const [newErrors, setNewErrors] = useState({
+        firstname: "",
+        surname: "",
+        email: "",
+        phone_number: "",
+        user_rank: "",
+        role: "",
+    });
 
     const roleOptions = [
-        { value: "user", label: "user" },
-        { value: "admin", label: "admin" }
+        { value: "user", label: "User" },
+        { value: "admin", label: "Admin" },
     ];
 
-    useEffect(() => {
-        if (message) {
-            const hideTimer = setTimeout(() => {
-                setMessage(""); // Clear the message completely
-            }, 3000);
+    const [role, setRole] = useState(sessionStorage.getItem("role") || "");
 
-            return () => clearTimeout(hideTimer); // Cleanup on unmount
+    // -------- row message helpers --------
+    const showRowMsg = (userId, text, kind = "info", ttl = 3000) => {
+        setRowMessages((prev) => ({ ...prev, [userId]: { text, kind } }));
+        if (ttl) {
+            setTimeout(() => {
+                setRowMessages((prev) => {
+                    const next = { ...prev };
+                    delete next[userId];
+                    return next;
+                });
+            }, ttl);
+        }
+    };
+    const msgClass = (kind) =>
+        kind === "success"
+            ? "alert-success"
+            : kind === "error"
+                ? "alert-danger"
+                : kind === "warning"
+                    ? "alert-warning"
+                    : "alert-info";
+
+    // -------- effects --------
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await fetchUsers();
+                const usersWithFreezers = await Promise.all(
+                    data.map(async (user) => {
+                        try {
+                            const freezers = await fetchFreezersByUser(user.id);
+                            return { ...user, freezers: asArray(freezers) };
+                        } catch {
+                            return { ...user, freezers: [] };
+                        }
+                    })
+                );
+                setUsers(usersWithFreezers);
+            } catch (err) {
+                setError("Failed to load users");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadUsers();
+    }, []);
+
+    useEffect(() => {
+        if (message.text) {
+            const hideTimer = setTimeout(() => setMessage({ text: "", kind: "" }), 3000);
+            return () => clearTimeout(hideTimer);
         }
     }, [message]);
 
@@ -46,7 +123,7 @@ const StaffContent = () => {
             if (!role) {
                 try {
                     const res = await fetch("http://localhost:8000/api/auth/role", {
-                        credentials: "include"
+                        credentials: "include",
                     });
                     if (res.ok) {
                         const fetchedRole = await res.text();
@@ -62,35 +139,88 @@ const StaffContent = () => {
         fetchRoleIfNeeded();
     }, [role]);
 
-    useEffect(() => {
-        if (role === "admin") {
-            loadUsers();
-        }
-    }, [role]);
+    // -------- utils & validators --------
+    const toggleExpand = (userId) => {
+        setExpandedUserId((prev) => (prev === userId ? null : userId));
+    };
+    const confirmDelete = (userId) => setDeletingUserId(userId);
 
-    const loadUsers = async () => {
-        try {
-            const data = await fetchUsers();
-            const usersWithFreezers = await Promise.all(
-                data.map(async (user) => {
-                    const freezers = await fetchFreezersByUser(user.id);
-                    return { ...user, freezers: Array.isArray(freezers) ? freezers : [] };
-                })
-            );
-            setUsers(usersWithFreezers);
-        } catch (err) {
-            setError("Failed to load users");
-        } finally {
-            setLoading(false);
-        }
+    const validateEmail = (email) => {
+        if (!email || /\s/.test(email)) return false;
+        if (email.includes("+")) return false; // your rule: no '+'
+        const at = email.indexOf("@");
+        if (at < 1) return false;
+        const dot = email.lastIndexOf(".");
+        if (dot < at + 2 || dot === email.length - 1) return false;
+        return true;
     };
 
+    const NAME_ALLOWED_STRIP = /[^A-Za-zÀ-ÖØ-öø-ÿ' -]/g;
+    const NAME_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
+    const validateNamePart = (v) => NAME_RE.test((v || "").trim());
+
+    // Required: Sweden E.164 (+46 followed by 9 digits)
+    const validatePhone = (phone) => /^\+46\d{9}$/.test(phone);
+    const validateRank = (rank) => /^\d+$/.test(rank);
+    const recomputeName = (draft) =>
+        `${(draft.firstname || "").trim()} ${(draft.surname || "").trim()}`.trim();
+    const validateNewUser = (draft) => {
+        const errs = {
+            firstname: "",
+            surname: "",
+            email: "",
+            phone_number: "",
+            user_rank: "",
+            role: "",
+        };
+        if (!draft.firstname?.trim()) errs.firstname = "Firstname is required.";
+        else if (!validateNamePart(draft.firstname)) errs.firstname = "Invalid firstname.";
+
+        if (!draft.surname?.trim()) errs.surname = "Surname is required.";
+        else if (!validateNamePart(draft.surname)) errs.surname = "Invalid surname.";
+
+        if (!draft.email?.trim()) errs.email = "Email is required.";
+        else if (!validateEmail(draft.email)) errs.email = "Invalid email format.";
+
+        if (!draft.role) errs.role = "Role is required.";
+
+        if (!validatePhone(draft.phone_number))
+            errs.phone_number = "Invalid phone number (must be Swedish like +46 70-123 45 67).";
+
+        if (!draft.user_rank?.trim()) errs.user_rank = "Rank is required.";
+        else if (!validateRank(draft.user_rank))
+            errs.user_rank = "Rank must contain digits only.";
+        return errs;
+    };
+
+    // -------- handlers: edit inline --------
     const handleEditChange = (e, userId) => {
         const { name, value } = e.target;
+        if (name === "phone_number") return; // phone controlled by PhoneInput
+        let next;
+        try {
+            if (name === "name") {
+                next = (value ?? "").replace(NAME_ALLOWED_STRIP, "").trim();
+            } else if (name === "firstname" || name === "surname") {
+                // (in case you later split name in edit too)
+                next = (value ?? "").replace(NAME_ALLOWED_STRIP, "").trim();
+            } else {
+                next = sanitizeByField(name, value);
+            }
+        } catch {
+            next = (value ?? "").trim();
+        }
         setUsers((prev) =>
-            prev.map((user) =>
-                user.id === userId ? { ...user, [name]: value } : user
-            )
+            prev.map((user) => (user.id === userId ? { ...user, [name]: next } : user))
+        );
+    };
+
+    // store "+digits" (or "" while clearing). Country is locked to SE, so dial code stays +46.
+    const handleEditPhoneChange = (userId) => (val /* digits only string */, country) => {
+        const digits = (val || "").replace(/\D/g, "");
+        const e164 = digits ? `+${digits}` : "";
+        setUsers((prev) =>
+            prev.map((u) => (u.id === userId ? { ...u, phone_number: e164 } : u))
         );
     };
 
@@ -101,14 +231,20 @@ const StaffContent = () => {
                 user.id === userId
                     ? {
                         ...user,
-                        freezers: user.freezers.map((freezer, i) =>
-                            i === index ? { ...freezer, number: value } : freezer
-                        )
+                        freezers: asArray(user.freezers).map((f, i) =>
+                            i === index ? { ...f, number: value } : f
+                        ),
                     }
                     : user
             )
         );
     };
+
+    // ask/cancel confirmation for removing a freezer (inline)
+    const askRemoveFreezer = (userId, freezerId) => {
+        setConfirmingFreezer({ userId, freezerId });
+    };
+    const cancelRemoveFreezer = () => setConfirmingFreezer(null);
 
     const handleDeleteFreezer = async (userId, freezerId) => {
         try {
@@ -118,126 +254,243 @@ const StaffContent = () => {
                     user.id === userId
                         ? {
                             ...user,
-                            freezers: user.freezers.filter((freezer) => freezer.id !== freezerId)
+                            freezers: asArray(user.freezers).filter((f) => f.id !== freezerId),
                         }
                         : user
                 )
             );
-            setMessage("✅ Freezer successfully deleted from user.");
+            setConfirmingFreezer(null); // close the inline confirm UI
+            showRowMsg(userId, "✅ Freezer removed from user.", "success");
         } catch (err) {
-            setMessage("❌ Failed to delete freezer.");
-            console.error("Error deleting freezer from user:", err);
+            setConfirmingFreezer(null);
+            showRowMsg(userId, "❌ Failed to remove freezer.", "error");
         }
     };
 
-    // Handling Deletion with confirmation
-    const handleDelete = (userId) => {
-        setDeletingUserId(userId); // Show the confirmation UI
-    };
-
-    const cancelDelete = () => {
-        setDeletingUserId(null); // Hide the confirmation UI
-    };
-
-    const confirmDelete = async () => {
+    const handleDelete = async (userId) => {
         try {
-            await deleteUser(deletingUserId);
-            setUsers((prev) => prev.filter((user) => user.id !== deletingUserId));
-            setMessage("✅ User successfully deleted.");
-            setDeletingUserId(null); // Hide the confirmation UI after successful deletion
+            await deleteUser(userId);
+            showRowMsg(userId, "✅ User deleted successfully!", "success", 1500);
+            setDeletingUserId(null);
+            setTimeout(() => {
+                setUsers((prev) => prev.filter((u) => u.id !== userId));
+            }, 1500);
         } catch (err) {
-            setMessage("❌ Failed to delete user.");
-            setDeletingUserId(null); // Hide the confirmation UI after error
+            showRowMsg(userId, "❌ Failed to delete user.", "error");
         }
-    };
-
-    const handleNewChange = (e) => {
-        const { name, value } = e.target;
-        let sanitizedValue = sanitizeInputSec(value, name);
-
-        if (name === "phone_number") {
-            if (!sanitizedValue.startsWith("+46")) {
-                sanitizedValue = "+46" + sanitizedValue.replace(/^\+*/, "").replace(/^46*/, "");
-            }
-        }
-
-        setNewUser((prev) => ({ ...prev, [name]: sanitizedValue }));
     };
 
     const handleSave = async (userId) => {
-        const userToUpdate = users.find((user) => user.id === userId);
+        const userToUpdate = users.find((u) => u.id === userId);
+        // quick guards
+        if (!userToUpdate?.name?.trim()) {
+            showRowMsg(userId, "❌ Name is required.", "error");
+            return;
+        }
+        if (!NAME_RE.test(userToUpdate.name)) {
+            showRowMsg(userId, "❌ Name can only include letters, spaces, hyphens, and apostrophes.", "error");
+            return;
+        }
+        if (!userToUpdate?.email?.trim()) {
+            showRowMsg(userId, "❌ Email is required.", "error");
+            return;
+        }
+        const emailOk =
+            userToUpdate.email &&
+            !/\s/.test(userToUpdate.email) &&
+            !userToUpdate.email.includes("+") &&
+            userToUpdate.email.includes("@") &&
+            /\.[A-Za-z]{2,}$/.test(userToUpdate.email);
+        if (!emailOk) {
+            showRowMsg(userId, "❌ Invalid email format.", "error");
+            return;
+        }
+        if (!validatePhone(userToUpdate.phone_number)) {
+            showRowMsg(userId, "❌ Phone must start with +46 and have 9 digits after", "error");
+            return;
+        }
+        if (!userToUpdate.user_rank || !/^\d+$/.test(userToUpdate.user_rank)) {
+            showRowMsg(userId, "❌ Rank is required and must be digits.", "error");
+            return;
+        }
+
         const allowedFields = {
             name: userToUpdate.name,
             email: userToUpdate.email,
             phone_number: userToUpdate.phone_number,
             user_rank: userToUpdate.user_rank,
             role: userToUpdate.role,
-            freezers: userToUpdate.freezers.map((freezer) => freezer.id)
+            freezers: asArray(userToUpdate.freezers).map((f) => f.id),
         };
 
         try {
             await updateUser(userId, allowedFields);
             setEditingUserId(null);
-            setMessage("✅ User updated successfully!");
+            showRowMsg(userId, "✅ User updated successfully!", "success");
         } catch (err) {
-            setMessage("❌ Review the form input. Some fields are not valid.");
+            const serverMsg =
+                err?.response?.data ||
+                err?.message ||
+                "Review the form input. Some fields are not valid.";
+            showRowMsg(userId, `❌ ${serverMsg}`, "error");
         }
     };
 
+    // -------- handlers: add form --------
+    const handleNewChange = (e) => {
+        const { name, value } = e.target;
+        // Phone is handled by PhoneInput
+        if (name === "phone_number") return;
+        let sanitized;
+        try {
+            // block invalid characters before printing
+            if (name === "firstname" || name === "surname") {
+                sanitized = (value ?? "").replace(NAME_ALLOWED_STRIP, "");
+            } else {
+                sanitized = sanitizeByField(name, value);
+            }
+        } catch {
+            sanitized = (value ?? "").trim();
+        }
+        setNewUser((prev) => {
+            const updated = { ...prev, [name]: sanitized };
+            if (name === "firstname" || name === "surname") {
+                updated.name = recomputeName(updated);
+            }
+            // per-field errors
+            setNewErrors((prevErrs) => {
+                const next = { ...prevErrs };
+                if (name === "firstname") {
+                    next.firstname = updated.firstname?.trim()
+                        ? ""
+                        : "Firstname is required.";
+                } else if (name === "surname") {
+                    next.surname = updated.surname?.trim()
+                        ? ""
+                        : "Surname is required.";
+                } else if (name === "email") {
+                    next.email = !updated.email
+                        ? "Email is required."
+                        : validateEmail(updated.email)
+                            ? ""
+                            : "Invalid email format.";
+                } else if (name === "user_rank") {
+                    next.user_rank = updated.user_rank
+                        ? (validateRank(updated.user_rank) ? "" : "Digits only.")
+                        : "Rank is required.";
+                }
+                return next;
+            });
+            return updated;
+        });
+    };
+
+    // IMPORTANT (Add form): allow clearing; only add "+" when digits exist
+    const handlePhoneChange = (val) => {
+        const digits = (val || "").replace(/\D/g, "");
+        const e164 = digits ? `+${digits}` : "";
+        setNewUser((prev) => {
+            const updated = { ...prev, phone_number: e164 };
+            setNewErrors((prevErrs) => ({
+                ...prevErrs,
+                phone_number: validatePhone(updated.phone_number)
+                    ? ""
+                    : "Phone must start with +46 and have 9 digits after",
+            }));
+            return updated;
+        });
+    };
+
+    const handleRoleChange = (selectedOption) => {
+        const roleValue = selectedOption?.value || "";
+        setNewUser((prev) => {
+            const updated = { ...prev, role: roleValue };
+            setNewErrors((prevErrs) => ({
+                ...prevErrs,
+                role: updated.role ? "" : "Role is required.",
+            }));
+            return updated;
+        });
+    };
+
     const handleAddUser = async () => {
-        const phonePattern = /^\+46\d{9}$/;
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,24}$/;
+        // final validation
+        const draft = { ...newUser, name: recomputeName(newUser) };
+        const errs = validateNewUser(draft);
+        setNewErrors(errs);
+        if (Object.values(errs).some(Boolean)) return;
 
-        if (!phonePattern.test(newUser.phone_number)) {
-            setMessage("❌ Phone number must start with +46 and be followed by exactly 9 digits.");
-            return;
-        }
-
-        if (!emailPattern.test(newUser.email)) {
-            setMessage("❌ Please enter a valid email address.");
-            return;
-        }
-
-        if (!newUser.name || !newUser.email || !newUser.role) {
-            setMessage("❌ Name, email, and role are required.");
-            return;
-        }
-        if (!newUser.email) {
-            setMessage("❌ Please enter a valid email address.");
-            return;
-        }
+        const payload = {
+            firstname: draft.firstname,
+            surname: draft.surname,
+            name: draft.name,
+            email: draft.email,
+            phone_number: draft.phone_number,
+            user_rank: draft.user_rank,
+            role: draft.role,
+        };
 
         try {
-            const created = await createUser(newUser);
-            setUsers((prev) => [...prev, created]);
-            setNewUser({ name: "", email: "", phone_number: "+46", user_rank: "", role: "" });
+            const created = await createUser(payload);
+            let freezers = await fetchFreezersByUser(created.id);
+            freezers = asArray(freezers);
+            setUsers((prev) => [...prev, { ...created, freezers }]);
+
+            setNewUser({
+                firstname: "",
+                surname: "",
+                name: "",
+                email: "",
+                phone_number: "+46",
+                user_rank: "",
+                role: "",
+            });
+            setNewErrors({
+                firstname: "",
+                surname: "",
+                email: "",
+                phone_number: "",
+                user_rank: "",
+                role: "",
+            });
             setShowAddForm(false);
-            setMessage("✅ New user created successfully!");
+            setMessage({ text: "✅ New user created successfully!", kind: "success" });
         } catch (err) {
             const errorText = err?.response?.data;
-            if (typeof errorText === "string" && errorText.includes("Email already exists")) {
-                setMessage("❌ This email is already in use.");
+            if (
+                typeof errorText === "string" &&
+                errorText.includes("Email already exists")
+            ) {
+                setNewErrors((prev) => ({
+                    ...prev,
+                    email: "This email is already in use.",
+                }));
+                //setMessage("❌ This email is already in use.");
+                setMessage({ text: "❌ This email is already in use.", kind: "error" });
             } else {
-                setMessage("❌ Failed to create user.");
+                //setMessage("❌ Failed to create user.");
+                setMessage({ text: "❌ Failed to create user.", kind: "error" });
             }
         }
     };
 
-    const toggleExpand = (userId) => {
-        setExpandedUserId(expandedUserId === userId ? null : userId);
-    };
+    if (!role) return <Navigate to="/login" replace />;
 
-    if (role && role !== "admin") {
-        return <Navigate to="/unauthorized" replace />;
-    }
-
+    // -------- render --------
     return (
-        <main className="container mt-1 mt-sm-3">
+        <main className="container py-4">
             <h2 className="text-center  mb-2 mb-sm-4">Registered Personnel</h2>
 
-            <div className="text-center mt-2 mt-sm-3 mb-2">
+            {/* TOP banner — used by Add form only */}
+            {message.text && (
+                <div className={`alert ${message.kind === "success" ? "alert-success" : "alert-error"}`} role="alert">
+                    {message.text}
+                </div>
+            )}
+
+            <div className="d-flex justify-content-center mb-3">
                 <button
-                    className="btn"
+                    className="btn mx-auto"
                     style={{ backgroundColor: "#5D8736", color: "white" }}
                     onClick={() => setShowAddForm(!showAddForm)}
                 >
@@ -246,64 +499,122 @@ const StaffContent = () => {
             </div>
 
             {showAddForm && (
-                <div className="border p-3 rounded mb-4" style={{ backgroundColor: "#f8fff0", maxWidth: "500px", margin: "0 auto" }}>
+                <div
+                    className="border p-3 rounded mb-4"
+                    style={{ backgroundColor: "#f8fff0", maxWidth: "500px", margin: "0 auto" }}
+                >
                     <h5 className="mb-3">Add New User</h5>
                     <div className="d-flex flex-column gap-2">
                         <input
-                            name="name"
-                            className="form-control"
-                            placeholder="Name"
-                            value={newUser.name}
+                            name="firstname"
+                            className={`form-control ${newErrors.firstname ? "is-invalid" : ""}`}
+                            placeholder="Firstname"
+                            value={newUser.firstname}
                             onChange={handleNewChange}
                         />
+                        {newErrors.firstname && (
+                            <div className="text-danger small">{newErrors.firstname}</div>
+                        )}
+                        <input
+                            name="surname"
+                            className={`form-control ${newErrors.surname ? "is-invalid" : ""}`}
+                            placeholder="Surname"
+                            value={newUser.surname}
+                            onChange={handleNewChange}
+                        />
+                        {newErrors.surname && (
+                            <div className="text-danger small">{newErrors.surname}</div>
+                        )}
+
                         <input
                             name="email"
-                            className="form-control"
+                            type="email"
+                            inputMode="email"
+                            autoComplete="email"
+                            className={`form-control ${newErrors.email ? "is-invalid" : ""}`}
                             placeholder="Email"
                             value={newUser.email}
                             onChange={handleNewChange}
                         />
-                        <input
-                            type="tel"
-                            name="phone_number"
-                            className="form-control"
-                            placeholder="+46123456789"
-                            value={newUser.phone_number}
-                            onChange={handleNewChange}
-                            maxLength={12}
-                            title="Phone number must start with +46 and be followed by exactly 9 digits"
+                        {newErrors.email && (
+                            <div className="text-danger small">{newErrors.email}</div>
+                        )}
+
+                        <PhoneInput
+                            country="se"
+                            onlyCountries={["se"]}
+                            disableDropdown
+                            countryCodeEditable={false}
+                            masks={{ se: "..-... .. .." }}             // 2-3 2 2 groups
+                            placeholder="+46 XX-XXX XX XX"
+                            value={newUser.phone_number || ""}
+                            onChange={(val) => handlePhoneChange(val)}
+                            inputClass={`form-control ${newErrors.phone_number ? "is-invalid" : ""}`}
+                            containerClass="w-100"
                         />
-                        <input
+                        {newErrors.phone_number && (
+                            <div className="text-danger small">{newErrors.phone_number}</div>
+                        )}
+
+                        <select
                             name="user_rank"
-                            className="form-control"
-                            placeholder="Rank"
+                            className={`form-control ${newErrors.user_rank ? "is-invalid" : ""}`}
                             value={newUser.user_rank}
                             onChange={handleNewChange}
-                        />
+                        >
+                            <option value="">Choose rank…</option>
+                            {[...Array(10)].map((_, i) => {
+                                const v = String(i + 1);
+                                return <option key={v} value={v}>{v}</option>;
+                            })}
+                        </select>
+                        {newErrors.user_rank && (
+                            <div className="text-danger small">{newErrors.user_rank}</div>
+                        )}
+
                         <Select
                             className="role-type-select"
                             classNamePrefix="ft"
                             options={roleOptions}
                             placeholder="Select role"
                             value={roleOptions.find((opt) => opt.value === newUser.role) || null}
-                            onChange={(selectedOption) =>
-                                setNewUser((prev) => ({
-                                    ...prev,
-                                    role: selectedOption.value
-                                }))
-                            }
+                            onChange={handleRoleChange}
+                            isSearchable={false}
                         />
+                        {newErrors.role && (
+                            <div className="text-danger small">{newErrors.role}</div>
+                        )}
                     </div>
 
                     <div className="d-flex justify-content-between mt-3">
-                        <button className="btn" style={{ backgroundColor: "#5D8736", color: "white" }} onClick={handleAddUser}>
+                        <button
+                            className="btn"
+                            style={{ backgroundColor: "#5D8736", color: "white" }}
+                            onClick={handleAddUser}
+                        >
                             Add
                         </button>
                         <button
                             className="btn btn-secondary"
                             onClick={() => {
                                 setShowAddForm(false);
-                                setNewUser({ name: "", email: "", phone_number: "+46", user_rank: "", role: "" });
+                                setNewUser({
+                                    firstname: "",
+                                    surname: "",
+                                    name: "",
+                                    email: "",
+                                    phone_number: "+46",
+                                    user_rank: "",
+                                    role: "",
+                                });
+                                setNewErrors({
+                                    firstname: "",
+                                    surname: "",
+                                    email: "",
+                                    phone_number: "",
+                                    user_rank: "",
+                                    role: "",
+                                });
                             }}
                         >
                             Cancel
@@ -312,40 +623,10 @@ const StaffContent = () => {
                 </div>
             )}
 
-            {/* Message Display */}
-            {message && (
-                <div
-                    className="alert"
-                    style={{
-                        padding: "10px",
-                        backgroundColor: message.startsWith("✅") ? "#d4edda" : "#f8d7da",
-                        color: message.startsWith("✅") ? "#155724" : "#721c24",
-                    }}
-                >
-                    {message}
-                </div>
-            )}
-
-            {/* Deletion Confirmation UI */}
-            {deletingUserId !== null && (
-                <div className="alert" style={{ backgroundColor: "#f8d7da", color: "#721c24", marginTop: "20px" }}>
-                    <p>Are you sure you want to delete this user?</p>
-                    <div className="d-flex justify-content-center">
-                        <button className="btn btn-sm" style={{ backgroundColor: "#155724", color: "white" }} onClick={confirmDelete}>
-                            Yes, Delete
-                        </button>
-                        <button className="btn btn-sm ms-2" style={{ backgroundColor: "#721c24", color: "white" }} onClick={cancelDelete}>
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {loading && <p className="text-center">Loading users...</p>}
-            {error && <p className="text-center text-danger">{error}</p>}
-
-            {users.length > 0 ? (
-                <div className="table-responsive mt-4">
+            {loading ? (
+                <div>Loading users...</div>
+            ) : users.length > 0 ? (
+                <div className="table-responsive">
                     <table className="table table-bordered table-sm text-center">
                         <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>
                         <tr>
@@ -362,21 +643,26 @@ const StaffContent = () => {
                         {users.map((user) => {
                             const isEditing = editingUserId === user.id;
                             const isExpanded = expandedUserId === user.id;
+                            const phoneInvalid = isEditing && !validatePhone(user.phone_number || "");
 
                             return (
                                 <React.Fragment key={user.id}>
                                     <tr>
                                         <td className="text-start d-flex justify-content-between align-items-center">
                                             {isEditing ? (
-                                                <input name="name" value={user.name}
-                                                       onChange={(e) => handleEditChange(e, user.id)}/>
+                                                <input
+                                                    name="name"
+                                                    className="form-control"
+                                                    value={user.name}
+                                                    onChange={(e) => handleEditChange(e, user.id)}
+                                                />
                                             ) : (
                                                 <>
                                                     {user.name}
                                                     <button
                                                         className="btn btn-sm d-md-none ms-auto"
                                                         onClick={() => toggleExpand(user.id)}
-                                                        style={{backgroundColor: "#A9C46C", color: "white"}}
+                                                        style={{ backgroundColor: "#A9C46C", color: "white" }}
                                                     >
                                                         {isExpanded ? "▲" : "▼"}
                                                     </button>
@@ -385,66 +671,144 @@ const StaffContent = () => {
                                         </td>
                                         <td>
                                             {isEditing ? (
-                                                <input name="email" value={user.email}
-                                                       onChange={(e) => handleEditChange(e, user.id)}/>
+                                                <input
+                                                    name="email"
+                                                    className="form-control"
+                                                    value={user.email}
+                                                    onChange={(e) => handleEditChange(e, user.id)}
+                                                />
                                             ) : (
                                                 user.email
                                             )}
                                         </td>
+
                                         <td className="d-none d-md-table-cell">
                                             {isEditing ? (
-                                                <input name="phone_number" value={user.phone_number}
-                                                       onChange={(e) => handleEditChange(e, user.id)}/>
+                                                <PhoneInput
+                                                    country="se"
+                                                    onlyCountries={["se"]}
+                                                    disableDropdown
+                                                    countryCodeEditable={false}
+                                                    masks={{ se: "..-... .. .." }}
+                                                    placeholder="+46 XX-XXX XX XX"
+                                                    value={user.phone_number || ""}
+                                                    onChange={handleEditPhoneChange(user.id)}
+                                                    inputClass={`form-control ${phoneInvalid ? "is-invalid" : ""}`}
+                                                    containerClass="w-100"
+                                                />
                                             ) : (
                                                 user.phone_number
                                             )}
                                         </td>
+
                                         <td className="d-none d-lg-table-cell">
                                             {isEditing ? (
-                                                <input name="user_rank" value={user.user_rank}
-                                                       onChange={(e) => handleEditChange(e, user.id)}/>
+                                                <select
+                                                    name="user_rank"
+                                                    className="form-control"
+                                                    value={user.user_rank || ""}
+                                                    onChange={(e) => handleEditChange(e, user.id)}
+                                                >
+                                                    <option value="">Choose rank…</option>
+                                                    {[...Array(10)].map((_, i) => {
+                                                        const v = String(i + 1);
+                                                        return (
+                                                            <option key={v} value={v}>
+                                                                {v}
+                                                            </option>
+                                                        );
+                                                    })}
+                                                </select>
                                             ) : (
                                                 user.user_rank
                                             )}
                                         </td>
+
                                         <td className="d-none d-lg-table-cell">
                                             {isEditing ? (
-                                                <input name="role" value={user.role}
-                                                       onChange={(e) => handleEditChange(e, user.id)}/>
+                                                <input
+                                                    name="role"
+                                                    className="form-control"
+                                                    value={user.role}
+                                                    onChange={(e) => handleEditChange(e, user.id)}
+                                                />
                                             ) : (
                                                 user.role
                                             )}
                                         </td>
-                                        <td className="d-none d-lg-table-cell freezer-numbers" style={{width: '80px'}}>
+
+                                        <td
+                                            className="d-none d-lg-table-cell freezer-numbers"
+                                            style={{ width: "80px" }}
+                                        >
                                             {isEditing ? (
                                                 <div className="d-flex flex-column">
-                                                    {user.freezers?.map((freezer) => (
-                                                        <div key={freezer.id}
-                                                             className="d-flex align-items-center mb-2">
-                                                            <span className="form-control me-2"
-                                                                  style={{width: '80px'}}>{freezer.number}</span>
-                                                            <button
-                                                                className="btn btn-danger btn-sm"
-                                                                onClick={() => handleDeleteFreezer(user.id, freezer.id)}
+                                                    {asArray(user.freezers).map((freezer) => {
+                                                        const isAsking =
+                                                            confirmingFreezer &&
+                                                            confirmingFreezer.userId === user.id &&
+                                                            confirmingFreezer.freezerId === freezer.id;
+
+                                                        return (
+                                                            <div
+                                                                key={freezer.id}
+                                                                className="d-flex align-items-center mb-2"
                                                             >
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                    ))}
+                                  <span
+                                      className="form-control me-2"
+                                      style={{ width: "80px" }}
+                                  >
+                                    {freezer.number}
+                                  </span>
+                                                                {isAsking ? (
+                                                                    <div className="d-flex align-items-center gap-2">
+                                      <span className="text-danger small fw-semibold">
+                                        Remove?
+                                      </span>
+                                                                        <button
+                                                                            className="btn btn-sm btn-danger"
+                                                                            onClick={() =>
+                                                                                handleDeleteFreezer(user.id, freezer.id)
+                                                                            }
+                                                                        >
+                                                                            Yes
+                                                                        </button>
+                                                                        <button
+                                                                            className="btn btn-sm btn-secondary"
+                                                                            onClick={cancelRemoveFreezer}
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <button
+                                                                        className="btn btn-danger btn-sm"
+                                                                        onClick={() =>
+                                                                            askRemoveFreezer(user.id, freezer.id)
+                                                                        }
+                                                                        title="Remove this freezer from the user"
+                                                                    >
+                                                                        X
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             ) : (
-                                                (user.freezers || []).map(freezer => (
+                                                asArray(user.freezers).map((freezer) => (
                                                     <div key={freezer.id}>{freezer.number}</div>
                                                 ))
                                             )}
                                         </td>
+
                                         <td className="d-none d-md-table-cell">
                                             <div className="d-flex justify-content-center gap-2">
                                                 {isEditing ? (
                                                     <>
                                                         <button
                                                             className="btn btn-sm"
-                                                            style={{backgroundColor: "#7BAE3F", color: "white"}}
+                                                            style={{ backgroundColor: "#7BAE3F", color: "white" }}
                                                             onClick={() => handleSave(user.id)}
                                                         >
                                                             Save
@@ -460,7 +824,7 @@ const StaffContent = () => {
                                                     <>
                                                         <button
                                                             className="btn btn-sm"
-                                                            style={{backgroundColor: "#5D8736", color: "white"}}
+                                                            style={{ backgroundColor: "#5D8736", color: "white" }}
                                                             onClick={() => setEditingUserId(user.id)}
                                                         >
                                                             Edit
@@ -470,9 +834,9 @@ const StaffContent = () => {
                                                             style={{
                                                                 backgroundColor: "#A9C46C",
                                                                 color: "white",
-                                                                border: "1px solid #c3e6cb"
+                                                                border: "1px solid #c3e6cb",
                                                             }}
-                                                            onClick={() => handleDelete(user.id)}
+                                                            onClick={() => confirmDelete(user.id)}
                                                         >
                                                             Delete
                                                         </button>
@@ -480,19 +844,63 @@ const StaffContent = () => {
                                                 )}
                                             </div>
                                         </td>
-
                                     </tr>
 
+                                    {/* Mobile expanded row */}
                                     {isExpanded && (
                                         <tr className="d-md-none">
-                                            <td colSpan="6" className="text-start bg-light">
-                                                <div><strong>Phone:</strong> {user.phone_number}</div>
-                                                <div><strong>Rank:</strong> {user.user_rank}</div>
-                                                <div><strong>Role:</strong> {user.role}</div>
-                                                <div><strong>Assigned Freezers:</strong></div>
-                                                {user.freezers?.map(freezer => (
+                                            <td colSpan="7" className="text-start bg-light">
+                                                <div>
+                                                    <strong>Phone:</strong> {user.phone_number}
+                                                </div>
+                                                <div>
+                                                    <strong>Rank:</strong> {user.user_rank}
+                                                </div>
+                                                <div>
+                                                    <strong>Role:</strong> {user.role}
+                                                </div>
+                                                <div>
+                                                    <strong>Assigned Freezers:</strong>
+                                                </div>
+                                                {asArray(user.freezers).map((freezer) => (
                                                     <div key={freezer.id}>{freezer.number}</div>
                                                 ))}
+                                            </td>
+                                        </tr>
+                                    )}
+
+                                    {/* INLINE DELETE CONFIRMATION under the row */}
+                                    {deletingUserId === user.id && (
+                                        <tr>
+                                            <td colSpan="7">
+                                                <div className="alert alert-warning d-flex justify-content-between align-items-center my-2">
+                                                    <span>Are you sure you want to delete this user?</span>
+                                                    <span className="d-flex gap-2">
+                              <button
+                                  className="btn btn-danger btn-sm"
+                                  onClick={() => handleDelete(user.id)}
+                              >
+                                Yes, delete
+                              </button>
+                              <button
+                                  className="btn btn-secondary btn-sm"
+                                  onClick={() => setDeletingUserId(null)}
+                              >
+                                Cancel
+                              </button>
+                            </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+
+                                    {/* INLINE ROW MESSAGE (edit/delete/freezer feedback) */}
+                                    {rowMessages[user.id] && (
+                                        <tr>
+                                            <td colSpan="7">
+                                                <div className={`alert ${msgClass(rowMessages[user.id].kind)} my-2`}>
+                                                    {rowMessages[user.id].text}
+                                                </div>
                                             </td>
                                         </tr>
                                     )}
@@ -510,7 +918,3 @@ const StaffContent = () => {
 };
 
 export default StaffContent;
-
-
-
-

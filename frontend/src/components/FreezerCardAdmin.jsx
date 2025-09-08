@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {updateFreezerWithUsers, deleteFreezer,} from "../services/api";
-import {sanitizeInput} from "../services/utils";
+import { sanitizeByField } from "../services/utils";
 import {fetchUsers} from "../services/api";
 import { sendEmail } from "../services/api";
 import "../assets/styles.css";
@@ -159,7 +159,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
     const {number, room, address, type} = editData;
 
     const handleSanitizedFieldChange = (field) => (e) => {
-        const sanitized = sanitizeInput(e.target.value);
+        const sanitized = sanitizeByField(field, e.target.value, { live: true });
         handleChange({target: {name: field, value: sanitized}});
     };
 
@@ -203,6 +203,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                                 className="form-control"
                                 value={room}
                                 onChange={handleSanitizedFieldChange("room")}
+                                onBlur={(e) => handleChange({ target: { name: "room", value: sanitizeByField("room", e.target.value) } })}
                                 style={{maxWidth: "300px"}}
                             />
                         ) : (
@@ -217,6 +218,7 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                                 className="form-control"
                                 value={address}
                                 onChange={handleSanitizedFieldChange("address")}
+                                onBlur={(e) => handleChange({ target: { name: "address", value: sanitizeByField("address", e.target.value) } })}
                                 style={{maxWidth: "300px"}}
                             />
                         ) : (
