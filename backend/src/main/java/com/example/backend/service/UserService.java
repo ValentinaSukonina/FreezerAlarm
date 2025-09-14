@@ -1,9 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.controller.UserController;
-import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.UserDTO;
-import com.example.backend.entity.Freezer;
 import com.example.backend.entity.User;
 import com.example.backend.exception.Exceptions;
 import com.example.backend.mapper.UserMapper;
@@ -17,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -36,9 +33,21 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists in the system");
+        final String userName = user.getName();
+        final String userEmail = user.getEmail();
+
+        boolean nameExists = userRepository.findByName(userName).isPresent();
+
+        if (nameExists) {
+            throw new Exceptions.UserAlreadyExistsException("Name already exists in the system.");
         }
+
+        boolean emailExists = userRepository.findByEmail(userEmail).isPresent();
+
+        if (emailExists) {
+            throw new Exceptions.UserAlreadyExistsException("Email already exists in the system.");
+        }
+
         return userRepository.save(user);
     }
 

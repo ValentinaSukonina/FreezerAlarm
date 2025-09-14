@@ -41,15 +41,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        try {
-            User savedUser = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toUserDTO(savedUser));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            logger.error("Failed to create user: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred.");
-        }
+        var saved = userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toUserDTO(saved));
     }
 
     @DeleteMapping("/{id}")
