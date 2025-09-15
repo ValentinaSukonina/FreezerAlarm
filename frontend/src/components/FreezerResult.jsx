@@ -30,7 +30,7 @@ const FreezerResult = ({freezerNumber}) => {
                 }
                 setFreezer(data);
             } catch (err) {
-                setError("No freezer found for this number.");
+                setError(err?.message || "No freezer found for this number.");
             } finally {
                 setLoading(false);
             }
@@ -69,7 +69,7 @@ const FreezerResult = ({freezerNumber}) => {
     };
 
 
-    if (loading) return <p>Loading freezer data...</p>;
+    if (loading) return <p className="my-3">Loading freezer data...</p>;
 
     return (
         <main className="freezer-result-wrapper d-flex justify-content-center my-2 px-2">

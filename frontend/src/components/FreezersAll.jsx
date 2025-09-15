@@ -20,8 +20,6 @@ const FreezersAll = () => {
         file: ""
     });
 
-
-
     useEffect(() => {
         const fetchRoleIfNeeded = async () => {
             if (!role) {
@@ -65,8 +63,7 @@ const FreezersAll = () => {
 
     const handleAddFreezer = async (freezerData) => {
         if (!freezerData.number || !freezerData.room) {
-            setFormError("Freezer number and room are required.");
-            return false;
+            return { ok: false, message: "Freezer number and room are required." };
         }
 
         try {
@@ -75,19 +72,16 @@ const FreezersAll = () => {
             const updatedFreezers = await fetchAllFreezersWithUsers();
             setFreezers(updatedFreezers);
 
-            setNewFreezer({number: "", room: "", address: "", type: "", file: ""});
+            setNewFreezer({ number: "", room: "", address: "", type: "", file: "" });
             formRef.current?.resetCheckboxes();
 
-            setFormError("");
             setSuccessMessage(`✅ Freezer ${created.number} added successfully!`);
             setTimeout(() => setSuccessMessage(""), 3000);
 
-            return true; //  success
+            return { ok: true }; // success
         } catch (err) {
-            setFormError(err.message);
-            setSuccessMessage("");
             console.error("Failed to create freezer:", err);
-            return false; // error
+            return { ok: false, message: err.message || "Failed to add freezer." };
         }
     };
 
@@ -98,8 +92,8 @@ const FreezersAll = () => {
         formRef.current?.closeForm();
     };
 
-    if (loading) return <p>Loading freezers...</p>;
-    if (error) return <p>Error: {error}</p>;
+    if (loading) return <p className="text-center my-4">Loading freezers...</p>;
+    if (error) return <p className="text-center my-4">Error: {error}</p>;
 
     return (
         <div className="content-wrapper mx-2 my-1">
@@ -116,6 +110,7 @@ const FreezersAll = () => {
                             onCancel={handleCancelForm}
                             formError={formError}
                             onClearFormError={() => setFormError("")}
+                            existingNumbers={freezers.map(f => String(f.number))}
                         />
 
                         {successMessage && (

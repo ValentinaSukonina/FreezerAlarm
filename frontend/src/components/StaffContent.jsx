@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import {
     fetchUsers,
     updateUser,
@@ -10,9 +12,8 @@ import {
 } from "../services/api";
 import { Navigate } from "react-router-dom";
 import Select from "react-select";
-import { sanitizeByField } from "../services/utils";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+import { sanitizeByField, formatPhoneSE } from "../services/utils";
+import "../assets/styles.css";
 
 // helper so .map/.filter never crash if freezers is not an array
 const asArray = (v) => (Array.isArray(v) ? v : []);
@@ -55,8 +56,8 @@ const StaffContent = () => {
     });
 
     const roleOptions = [
-        { value: "user", label: "User" },
-        { value: "admin", label: "Admin" },
+        { value: "user", label: "user" },
+        { value: "admin", label: "admin" },
     ];
 
     const [role, setRole] = useState(sessionStorage.getItem("role") || "");
@@ -161,6 +162,7 @@ const StaffContent = () => {
 
     // Required: Sweden E.164 (+46 followed by 9 digits)
     const validatePhone = (phone) => /^\+46\d{9}$/.test(phone);
+
     const validateRank = (rank) => /^\d+$/.test(rank);
     const recomputeName = (draft) =>
         `${(draft.firstname || "").trim()} ${(draft.surname || "").trim()}`.trim();
@@ -202,7 +204,6 @@ const StaffContent = () => {
             if (name === "name") {
                 next = (value ?? "").replace(NAME_ALLOWED_STRIP, "").trim();
             } else if (name === "firstname" || name === "surname") {
-                // (in case you later split name in edit too)
                 next = (value ?? "").replace(NAME_ALLOWED_STRIP, "").trim();
             } else {
                 next = sanitizeByField(name, value);
@@ -456,19 +457,29 @@ const StaffContent = () => {
             setShowAddForm(false);
             setMessage({ text: "✅ New user created successfully!", kind: "success" });
         } catch (err) {
-            const errorText = err?.response?.data;
-            if (
-                typeof errorText === "string" &&
-                errorText.includes("Email already exists")
-            ) {
-                setNewErrors((prev) => ({
-                    ...prev,
-                    email: "This email is already in use.",
-                }));
-                //setMessage("❌ This email is already in use.");
-                setMessage({ text: "❌ This email is already in use.", kind: "error" });
+            const data = err?.response?.data;
+            const text = typeof data === "string" ? data : JSON.stringify(data ?? "");
+
+            const hasNameDuplication =
+                /name\s*already\s*exists/i.test(text) ||
+                /user\s*already\s*exists/i.test(text) ||
+                /duplicate\s*name/i.test(text);
+
+            const hasEmailDuplication =
+                /email\s*already\s*exists/i.test(text) ||
+                /duplicate\s*email/i.test(text);
+
+            const fieldErrs = {};
+            if (hasNameDuplication) {
+                fieldErrs.surname = "A user with this first and last name already exists.";
+            }
+            if (hasEmailDuplication) {
+                fieldErrs.email = "This email is already in use.";
+            }
+
+            if (Object.keys(fieldErrs).length > 0) {
+                setNewErrors(prev => ({ ...prev, ...fieldErrs }));
             } else {
-                //setMessage("❌ Failed to create user.");
                 setMessage({ text: "❌ Failed to create user.", kind: "error" });
             }
         }
@@ -586,7 +597,7 @@ const StaffContent = () => {
                         )}
                     </div>
 
-                    <div className="d-flex justify-content-between mt-3">
+                    <div className="d-flex justify-content-start gap-3 mt-3">
                         <button
                             className="btn"
                             style={{ backgroundColor: "#5D8736", color: "white" }}
@@ -624,7 +635,7 @@ const StaffContent = () => {
             )}
 
             {loading ? (
-                <div>Loading users...</div>
+                <div className="my-3">Loading users...</div>
             ) : users.length > 0 ? (
                 <div className="table-responsive">
                     <table className="table table-bordered table-sm text-center">
@@ -697,7 +708,7 @@ const StaffContent = () => {
                                                     containerClass="w-100"
                                                 />
                                             ) : (
-                                                user.phone_number
+                                                formatPhoneSE(user.phone_number)
                                             )}
                                         </td>
 
@@ -726,14 +737,26 @@ const StaffContent = () => {
 
                                         <td className="d-none d-lg-table-cell">
                                             {isEditing ? (
-                                                <input
-                                                    name="role"
-                                                    className="form-control"
-                                                    value={user.role}
-                                                    onChange={(e) => handleEditChange(e, user.id)}
-                                                />
+                                            <select
+                                                name="role"
+                                                className="form-control"
+                                                value={user.role || ""}
+                                                onChange={(e) => {
+                                                    const roleValue = e.target.value;
+                                                    setUsers((prev) =>
+                                                        prev.map((u) =>
+                                                            u.id === user.id ? { ...u, role: roleValue } : u
+                                                        )
+                                                    );
+                                                }}
+                                            >
+                                                <option value="">Select role…</option>
+                                                {roleOptions.map(o => (
+                                                    <option key={o.value} value={o.value}>{o.label}</option>
+                                                ))}
+                                            </select>
                                             ) : (
-                                                user.role
+                                            user.role
                                             )}
                                         </td>
 
@@ -851,7 +874,7 @@ const StaffContent = () => {
                                         <tr className="d-md-none">
                                             <td colSpan="7" className="text-start bg-light">
                                                 <div>
-                                                    <strong>Phone:</strong> {user.phone_number}
+                                                    <strong>Phone:</strong> {formatPhoneSE(user.phone_number)}
                                                 </div>
                                                 <div>
                                                     <strong>Rank:</strong> {user.user_rank}

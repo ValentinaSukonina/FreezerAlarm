@@ -5,6 +5,18 @@ const API = axios.create({
     withCredentials: true
 });
 
+const normErr = (error, fallback = "Unexpected error") => {
+    const msg =
+        error?.response?.data?.message ||
+        (typeof error?.response?.data === "string" ? error.response.data : null) ||
+        error?.message ||
+        fallback;
+    const e = new Error(msg);
+    e.status = error?.response?.status;
+    e.data = error?.response?.data;
+    return e;
+};
+
 export const fetchUsers = async () => {
     try {
         const response = await API.get('/users');
@@ -12,7 +24,7 @@ export const fetchUsers = async () => {
         return response.data;
     } catch (error) {
         console.error("Error fetching users:", error.response ? error.response.data : error.message);
-        return [];
+        throw normErr(err, "Failed to fetch users");
     }
 };
 
@@ -69,24 +81,36 @@ export async function fetchFreezerWithUsers(freezerNumber) {
         }
 
         if (!response.ok) {
-            throw new Error(`Error fetching freezer: ${response.statusText}`);
+            let serverMsg = "";
+            try {
+                const data = await response.clone().json();
+                serverMsg = data?.message || data?.error || "";
+            } catch {
+                serverMsg = (await response.text()).trim();
+            }
+
+            if (response.status === 404) {
+                throw new Error(
+                    serverMsg || `Freezer with number ${freezerNumber} does not exist.`
+                );
+            }
+
+            throw new Error(serverMsg || `Error fetching freezer: ${response.statusText}`);
         }
 
         return await response.json();
-    } catch (error) {
-        console.error("Error fetching freezer:", error);
-        throw error;
+    } catch (err) {
+        throw new Error(err?.message || "Error fetching freezer");
     }
 }
 
-// Fetch all freezers with users
 export const fetchAllFreezersWithUsers = async () => {
     try {
         const response = await API.get(`/freezers`);
         return response.data;
     } catch (error) {
         console.error("Error fetching freezers:", error.response ? error.response.data : error.message);
-        throw new Error("Could not fetch freezers");
+        throw normErr(err, "Could not fetch freezers");
     }
 
 };
@@ -103,22 +127,30 @@ export const fetchUserRole = async () => {
 };
 
 export const updateFreezerWithUsers = async (id, updatedData, userIds) => {
-    const response = await API.put(`/freezers/${id}/with-users`, {
-        id,
-        number: updatedData.number,
-        address: updatedData.address,
-        room: updatedData.room,
-        type: updatedData.type,
-        file: updatedData.file,
-        userIds: userIds
-    });
-
-    console.log("🔁 Combined update response:", response.data);
-    return response.data;
+    try {
+        const response = await API.put(`/freezers/${id}/with-users`, {
+            id,
+            number: updatedData.number,
+            address: updatedData.address,
+            room: updatedData.room,
+            type: updatedData.type,
+            file: updatedData.file,
+            userIds: userIds
+        });
+        console.log("Combined update response:", response.data);
+        return response.data;
+    } catch (error) {
+        throw normErr(err, "Failed to update freezer.");
+    }
 };
 
 export const deleteFreezer = async (id) => {
-    await API.delete(`/freezers/${id}`);
+    try {
+        await API.delete(`/freezers/${id}`);
+        return { ok: true };
+    } catch (error) {
+        throw normErr(error, "Server error while deleting freezer.");
+    }
 };
 
 export const createFreezer = async (freezerData) => {

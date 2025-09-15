@@ -2,9 +2,10 @@ import React, { useImperativeHandle, useState, forwardRef, useEffect } from "rea
 import Select from "react-select";
 import { fetchUsers } from "../services/api";
 import { sanitizeByField } from "../services/utils";
+import "../assets/styles.css";
 
 const AddFreezerForm = forwardRef(
-    ({ newFreezer, onChange, onAdd, onCancel, formError, onClearFormError }, ref) => {
+    ({ newFreezer, onChange, onAdd, onCancel, formError, onClearFormError, existingNumbers = [] }, ref) => {
         const [users, setUsers] = useState([]);
         const [selectedUserIds, setSelectedUserIds] = useState([]);
         const [showForm, setShowForm] = useState(false);
@@ -15,6 +16,7 @@ const AddFreezerForm = forwardRef(
         const [roomError, setRoomError] = useState("");
         const [addressError, setAddressError] = useState("");
         const [typeError, setTypeError] = useState("");
+        const [submitting, setSubmitting] = useState(false);
 
         const [localFormError, setLocalFormError] = useState("");
         const bannerError = formError || localFormError;
@@ -119,6 +121,8 @@ const AddFreezerForm = forwardRef(
         };
 
         const handleSubmit = async () => {
+            if (submitting) return;
+
             // reset banner
             setLocalFormError("");
 
@@ -142,9 +146,14 @@ const AddFreezerForm = forwardRef(
             }
             if (hasError) return;
 
+            if (existingNumbers.includes(String(newFreezer.number))) {
+                setNumberError(`Freezer with number ${newFreezer.number} already exists.`);
+                return;
+            }
+
+            setSubmitting(true);
             try {
                 const result = await onAdd({ ...newFreezer, userIds: selectedUserIds });
-
                 const ok =
                     typeof result === "boolean"
                         ? result
@@ -164,11 +173,16 @@ const AddFreezerForm = forwardRef(
 
                 const parentMsg = formError && String(formError);
                 const resMsg =
-                    (typeof result === "object" && result?.message) ||
-                    (parentMsg ? parentMsg : `❌ Freezer with number ${newFreezer.number} already exists.`);
-                setLocalFormError(resMsg);
+                    (typeof result === "object" && (result?.message || result?.error)) ||
+                    parentMsg ||
+                    "❌ Failed to add freezer.";
+
+                if (/Freezer with number/i.test(resMsg)) {
+                    setNumberError(resMsg.replace(/^❌\s*/, ""));
+                } else {
+                    setLocalFormError(resMsg.startsWith("❌") ? resMsg : `❌ ${resMsg}`);
+                }
             } catch (err) {
-                // axios-style errors
                 const status = err?.response?.status;
                 const serverMsg =
                     err?.response?.data?.message ||
@@ -176,12 +190,14 @@ const AddFreezerForm = forwardRef(
                     err?.message;
 
                 if (status === 409) {
-                    setLocalFormError(`❌ Freezer with number ${newFreezer.number} already exists.`);
+                    setNumberError(`Freezer with number ${newFreezer.number} already exists.`);
                 } else {
                     setLocalFormError(
                         `❌ Failed to add freezer${serverMsg ? `: ${String(serverMsg)}` : "."}`
                     );
                 }
+            } finally {
+                setSubmitting(false);
             }
         };
 
@@ -315,35 +331,26 @@ const AddFreezerForm = forwardRef(
                                 </div>
                             )}
 
-                            <div className="d-flex justify-content-between mt-3">
+                            <div className="d-flex justify-content-center gap-3 mt-3">
                                 <button
                                     className="btn"
                                     style={{ backgroundColor: "#5D8736", color: "white" }}
                                     onClick={handleSubmit}
+                                    disabled={submitting}
                                 >
-                                    Add
+                                    {submitting ? "Adding…" : "Add"}
                                 </button>
-                                <button className="btn btn-secondary" onClick={handleCancel}>
+                                <button className="btn btn-secondary" onClick={handleCancel} disabled={submitting}>
                                     Cancel
                                 </button>
                             </div>
-
-                            {/* error banner (parent-driven or local fallback) */}
-                            {bannerError && (
-                                <div
-                                    className="text-center my-3"
-                                    style={{
-                                        backgroundColor: "#f8d7da",
-                                        color: "#721c24",
-                                        border: "1px solid #f5c6cb",
-                                        padding: "10px 16px",
-                                        borderRadius: "5px",
-                                        maxWidth: "500px",
-                                        margin: "0 auto",
-                                    }}
-                                >
-                                    {bannerError}
+                            {localFormError && (
+                                <div className="alert alert-error" role="alert">
+                                    {localFormError}
                                 </div>
+                            )}
+                            {submitting && !localFormError && (
+                                <div className="text-muted small mt-2">Connecting to server…</div>
                             )}
                         </div>
                     </>

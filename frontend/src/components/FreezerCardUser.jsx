@@ -1,5 +1,6 @@
 import React from "react";
 import "../assets/styles.css";
+import { formatPhoneSE } from "../services/utils";
 
 const FreezerCardUser = ({freezer}) => {
     if (!freezer) {
@@ -32,7 +33,7 @@ const FreezerCardUser = ({freezer}) => {
                                 <li key={user.id || user.name} className="border-bottom py-1 py-sm-2">
                                     <p className="fw-bold mb-0">• {user.name} ({user.user_rank || "No rank"})</p>
                                     <p className="mb-0 ms-2">{user.email}</p>
-                                    <p className="mb-0 ms-2">{user.phone_number}</p>
+                                    <p className="mb-0 ms-2">{formatPhoneSE(user.phone_number)}</p>
                                 </li>
                             ))}
                         </ul>

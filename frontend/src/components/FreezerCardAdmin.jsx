@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {updateFreezerWithUsers, deleteFreezer,} from "../services/api";
-import { sanitizeByField } from "../services/utils";
+import { sanitizeByField, formatPhoneSE } from "../services/utils";
 import {fetchUsers} from "../services/api";
 import { sendEmail } from "../services/api";
 import "../assets/styles.css";
@@ -295,8 +295,8 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                                 </div>
                                 <p className="mb-0 ms-2">{user.email}</p>
                                 <p className="mb-1 ms-2">
-                                    <a href={`tel:${user.phone_number}`} style={{ textDecoration: 'none', color: '#000' }}>
-                                        <i className="bi bi-telephone me-1"></i>{user.phone_number}
+                                    <a href={`tel:${formatPhoneSE(user.phone_number)}`} style={{ textDecoration: 'none', color: '#000' }}>
+                                        <i className="bi bi-telephone me-1"></i>{formatPhoneSE(user.phone_number)}
                                     </a>
                                 </p>
 
@@ -357,9 +357,10 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                                         try {
                                             await deleteFreezer(freezer.id);
                                             onFreezerDeleted?.(freezer.id);
+                                            onMessage?.(`🗑️ Freezer ${freezer.number} deleted successfully.`);
                                         } catch (err) {
                                             console.error("❌ Failed to delete freezer:", err);
-                                            onFreezerUpdated?.(null, "❌ Failed to delete freezer.");
+                                            onMessage?.(`❌ Failed to delete freezer: ${err.message}`);
                                         }
                                     }}
                                 >

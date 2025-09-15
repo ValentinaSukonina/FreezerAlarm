@@ -136,7 +136,7 @@ const LoginContent = () => {
                 {message && (
                     <div
                         role="alert"
-                        className="my-3 my-sm-4 p-1 p-sm-3 text-center"
+                        className="my-2 my-sm-4 p-1 p-sm-3 text-center"
                          style={{
                              backgroundColor: isAuthorized ? "#D4EDDA" : "#F8D7DA",
                              color: isAuthorized ? "#155724" : "#721C24",
@@ -148,7 +148,7 @@ const LoginContent = () => {
 
                 {/* Google Login Button (shown only if authorized) */}
                 {isAuthorized && (
-                    <div className="text-center mt-4">
+                    <div className="text-center my-1">
                         <button
                             onClick={handleLogin}
                             data-testid="google-login-btn"

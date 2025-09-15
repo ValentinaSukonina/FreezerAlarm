@@ -74,3 +74,8 @@ export const sanitizeByField = (field, raw, { live = false } = {}) => {
             return live ? v : v.trim();
     }
 };
+
+export const formatPhoneSE = (e164) => {
+    const m = /^\+46(\d{2})(\d{3})(\d{2})(\d{2})$/.exec(e164 || "");
+    return m ? `+46 ${m[1]}-${m[2]} ${m[3]} ${m[4]}` : (e164 || "");
+};
