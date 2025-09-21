@@ -35,21 +35,20 @@ export const createUser = async (userData) => {
         console.log("User created successfully:", response.data);
         return response.data;
     } catch (err) {
-        // Log for debugging
         console.error("Error creating user:", err.response?.data || err.message);
-        throw err; // Pass the error to the component
+        throw normErr(err, "Failed to create user");
     }
 };
 
 // Update an existing user
-export const updateUser = async (id, updatedData) => {
+export const updateUser = async (id, userData) => {
     try {
-        const response = await API.put(`/users/${id}`, updatedData);
+        const response = await API.put(`/users/${id}`, userData);
         console.log("User updated successfully:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error updating user:", error.response ? error.response.data : error.message);
-        throw error;  // Handle error appropriately in your frontend
+        throw normErr(err, "Failed to update user");
     }
 };
 
@@ -60,7 +59,7 @@ export const deleteUser = async (id) => {
         console.log("User deleted successfully.");
     } catch (error) {
         console.error("Error deleting user:", error.response ? error.response.data : error.message);
-        throw error;  // Handle error appropriately in your frontend
+        throw normErr(err, "Error deleting user");
     }
 };
 

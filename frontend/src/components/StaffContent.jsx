@@ -1,64 +1,45 @@
-import { useEffect, useState } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { Navigate } from "react-router-dom";
 import {
     fetchUsers,
     updateUser,
     deleteUser,
-    createUser,
     fetchFreezersByUser,
     deleteFreezerFromUser,
 } from "../services/api";
-import { Navigate } from "react-router-dom";
-import Select from "react-select";
-import { sanitizeByField, formatPhoneSE } from "../services/utils";
-import "../assets/styles.css";
 
-// helper so .map/.filter never crash if freezers is not an array
+import {
+    sanitizeByField,
+    formatPhoneSE,
+    validateUser,
+} from "../services/utils";
+import "../assets/styles.css";
+import AddUserForm from "./AddUserForm";
+
+// ---- small helpers ----
 const asArray = (v) => (Array.isArray(v) ? v : []);
 
 const StaffContent = () => {
     // -------- state --------
-    //const [message, setMessage] = useState(""); // TOP banner (Add form only)
-    const [message, setMessage] = useState({ text: "", kind: "" });
+    const [message, setMessage] = useState({ text: "", kind: "" }); // top banner (Add form only)
     const [deletingUserId, setDeletingUserId] = useState(null);
     const [users, setUsers] = useState([]);
-    const [rowMessages, setRowMessages] = useState({}); // { [userId]: { text, kind } }
+    const [rowMessages, setRowMessages] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [editingUserId, setEditingUserId] = useState(null);
     const [expandedUserId, setExpandedUserId] = useState(null);
+    const [editErrors, setEditErrors] = useState({});
+
+    // drafts/errors for inline edit rows
+    const [drafts, setDrafts] = useState({});        // { [id]: {...fields} }
 
     // Inline confirm for removing a freezer from a user
-    // shape: { userId, freezerId } | null
-    const [confirmingFreezer, setConfirmingFreezer] = useState(null);
+    const [confirmingFreezer, setConfirmingFreezer] = useState(null); // { userId, freezerId } | null
 
     const [showAddForm, setShowAddForm] = useState(false);
-    const [newUser, setNewUser] = useState({
-        firstname: "",
-        surname: "",
-        name: "",
-        email: "",
-        phone_number: "+46",
-        user_rank: "",
-        role: "",
-    });
-
-    // field-level errors for Add form
-    const [newErrors, setNewErrors] = useState({
-        firstname: "",
-        surname: "",
-        email: "",
-        phone_number: "",
-        user_rank: "",
-        role: "",
-    });
-
-    const roleOptions = [
-        { value: "user", label: "user" },
-        { value: "admin", label: "admin" },
-    ];
 
     const [role, setRole] = useState(sessionStorage.getItem("role") || "");
 
@@ -146,99 +127,34 @@ const StaffContent = () => {
     };
     const confirmDelete = (userId) => setDeletingUserId(userId);
 
-    const validateEmail = (email) => {
-        if (!email || /\s/.test(email)) return false;
-        if (email.includes("+")) return false; // your rule: no '+'
-        const at = email.indexOf("@");
-        if (at < 1) return false;
-        const dot = email.lastIndexOf(".");
-        if (dot < at + 2 || dot === email.length - 1) return false;
-        return true;
-    };
-
-    const NAME_ALLOWED_STRIP = /[^A-Za-zÀ-ÖØ-öø-ÿ' -]/g;
-    const NAME_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
-    const validateNamePart = (v) => NAME_RE.test((v || "").trim());
-
-    // Required: Sweden E.164 (+46 followed by 9 digits)
-    const validatePhone = (phone) => /^\+46\d{9}$/.test(phone);
-
-    const validateRank = (rank) => /^\d+$/.test(rank);
-    const recomputeName = (draft) =>
-        `${(draft.firstname || "").trim()} ${(draft.surname || "").trim()}`.trim();
-    const validateNewUser = (draft) => {
-        const errs = {
-            firstname: "",
-            surname: "",
-            email: "",
-            phone_number: "",
-            user_rank: "",
-            role: "",
-        };
-        if (!draft.firstname?.trim()) errs.firstname = "Firstname is required.";
-        else if (!validateNamePart(draft.firstname)) errs.firstname = "Invalid firstname.";
-
-        if (!draft.surname?.trim()) errs.surname = "Surname is required.";
-        else if (!validateNamePart(draft.surname)) errs.surname = "Invalid surname.";
-
-        if (!draft.email?.trim()) errs.email = "Email is required.";
-        else if (!validateEmail(draft.email)) errs.email = "Invalid email format.";
-
-        if (!draft.role) errs.role = "Role is required.";
-
-        if (!validatePhone(draft.phone_number))
-            errs.phone_number = "Invalid phone number (must be Swedish like +46 70-123 45 67).";
-
-        if (!draft.user_rank?.trim()) errs.user_rank = "Rank is required.";
-        else if (!validateRank(draft.user_rank))
-            errs.user_rank = "Rank must contain digits only.";
-        return errs;
-    };
-
     // -------- handlers: edit inline --------
     const handleEditChange = (e, userId) => {
         const { name, value } = e.target;
-        if (name === "phone_number") return; // phone controlled by PhoneInput
-        let next;
-        try {
-            if (name === "name") {
-                next = (value ?? "").replace(NAME_ALLOWED_STRIP, "").trim();
-            } else if (name === "firstname" || name === "surname") {
-                next = (value ?? "").replace(NAME_ALLOWED_STRIP, "").trim();
-            } else {
-                next = sanitizeByField(name, value);
-            }
-        } catch {
-            next = (value ?? "").trim();
-        }
-        setUsers((prev) =>
-            prev.map((user) => (user.id === userId ? { ...user, [name]: next } : user))
-        );
+        setDrafts((prev) => ({
+            ...prev,
+            [userId]: {
+                ...(prev[userId] || {}),
+                [name]: sanitizeByField(name, value, { live: true }),
+            },
+        }));
+        // clear that field's error as user types
+        setEditErrors((prev) => ({
+            ...prev,
+            [userId]: { ...(prev[userId] || {}), [name]: "" },
+        }));
     };
 
-    // store "+digits" (or "" while clearing). Country is locked to SE, so dial code stays +46.
-    const handleEditPhoneChange = (userId) => (val /* digits only string */, country) => {
+    const handleEditPhoneChange = (userId) => (val) => {
         const digits = (val || "").replace(/\D/g, "");
         const e164 = digits ? `+${digits}` : "";
-        setUsers((prev) =>
-            prev.map((u) => (u.id === userId ? { ...u, phone_number: e164 } : u))
-        );
-    };
-
-    const handleFreezerChange = (e, userId, index) => {
-        const { value } = e.target;
-        setUsers((prevUsers) =>
-            prevUsers.map((user) =>
-                user.id === userId
-                    ? {
-                        ...user,
-                        freezers: asArray(user.freezers).map((f, i) =>
-                            i === index ? { ...f, number: value } : f
-                        ),
-                    }
-                    : user
-            )
-        );
+        setDrafts((prev) => ({
+            ...prev,
+            [userId]: { ...(prev[userId] || {}), phone_number: e164 },
+        }));
+        setEditErrors((prev) => ({
+            ...prev,
+            [userId]: { ...(prev[userId] || {}), phone_number: "" },
+        }));
     };
 
     // ask/cancel confirmation for removing a freezer (inline)
@@ -282,205 +198,66 @@ const StaffContent = () => {
     };
 
     const handleSave = async (userId) => {
-        const userToUpdate = users.find((u) => u.id === userId);
-        // quick guards
-        if (!userToUpdate?.name?.trim()) {
-            showRowMsg(userId, "❌ Name is required.", "error");
-            return;
-        }
-        if (!NAME_RE.test(userToUpdate.name)) {
-            showRowMsg(userId, "❌ Name can only include letters, spaces, hyphens, and apostrophes.", "error");
-            return;
-        }
-        if (!userToUpdate?.email?.trim()) {
-            showRowMsg(userId, "❌ Email is required.", "error");
-            return;
-        }
-        const emailOk =
-            userToUpdate.email &&
-            !/\s/.test(userToUpdate.email) &&
-            !userToUpdate.email.includes("+") &&
-            userToUpdate.email.includes("@") &&
-            /\.[A-Za-z]{2,}$/.test(userToUpdate.email);
-        if (!emailOk) {
-            showRowMsg(userId, "❌ Invalid email format.", "error");
-            return;
-        }
-        if (!validatePhone(userToUpdate.phone_number)) {
-            showRowMsg(userId, "❌ Phone must start with +46 and have 9 digits after", "error");
-            return;
-        }
-        if (!userToUpdate.user_rank || !/^\d+$/.test(userToUpdate.user_rank)) {
-            showRowMsg(userId, "❌ Rank is required and must be digits.", "error");
-            return;
-        }
+        const original = users.find((u) => u.id === userId);
+        const draft = drafts[userId] || {};
+        const candidate = { ...original, ...draft };
 
-        const allowedFields = {
-            name: userToUpdate.name,
-            email: userToUpdate.email,
-            phone_number: userToUpdate.phone_number,
-            user_rank: userToUpdate.user_rank,
-            role: userToUpdate.role,
-            freezers: asArray(userToUpdate.freezers).map((f) => f.id),
-        };
-
-        try {
-            await updateUser(userId, allowedFields);
-            setEditingUserId(null);
-            showRowMsg(userId, "✅ User updated successfully!", "success");
-        } catch (err) {
-            const serverMsg =
-                err?.response?.data ||
-                err?.message ||
-                "Review the form input. Some fields are not valid.";
-            showRowMsg(userId, `❌ ${serverMsg}`, "error");
-        }
-    };
-
-    // -------- handlers: add form --------
-    const handleNewChange = (e) => {
-        const { name, value } = e.target;
-        // Phone is handled by PhoneInput
-        if (name === "phone_number") return;
-        let sanitized;
-        try {
-            // block invalid characters before printing
-            if (name === "firstname" || name === "surname") {
-                sanitized = (value ?? "").replace(NAME_ALLOWED_STRIP, "");
-            } else {
-                sanitized = sanitizeByField(name, value);
-            }
-        } catch {
-            sanitized = (value ?? "").trim();
-        }
-        setNewUser((prev) => {
-            const updated = { ...prev, [name]: sanitized };
-            if (name === "firstname" || name === "surname") {
-                updated.name = recomputeName(updated);
-            }
-            // per-field errors
-            setNewErrors((prevErrs) => {
-                const next = { ...prevErrs };
-                if (name === "firstname") {
-                    next.firstname = updated.firstname?.trim()
-                        ? ""
-                        : "Firstname is required.";
-                } else if (name === "surname") {
-                    next.surname = updated.surname?.trim()
-                        ? ""
-                        : "Surname is required.";
-                } else if (name === "email") {
-                    next.email = !updated.email
-                        ? "Email is required."
-                        : validateEmail(updated.email)
-                            ? ""
-                            : "Invalid email format.";
-                } else if (name === "user_rank") {
-                    next.user_rank = updated.user_rank
-                        ? (validateRank(updated.user_rank) ? "" : "Digits only.")
-                        : "Rank is required.";
-                }
-                return next;
-            });
-            return updated;
+        // run unified validator
+        const { cleaned, errors, valid } = validateUser(candidate, {
+            mode: "edit",
+            original,
         });
-    };
-
-    // IMPORTANT (Add form): allow clearing; only add "+" when digits exist
-    const handlePhoneChange = (val) => {
-        const digits = (val || "").replace(/\D/g, "");
-        const e164 = digits ? `+${digits}` : "";
-        setNewUser((prev) => {
-            const updated = { ...prev, phone_number: e164 };
-            setNewErrors((prevErrs) => ({
-                ...prevErrs,
-                phone_number: validatePhone(updated.phone_number)
-                    ? ""
-                    : "Phone must start with +46 and have 9 digits after",
-            }));
-            return updated;
-        });
-    };
-
-    const handleRoleChange = (selectedOption) => {
-        const roleValue = selectedOption?.value || "";
-        setNewUser((prev) => {
-            const updated = { ...prev, role: roleValue };
-            setNewErrors((prevErrs) => ({
-                ...prevErrs,
-                role: updated.role ? "" : "Role is required.",
-            }));
-            return updated;
-        });
-    };
-
-    const handleAddUser = async () => {
-        // final validation
-        const draft = { ...newUser, name: recomputeName(newUser) };
-        const errs = validateNewUser(draft);
-        setNewErrors(errs);
-        if (Object.values(errs).some(Boolean)) return;
+        if (!valid) {
+            setEditErrors((prev) => ({ ...prev, [userId]: errors }));
+            //showRowMsg(userId, "❌ Please fix highlighted fields.", "error");
+            return;
+        }
 
         const payload = {
-            firstname: draft.firstname,
-            surname: draft.surname,
-            name: draft.name,
-            email: draft.email,
-            phone_number: draft.phone_number,
-            user_rank: draft.user_rank,
-            role: draft.role,
+            name: cleaned.name,
+            email: cleaned.email,
+            phone_number: cleaned.phone_number,
+            user_rank: cleaned.user_rank,
+            role: cleaned.role,
+            freezers: Array.isArray(original.freezers)
+                ? original.freezers.map((f) => f.id)
+                : [],
         };
 
         try {
-            const created = await createUser(payload);
-            let freezers = await fetchFreezersByUser(created.id);
-            freezers = asArray(freezers);
-            setUsers((prev) => [...prev, { ...created, freezers }]);
-
-            setNewUser({
-                firstname: "",
-                surname: "",
-                name: "",
-                email: "",
-                phone_number: "+46",
-                user_rank: "",
-                role: "",
+            const updated = await updateUser(userId, payload);
+            // commit to users
+            setUsers((prev) =>
+                prev.map((u) => (u.id === userId ? { ...u, ...updated } : u))
+            );
+            // clear edit mode/drafts/errors
+            setEditingUserId(null);
+            setDrafts((prev) => {
+                const n = { ...prev };
+                delete n[userId];
+                return n;
             });
-            setNewErrors({
-                firstname: "",
-                surname: "",
-                email: "",
-                phone_number: "",
-                user_rank: "",
-                role: "",
+            setEditErrors((prev) => {
+                const n = { ...prev };
+                delete n[userId];
+                return n;
             });
-            setShowAddForm(false);
-            setMessage({ text: "✅ New user created successfully!", kind: "success" });
+            showRowMsg(userId, "✅ User updated successfully!", "success");
         } catch (err) {
-            const data = err?.response?.data;
-            const text = typeof data === "string" ? data : JSON.stringify(data ?? "");
-
-            const hasNameDuplication =
-                /name\s*already\s*exists/i.test(text) ||
-                /user\s*already\s*exists/i.test(text) ||
-                /duplicate\s*name/i.test(text);
-
-            const hasEmailDuplication =
-                /email\s*already\s*exists/i.test(text) ||
-                /duplicate\s*email/i.test(text);
-
+            const text = err?.data || err?.message || "";
             const fieldErrs = {};
-            if (hasNameDuplication) {
-                fieldErrs.surname = "A user with this first and last name already exists.";
+            if (/name\s*already\s*exists|duplicate\s*name|user\s*already\s*exists/i.test(text)) {
+                fieldErrs.name = "This full name is already taken.";
             }
-            if (hasEmailDuplication) {
+            if (/email\s*already\s*exists|duplicate\s*email/i.test(text)) {
                 fieldErrs.email = "This email is already in use.";
             }
-
-            if (Object.keys(fieldErrs).length > 0) {
-                setNewErrors(prev => ({ ...prev, ...fieldErrs }));
-            } else {
-                setMessage({ text: "❌ Failed to create user.", kind: "error" });
+            setEditErrors((prev) => ({
+                ...prev,
+                [userId]: { ...(prev[userId] || {}), ...fieldErrs },
+            }));
+            if (!Object.keys(fieldErrs).length) {
+                showRowMsg(userId, `❌ ${err?.message || "Update failed."}`, "error");
             }
         }
     };
@@ -490,11 +267,16 @@ const StaffContent = () => {
     // -------- render --------
     return (
         <main className="container py-4">
-            <h2 className="text-center  mb-2 mb-sm-4">Registered Personnel</h2>
+            <h2 className="text-center mb-2 mb-sm-4">Registered Personnel</h2>
 
             {/* TOP banner — used by Add form only */}
             {message.text && (
-                <div className={`alert ${message.kind === "success" ? "alert-success" : "alert-error"}`} role="alert">
+                <div
+                    className={`alert ${
+                        message.kind === "success" ? "alert-success" : "alert-error"
+                    }`}
+                    role="alert"
+                >
                     {message.text}
                 </div>
             )}
@@ -510,128 +292,18 @@ const StaffContent = () => {
             </div>
 
             {showAddForm && (
-                <div
-                    className="border p-3 rounded mb-4"
-                    style={{ backgroundColor: "#f8fff0", maxWidth: "500px", margin: "0 auto" }}
-                >
-                    <h5 className="mb-3">Add New User</h5>
-                    <div className="d-flex flex-column gap-2">
-                        <input
-                            name="firstname"
-                            className={`form-control ${newErrors.firstname ? "is-invalid" : ""}`}
-                            placeholder="Firstname"
-                            value={newUser.firstname}
-                            onChange={handleNewChange}
-                        />
-                        {newErrors.firstname && (
-                            <div className="text-danger small">{newErrors.firstname}</div>
-                        )}
-                        <input
-                            name="surname"
-                            className={`form-control ${newErrors.surname ? "is-invalid" : ""}`}
-                            placeholder="Surname"
-                            value={newUser.surname}
-                            onChange={handleNewChange}
-                        />
-                        {newErrors.surname && (
-                            <div className="text-danger small">{newErrors.surname}</div>
-                        )}
-
-                        <input
-                            name="email"
-                            type="email"
-                            inputMode="email"
-                            autoComplete="email"
-                            className={`form-control ${newErrors.email ? "is-invalid" : ""}`}
-                            placeholder="Email"
-                            value={newUser.email}
-                            onChange={handleNewChange}
-                        />
-                        {newErrors.email && (
-                            <div className="text-danger small">{newErrors.email}</div>
-                        )}
-
-                        <PhoneInput
-                            country="se"
-                            onlyCountries={["se"]}
-                            disableDropdown
-                            countryCodeEditable={false}
-                            masks={{ se: "..-... .. .." }}             // 2-3 2 2 groups
-                            placeholder="+46 XX-XXX XX XX"
-                            value={newUser.phone_number || ""}
-                            onChange={(val) => handlePhoneChange(val)}
-                            inputClass={`form-control ${newErrors.phone_number ? "is-invalid" : ""}`}
-                            containerClass="w-100"
-                        />
-                        {newErrors.phone_number && (
-                            <div className="text-danger small">{newErrors.phone_number}</div>
-                        )}
-
-                        <select
-                            name="user_rank"
-                            className={`form-control ${newErrors.user_rank ? "is-invalid" : ""}`}
-                            value={newUser.user_rank}
-                            onChange={handleNewChange}
-                        >
-                            <option value="">Choose rank…</option>
-                            {[...Array(10)].map((_, i) => {
-                                const v = String(i + 1);
-                                return <option key={v} value={v}>{v}</option>;
-                            })}
-                        </select>
-                        {newErrors.user_rank && (
-                            <div className="text-danger small">{newErrors.user_rank}</div>
-                        )}
-
-                        <Select
-                            className="role-type-select"
-                            classNamePrefix="ft"
-                            options={roleOptions}
-                            placeholder="Select role"
-                            value={roleOptions.find((opt) => opt.value === newUser.role) || null}
-                            onChange={handleRoleChange}
-                            isSearchable={false}
-                        />
-                        {newErrors.role && (
-                            <div className="text-danger small">{newErrors.role}</div>
-                        )}
-                    </div>
-
-                    <div className="d-flex justify-content-start gap-3 mt-3">
-                        <button
-                            className="btn"
-                            style={{ backgroundColor: "#5D8736", color: "white" }}
-                            onClick={handleAddUser}
-                        >
-                            Add
-                        </button>
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => {
-                                setShowAddForm(false);
-                                setNewUser({
-                                    firstname: "",
-                                    surname: "",
-                                    name: "",
-                                    email: "",
-                                    phone_number: "+46",
-                                    user_rank: "",
-                                    role: "",
-                                });
-                                setNewErrors({
-                                    firstname: "",
-                                    surname: "",
-                                    email: "",
-                                    phone_number: "",
-                                    user_rank: "",
-                                    role: "",
-                                });
-                            }}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                <AddUserForm
+                    users={users}
+                    roleOptions={[
+                        { value: "user", label: "user" },
+                        { value: "admin", label: "admin" },
+                    ]}
+                    onUserCreated={(createdWithFreezers) => {
+                        setUsers(prev => [...prev, createdWithFreezers]);
+                    }}
+                    onClose={() => setShowAddForm(false)}
+                    setTopMessage={(m) => setMessage(m)}
+                />
             )}
 
             {loading ? (
@@ -654,116 +326,134 @@ const StaffContent = () => {
                         {users.map((user) => {
                             const isEditing = editingUserId === user.id;
                             const isExpanded = expandedUserId === user.id;
-                            const phoneInvalid = isEditing && !validatePhone(user.phone_number || "");
+                            const row = isEditing ? (drafts[user.id] || user) : user;
+                            const errs = editErrors[user.id] || {};
 
                             return (
                                 <React.Fragment key={user.id}>
                                     <tr>
-                                        <td className="text-start d-flex justify-content-between align-items-center">
-                                            {isEditing ? (
+                                    <td className="text-start d-flex justify-content-between align-items-center">
+                                        {isEditing ? (
+                                            <>
                                                 <input
                                                     name="name"
-                                                    className="form-control"
-                                                    value={user.name}
+                                                    className={`form-control ${errs.name ? "is-invalid" : ""}`}
+                                                    value={row.name || ""}
                                                     onChange={(e) => handleEditChange(e, user.id)}
                                                 />
-                                            ) : (
-                                                <>
-                                                    {user.name}
-                                                    <button
-                                                        className="btn btn-sm d-md-none ms-auto"
-                                                        onClick={() => toggleExpand(user.id)}
-                                                        style={{ backgroundColor: "#A9C46C", color: "white" }}
-                                                    >
-                                                        {isExpanded ? "▲" : "▼"}
-                                                    </button>
-                                                </>
-                                            )}
-                                        </td>
+                                                {errs.name && (
+                                                    <div className="invalid-feedback">{errs.name}</div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <>
+                                                {user.name}
+                                                <button
+                                                    className="btn btn-sm d-md-none ms-auto"
+                                                    onClick={() => toggleExpand(user.id)}
+                                                    style={{ backgroundColor: "#A9C46C", color: "white" }}
+                                                >
+                                                    {isExpanded ? "▲" : "▼"}
+                                                </button>
+                                            </>
+                                        )}
+                                    </td>
+
+                                        {/* Email */}
                                         <td>
                                             {isEditing ? (
-                                                <input
-                                                    name="email"
-                                                    className="form-control"
-                                                    value={user.email}
-                                                    onChange={(e) => handleEditChange(e, user.id)}
-                                                />
+                                                <>
+                                                    <input
+                                                        name="email"
+                                                        className={`form-control ${errs.email ? "is-invalid" : ""}`}
+                                                        value={row.email || ""}
+                                                        onChange={(e) => handleEditChange(e, user.id)}
+                                                    />
+                                                    {errs.email && (
+                                                        <div className="invalid-feedback">{errs.email}</div>
+                                                    )}
+                                                </>
                                             ) : (
                                                 user.email
                                             )}
                                         </td>
 
+                                        {/* Phone */}
                                         <td className="d-none d-md-table-cell">
                                             {isEditing ? (
-                                                <PhoneInput
-                                                    country="se"
-                                                    onlyCountries={["se"]}
-                                                    disableDropdown
-                                                    countryCodeEditable={false}
-                                                    masks={{ se: "..-... .. .." }}
-                                                    placeholder="+46 XX-XXX XX XX"
-                                                    value={user.phone_number || ""}
-                                                    onChange={handleEditPhoneChange(user.id)}
-                                                    inputClass={`form-control ${phoneInvalid ? "is-invalid" : ""}`}
-                                                    containerClass="w-100"
-                                                />
+                                                <>
+                                                    <PhoneInput
+                                                        country="se"
+                                                        onlyCountries={["se"]}
+                                                        disableDropdown
+                                                        countryCodeEditable={false}
+                                                        masks={{ se: "..-... .. .." }}
+                                                        placeholder="+46 XX-XXX XX XX"
+                                                        value={row.phone_number || ""}
+                                                        onChange={handleEditPhoneChange(user.id)}
+                                                        inputClass={`form-control ${
+                                                            errs.phone_number ? "is-invalid" : ""
+                                                        }`}
+                                                        containerClass="w-100"
+                                                    />
+                                                    {errs.phone_number && (
+                                                        <div className="invalid-feedback d-block">
+                                                            {errs.phone_number}
+                                                        </div>
+                                                    )}
+                                                </>
                                             ) : (
                                                 formatPhoneSE(user.phone_number)
                                             )}
                                         </td>
 
+                                        {/* Rank */}
                                         <td className="d-none d-lg-table-cell">
                                             {isEditing ? (
-                                                <select
-                                                    name="user_rank"
-                                                    className="form-control"
-                                                    value={user.user_rank || ""}
-                                                    onChange={(e) => handleEditChange(e, user.id)}
-                                                >
-                                                    <option value="">Choose rank…</option>
-                                                    {[...Array(10)].map((_, i) => {
-                                                        const v = String(i + 1);
-                                                        return (
-                                                            <option key={v} value={v}>
-                                                                {v}
-                                                            </option>
-                                                        );
-                                                    })}
-                                                </select>
+                                                <>
+                                                    <input
+                                                        name="user_rank"
+                                                        className={`form-control ${
+                                                            errs.user_rank ? "is-invalid" : ""
+                                                        }`}
+                                                        value={row.user_rank || ""}
+                                                        onChange={(e) => handleEditChange(e, user.id)}
+                                                    />
+                                                    {errs.user_rank && (
+                                                        <div className="invalid-feedback">
+                                                            {errs.user_rank}
+                                                        </div>
+                                                    )}
+                                                </>
                                             ) : (
                                                 user.user_rank
                                             )}
                                         </td>
 
+                                        {/* Role */}
                                         <td className="d-none d-lg-table-cell">
                                             {isEditing ? (
-                                            <select
-                                                name="role"
-                                                className="form-control"
-                                                value={user.role || ""}
-                                                onChange={(e) => {
-                                                    const roleValue = e.target.value;
-                                                    setUsers((prev) =>
-                                                        prev.map((u) =>
-                                                            u.id === user.id ? { ...u, role: roleValue } : u
-                                                        )
-                                                    );
-                                                }}
-                                            >
-                                                <option value="">Select role…</option>
-                                                {roleOptions.map(o => (
-                                                    <option key={o.value} value={o.value}>{o.label}</option>
-                                                ))}
-                                            </select>
+                                                <>
+                                                    <select
+                                                        name="role"
+                                                        className={`form-select ${errs.role ? "is-invalid" : ""}`}
+                                                        value={row.role || "user"}
+                                                        onChange={(e) => handleEditChange(e, user.id)}
+                                                    >
+                                                        <option value="user">user</option>
+                                                        <option value="admin">admin</option>
+                                                    </select>
+                                                    {errs.role && (
+                                                        <div className="invalid-feedback">{errs.role}</div>
+                                                    )}
+                                                </>
                                             ) : (
-                                            user.role
+                                                user.role
                                             )}
                                         </td>
 
-                                        <td
-                                            className="d-none d-lg-table-cell freezer-numbers"
-                                            style={{ width: "80px" }}
-                                        >
+                                        {/* Assigned Freezers */}
+                                        <td className="d-none d-lg-table-cell freezer-numbers" style={{ width: "80px" }}>
                                             {isEditing ? (
                                                 <div className="d-flex flex-column">
                                                     {asArray(user.freezers).map((freezer) => {
@@ -773,14 +463,8 @@ const StaffContent = () => {
                                                             confirmingFreezer.freezerId === freezer.id;
 
                                                         return (
-                                                            <div
-                                                                key={freezer.id}
-                                                                className="d-flex align-items-center mb-2"
-                                                            >
-                                  <span
-                                      className="form-control me-2"
-                                      style={{ width: "80px" }}
-                                  >
+                                                            <div key={freezer.id} className="d-flex align-items-center mb-2">
+                                  <span className="form-control me-2" style={{ width: "80px" }}>
                                     {freezer.number}
                                   </span>
                                                                 {isAsking ? (
@@ -806,9 +490,7 @@ const StaffContent = () => {
                                                                 ) : (
                                                                     <button
                                                                         className="btn btn-danger btn-sm"
-                                                                        onClick={() =>
-                                                                            askRemoveFreezer(user.id, freezer.id)
-                                                                        }
+                                                                        onClick={() => askRemoveFreezer(user.id, freezer.id)}
                                                                         title="Remove this freezer from the user"
                                                                     >
                                                                         X
@@ -825,6 +507,7 @@ const StaffContent = () => {
                                             )}
                                         </td>
 
+                                        {/* Actions */}
                                         <td className="d-none d-md-table-cell">
                                             <div className="d-flex justify-content-center gap-2">
                                                 {isEditing ? (
@@ -838,7 +521,19 @@ const StaffContent = () => {
                                                         </button>
                                                         <button
                                                             className="btn btn-sm btn-secondary"
-                                                            onClick={() => setEditingUserId(null)}
+                                                            onClick={() => {
+                                                                setEditingUserId(null);
+                                                                setDrafts((prev) => {
+                                                                    const next = { ...prev };
+                                                                    delete next[user.id];
+                                                                    return next;
+                                                                });
+                                                                setEditErrors((prev) => {
+                                                                    const next = { ...prev };
+                                                                    delete next[user.id];
+                                                                    return next;
+                                                                });
+                                                            }}
                                                         >
                                                             Cancel
                                                         </button>
@@ -848,7 +543,11 @@ const StaffContent = () => {
                                                         <button
                                                             className="btn btn-sm"
                                                             style={{ backgroundColor: "#5D8736", color: "white" }}
-                                                            onClick={() => setEditingUserId(user.id)}
+                                                            onClick={() => {
+                                                                setDrafts((prev) => ({ ...prev, [user.id]: { ...user } }));
+                                                                setEditErrors((prev) => ({ ...prev, [user.id]: {} }));
+                                                                setEditingUserId(user.id);
+                                                            }}
                                                         >
                                                             Edit
                                                         </button>
