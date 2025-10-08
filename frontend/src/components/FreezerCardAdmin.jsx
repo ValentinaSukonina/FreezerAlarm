@@ -295,8 +295,13 @@ const FreezerCardAdmin = ({freezer, onFreezerUpdated, onFreezerDeleted, onMessag
                                 </div>
                                 <p className="mb-0 ms-2">{user.email}</p>
                                 <p className="mb-1 ms-2">
-                                    <a href={`tel:${formatPhoneSE(user.phone_number)}`} style={{ textDecoration: 'none', color: '#000' }}>
-                                        <i className="bi bi-telephone me-1"></i>{formatPhoneSE(user.phone_number)}
+                                    <a
+                                        href={`tel:${user.phone_number}`}
+                                        className="phone-link"
+                                        title={`Call ${user.name}`}
+                                    >
+                                        <i className="bi bi-telephone me-1"></i>
+                                        {formatPhoneSE(user.phone_number)}
                                     </a>
                                 </p>
 

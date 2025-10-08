@@ -264,7 +264,7 @@ export const validateUser = (input, { mode = "create", original = null } = {}) =
 
     // phone: Sweden E.164 (+46 + 9 digits)
     if (!/^\+46\d{9}$/.test(cleaned.phone_number || "")) {
-        errors.phone_number = "Phone must start with +46 and have 9 digits after.";
+        errors.phone_number = "Enter as +46 00-000 00 00";
     }
 
     // rank

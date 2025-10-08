@@ -8,9 +8,11 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.service.FreezerService;
 import com.example.backend.service.FreezerUserService;
 import com.example.backend.service.UserService;
+import com.example.backend.exception.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -114,7 +116,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
         if (!userRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -122,9 +124,27 @@ public class UserController {
         try {
             User updatedUser = userService.updateUser(id, user);
             return ResponseEntity.ok(userMapper.toUserDTO(updatedUser));
+
+        } catch (Exceptions.UserAlreadyExistsException e) {
+            // ✅ Catch custom exception and send a friendly 409 response
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of(
+                            "error", "duplicate",
+                            "message", e.getMessage()
+                    ));
+
+        } catch (DataIntegrityViolationException e) {
+            // (Optional fallback, in case DB-level constraint fails)
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of(
+                            "error", "duplicate",
+                            "message", "Name or email already exists."
+                    ));
+
         } catch (Exception e) {
             logger.error("Failed to update user with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "unknown", "message", e.getMessage()));
         }
     }
 
@@ -141,10 +161,3 @@ public class UserController {
         }
     }
 }
-
-
-
-
-
-
-

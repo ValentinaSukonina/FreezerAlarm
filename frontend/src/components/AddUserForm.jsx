@@ -164,7 +164,6 @@ const AddUserForm = ({
             let freezers = await fetchFreezersByUser(created.id);
             freezers = Array.isArray(freezers) ? freezers : [];
 
-            // bubble up
             onUserCreated?.({ ...created, freezers });
 
             resetForm();

@@ -9,6 +9,7 @@ import com.example.backend.repository.FreezerUserRepository;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,16 +65,41 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public User updateUser(Long id, User user) {
-        return userRepository.findById(id).map(dbUser -> {
-            dbUser.setName(user.getName());
-            dbUser.setEmail(user.getEmail());
-            dbUser.setPhoneNumber(user.getPhoneNumber());
-            dbUser.setUser_rank(user.getUser_rank());
-            dbUser.setRole(user.getRole());
-            return userRepository.save(dbUser);
+    @Transactional
+    public User updateUser(Long id, User updatedUser) {
+        User dbUser = userRepository.findById(id)
+                .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User with id " + id + " not found"));
 
-        }).orElseThrow(() -> new Exceptions.ResourceNotFoundException("User with id " + id + " not found"));
+        final String newName = updatedUser.getName();
+        final String newEmail = updatedUser.getEmail();
+
+        // Check duplicate name (case-sensitive)
+        userRepository.findByName(newName).ifPresent(existing -> {
+            if (!existing.getId().equals(id)) {
+                throw new Exceptions.UserAlreadyExistsException("Name already exists in the system.");
+            }
+        });
+
+        // Check duplicate email (case-insensitive)
+        userRepository.findByEmail(newEmail).ifPresent(existing -> {
+            if (!existing.getId().equals(id)) {
+                throw new Exceptions.UserAlreadyExistsException("Email already exists in the system.");
+            }
+        });
+
+        // Update the record safely
+        dbUser.setName(newName);
+        dbUser.setEmail(newEmail);
+        dbUser.setPhoneNumber(updatedUser.getPhoneNumber());
+        dbUser.setUser_rank(updatedUser.getUser_rank());
+        dbUser.setRole(updatedUser.getRole());
+
+        try {
+            return userRepository.save(dbUser);
+        } catch (DataIntegrityViolationException ex) {
+            // DB-level fallback (e.g., unique constraint still triggered)
+            throw new Exceptions.UserAlreadyExistsException("Duplicate name or email detected.");
+        }
     }
 
     @Cacheable("allUsers")
@@ -102,4 +128,7 @@ public class UserService {
         return userRepository.findByName(name);
     }
 
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }

@@ -24,7 +24,7 @@ export const fetchUsers = async () => {
         return response.data;
     } catch (error) {
         console.error("Error fetching users:", error.response ? error.response.data : error.message);
-        throw normErr(err, "Failed to fetch users");
+        throw normErr(error, "Failed to fetch users");
     }
 };
 
@@ -34,9 +34,9 @@ export const createUser = async (userData) => {
         const response = await API.post('/users', userData);
         console.log("User created successfully:", response.data);
         return response.data;
-    } catch (err) {
-        console.error("Error creating user:", err.response?.data || err.message);
-        throw normErr(err, "Failed to create user");
+    } catch (error) {
+        console.error("Error creating user:", error.response?.data || error.message);
+        throw normErr(error, "Failed to create user");
     }
 };
 
@@ -48,7 +48,7 @@ export const updateUser = async (id, userData) => {
         return response.data;
     } catch (error) {
         console.error("Error updating user:", error.response ? error.response.data : error.message);
-        throw normErr(err, "Failed to update user");
+        throw normErr(error, "Failed to update user");
     }
 };
 

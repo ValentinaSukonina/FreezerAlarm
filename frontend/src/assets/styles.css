@@ -9,6 +9,10 @@ main {
     padding-top: 40px; /* or whatever your header height is */
 }
 
+body {
+    overflow-x: hidden; /* prevent horizontal scroll on small screens */
+}
+
 .content-wrapper {
     padding-top: 10px; /* Adjust based on your header height */
     margin-top: inherit;
@@ -119,14 +123,14 @@ main {
     padding: 10px 20px;
     background-color: white;
     color: #555;
-    border: 1px solid #ddd;
+    border: 1px solid #837b7b;
     border-radius: 7px;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-top: 5px;
+    margin-top: 1px;
 }
 
 .google-btn:hover {
@@ -240,6 +244,18 @@ main {
     flex-grow: 1;
 }
 
+.phone-link {
+    text-decoration: none;
+    color: #000;
+    transition: color 0.2s ease-in-out;
+}
+
+.phone-link:hover {
+    color: #5D8736;
+    font-weight: bold;
+
+}
+
 .confirm-delete-section {
     margin-top: 0px;
     margin-bottom: 0px;
@@ -312,6 +328,27 @@ main {
 .alert-error {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+.phone-input-container {
+    width: 100% !important;   /* shrink to parent width */
+    max-width: 180px;         /* match container */
+}
+
+.phone-input-container input {
+    width: 100% !important;   /* force input to fill container */
+    max-width: 180px;         /* no overflow */
+}
+
+.mark-to-remove-btn {
+    background-color: white;
+    color: #AD1212FF;
+    border: 1px solid #AD1212FF;
+    font-weight: bold;
+    padding: 5px 7px;
+    line-height: 1;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
 }
 
 @media (max-width: 375px) {
