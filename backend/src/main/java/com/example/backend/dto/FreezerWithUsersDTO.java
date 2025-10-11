@@ -5,7 +5,7 @@ import java.util.List;
 public record FreezerWithUsersDTO(
         Long id,
         String file,
-        String number,
+        Integer number,
         String address,
         String room,
         String type,

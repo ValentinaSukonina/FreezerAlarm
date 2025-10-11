@@ -47,7 +47,7 @@ public class FreezerService {
     }
 
     // Get Freezer WITHOUT users
-    public FreezerDTO findByNumber(String number) {
+    public FreezerDTO findByNumber(Integer number) {
         Freezer freezer = freezerRepository.findByNumber(number)
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException(
                         "Freezer with number " + number + " not found"));
@@ -56,7 +56,7 @@ public class FreezerService {
     }
 
     // Get Freezer WITH users
-    public FreezerWithUsersDTO findByNumberWithUsers(String number) {
+    public FreezerWithUsersDTO findByNumberWithUsers(Integer number) {
         Freezer freezer = freezerRepository.findByNumberWithUsers(number);
 
         if (freezer == null) {
@@ -80,7 +80,7 @@ public class FreezerService {
                 .toList();
     }
 
-    public FreezerDTO updateFreezerDetailsByNumber(String number, Freezer freezer) {
+    public FreezerDTO updateFreezerDetailsByNumber(Integer number, Freezer freezer) {
         int updatedRows = freezerRepository.updateFreezerDetailsByNumber(
                 freezer.getFile(), freezer.getAddress(), freezer.getRoom(), freezer.getType(), number
         );
@@ -94,7 +94,7 @@ public class FreezerService {
         );
     }
 
-    public void deleteFreezerByNumber(String number) {
+    public void deleteFreezerByNumber(Integer number) {
         int deletedRows = freezerRepository.deleteByNumber(number);
         if (deletedRows == 0) {
             throw new Exceptions.ResourceNotFoundException("Freezer with number " + number + " not found.");
@@ -133,7 +133,7 @@ public class FreezerService {
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer not found with ID: " + freezerId));
 
         // Update basic fields using data from the DTO
-        freezer.setNumber(dto.number());
+        freezer.setNumber(Integer.valueOf(dto.number()));
         freezer.setRoom(dto.room());
         freezer.setAddress(dto.address());
         freezer.setType(dto.type());

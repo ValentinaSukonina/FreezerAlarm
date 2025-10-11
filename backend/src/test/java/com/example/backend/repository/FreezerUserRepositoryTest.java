@@ -19,10 +19,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-
-
-
-
 @DataJpaTest
 @Transactional
 @Rollback
@@ -55,7 +51,7 @@ public class FreezerUserRepositoryTest {
 
         freezer = new Freezer();
         freezer.setFile("file.png");
-        freezer.setNumber("1111");
+        freezer.setNumber(1111);
         freezer.setAddress("Cold St");
         freezer.setRoom("A1");
         freezer.setType("-80");
@@ -70,7 +66,7 @@ public class FreezerUserRepositoryTest {
     @Test
     @DisplayName("Should find users by freezer number")
     void shouldFindUsersByFreezerNumber() {
-        List<User> users = freezerUserRepository.findUsersByFreezerNumber("1111");
+        List<User> users = freezerUserRepository.findUsersByFreezerNumber(1111);
         assertThat(users).hasSize(1);
         assertThat(users.get(0).getEmail()).isEqualTo("alice@example.com");
     }

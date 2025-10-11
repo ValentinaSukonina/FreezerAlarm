@@ -2,7 +2,6 @@ package com.example.backend.service;
 
 import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.UserDTO;
-import com.example.backend.dto.FreezerUserDTO;
 import com.example.backend.entity.Freezer;
 import com.example.backend.entity.User;
 import com.example.backend.entity.FreezerUser;
@@ -101,7 +100,7 @@ public class FreezerUserService {
         return freezerUserRepository.save(freezerUser);
     }
 
-    public List<UserDTO> getUsersByFreezerNumber(String freezerNumber) {
+    public List<UserDTO> getUsersByFreezerNumber(Integer freezerNumber) {
         Freezer freezer = freezerRepository.findByNumber(freezerNumber)
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer with number " + freezerNumber + " does not exist."));
         List<User> users = freezerUserRepository.findUsersByFreezerNumber(freezerNumber);

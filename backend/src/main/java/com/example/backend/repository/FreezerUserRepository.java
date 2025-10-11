@@ -26,7 +26,7 @@ public interface FreezerUserRepository extends ListCrudRepository<FreezerUser, L
     int deleteByFreezerAndUser(@Param("freezer") Freezer freezer, @Param("user") User user);
 
     @Query("SELECT u FROM FreezerUser fu JOIN fu.user u JOIN fu.freezer f WHERE f.number = :freezerNumber")
-    List<User> findUsersByFreezerNumber(@Param("freezerNumber") String freezerNumber);
+    List<User> findUsersByFreezerNumber(@Param("freezerNumber") Integer freezerNumber);
 
     @Transactional
     @Modifying

@@ -53,23 +53,23 @@ class FreezerServiceTest {
     @DisplayName("Should create a new freezer")
     void createFreezer_success() {
         Freezer freezer = new Freezer();
-        freezer.setNumber("1111");
+        freezer.setNumber(1111);
 
-        when(freezerRepository.findByNumber("1111")).thenReturn(Optional.empty());
+        when(freezerRepository.findByNumber(1111)).thenReturn(Optional.empty());
         when(freezerRepository.save(freezer)).thenReturn(freezer);
 
         Freezer saved = freezerService.createFreezer(freezer);
 
-        assertEquals("1111", saved.getNumber());
+        assertEquals(1111, saved.getNumber());
     }
 
     @Test
     @DisplayName("Should throw exception when freezer exists")
     void createFreezer_duplicate() {
         Freezer freezer = new Freezer();
-        freezer.setNumber("1111");
+        freezer.setNumber(1111);
 
-        when(freezerRepository.findByNumber("1111")).thenReturn(Optional.of(freezer));
+        when(freezerRepository.findByNumber(1111)).thenReturn(Optional.of(freezer));
 
         assertThrows(Exceptions.FreezerAlreadyExistsException.class, () -> freezerService.createFreezer(freezer));
     }
@@ -78,24 +78,24 @@ class FreezerServiceTest {
     @DisplayName("Should find freezer by number with users")
     void findByNumberWithUsers_success() {
         Freezer freezer = new Freezer();
-        freezer.setNumber("1111");
+        freezer.setNumber(1111);
 
-        when(freezerRepository.findByNumberWithUsers("1111")).thenReturn(freezer);
+        when(freezerRepository.findByNumberWithUsers(1111)).thenReturn(freezer);
         when(freezerMapper.toFreezerWithUsersDTO(freezer)).thenReturn(
-                new FreezerWithUsersDTO(1L, "", "1111", "", "", "", List.of(), List.of())
+                new FreezerWithUsersDTO(1L, "", 1111, "", "", "", List.of(), List.of())
         );
 
-        FreezerWithUsersDTO result = freezerService.findByNumberWithUsers("1111");
+        FreezerWithUsersDTO result = freezerService.findByNumberWithUsers(1111);
 
-        assertEquals("1111", result.number());
+        assertEquals(1111, result.number());
     }
 
     @Test
     @DisplayName("Should throw when freezer not found (with users)")
     void findByNumberWithUsers_notFound() {
-        when(freezerRepository.findByNumberWithUsers("999")).thenReturn(null);
+        when(freezerRepository.findByNumberWithUsers(999)).thenReturn(null);
 
-        assertThrows(Exceptions.ResourceNotFoundException.class, () -> freezerService.findByNumberWithUsers("999"));
+        assertThrows(Exceptions.ResourceNotFoundException.class, () -> freezerService.findByNumberWithUsers(999));
     }
 
     @Test
@@ -106,17 +106,17 @@ class FreezerServiceTest {
         freezer.setAddress("address");
         freezer.setRoom("room");
         freezer.setType("-80");
-        freezer.setNumber("F123");
+        freezer.setNumber(1234);
 
-        when(freezerRepository.updateFreezerDetailsByNumber(eq("file"), eq("address"), eq("room"), eq("-80"), eq("F123"))).thenReturn(1);
-        when(freezerRepository.findByNumber("F123")).thenReturn(Optional.of(freezer));
+        when(freezerRepository.updateFreezerDetailsByNumber(eq("file"), eq("address"), eq("room"), eq("-80"), eq(1234))).thenReturn(1);
+        when(freezerRepository.findByNumber(1234)).thenReturn(Optional.of(freezer));
         when(freezerMapper.toFreezerDTO(freezer)).thenReturn(
-                new FreezerDTO(1L, "file", "F123", "address", "room", "-80")
+                new FreezerDTO(1L, "file", 1234, "address", "room", "-80")
         );
 
-        FreezerDTO result = freezerService.updateFreezerDetailsByNumber("F123", freezer);
+        FreezerDTO result = freezerService.updateFreezerDetailsByNumber(1234, freezer);
 
-        assertEquals("F123", result.number());
+        assertEquals(1234, result.number());
         assertEquals("address", result.address());
     }
 
@@ -124,47 +124,47 @@ class FreezerServiceTest {
     @DisplayName("Should throw if freezer not found when updating")
     void updateFreezerDetailsByNumber_notFound() {
         Freezer freezer = new Freezer();
-        freezer.setNumber("F404");
+        freezer.setNumber(1234);
 
         when(freezerRepository.updateFreezerDetailsByNumber(any(), any(), any(), any(), any()))
                 .thenReturn(0); // No rows updated
 
-        assertThrows(Exceptions.ResourceNotFoundException.class, () -> freezerService.updateFreezerDetailsByNumber("F404", freezer));
+        assertThrows(Exceptions.ResourceNotFoundException.class, () -> freezerService.updateFreezerDetailsByNumber(1234, freezer));
     }
 
     @Test
     @DisplayName("Should create freezer with users")
     void createFreezerWithUsers_success() {
         Freezer freezerEntity = new Freezer();
-        freezerEntity.setNumber("FX01");
+        freezerEntity.setNumber(1234);
 
         User user1 = new User();
         user1.setId(100L);
 
         Freezer savedFreezerWithUsers = new Freezer();
-        savedFreezerWithUsers.setNumber("FX01");
+        savedFreezerWithUsers.setNumber(1234);
 
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
-                null, "", "FX01", "", "", "", List.of(100L), List.of()
+                null, "", 1234, "", "", "", List.of(100L), List.of()
         );
 
         when(freezerMapper.fromFreezerWithUsersDTO(dto)).thenReturn(freezerEntity);
         when(freezerRepository.save(freezerEntity)).thenReturn(freezerEntity);
         when(userRepository.findById(100L)).thenReturn(Optional.of(user1));
-        when(freezerRepository.findByNumberWithUsers("FX01")).thenReturn(savedFreezerWithUsers);
+        when(freezerRepository.findByNumberWithUsers(1234)).thenReturn(savedFreezerWithUsers);
         when(freezerMapper.toFreezerWithUsersDTO(savedFreezerWithUsers))
-                .thenReturn(new FreezerWithUsersDTO(1L, "", "FX01", "", "", "", List.of(100L), List.of()));
+                .thenReturn(new FreezerWithUsersDTO(1L, "", 1234, "", "", "", List.of(100L), List.of()));
 
         FreezerWithUsersDTO result = freezerService.createFreezerWithUsers(dto);
 
-        assertEquals("FX01", result.number());
+        assertEquals(1234, result.number());
     }
 
     @Test
     @DisplayName("Should throw exception when freezer with users already exists")
     void createFreezerWithUsers_duplicate() {
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
-                null, "", "DUPLICATE", "", "", "", List.of(), List.of()
+                null, "", 1234, "", "", "", List.of(), List.of()
         );
 
         when(freezerMapper.fromFreezerWithUsersDTO(dto)).thenReturn(new Freezer());
@@ -181,11 +181,11 @@ class FreezerServiceTest {
 
         Freezer existingFreezer = new Freezer();
         existingFreezer.setId(freezerId);
-        existingFreezer.setNumber("OLD123");
+        existingFreezer.setNumber(1234);
 
         Freezer updatedFreezer = new Freezer();
         updatedFreezer.setId(freezerId);
-        updatedFreezer.setNumber("NEW123");
+        updatedFreezer.setNumber(1123);
 
         User user = new User();
         user.setId(userId);
@@ -193,7 +193,7 @@ class FreezerServiceTest {
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
                 freezerId,
                 "file1",
-                "NEW123",
+                1123,
                 "New Street",
                 "Room 1",
                 "-80",
@@ -203,12 +203,12 @@ class FreezerServiceTest {
 
         when(freezerRepository.findById(freezerId)).thenReturn(Optional.of(existingFreezer));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(freezerRepository.findByNumberWithUsers("NEW123")).thenReturn(updatedFreezer);
+        when(freezerRepository.findByNumberWithUsers(1123)).thenReturn(updatedFreezer);
         when(freezerMapper.toFreezerWithUsersDTO(updatedFreezer)).thenReturn(dto);
 
         FreezerWithUsersDTO result = freezerService.updateFreezerAndUsers(freezerId, dto);
 
-        assertEquals("NEW123", result.number());
+        assertEquals(1123, result.number());
         assertEquals("file1", result.file());
         assertEquals("Room 1", result.room());
 
@@ -224,7 +224,7 @@ class FreezerServiceTest {
         when(freezerRepository.findById(freezerId)).thenReturn(Optional.empty());
 
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
-                freezerId, "", "F123", "", "", "", List.of(1L), List.of()
+                freezerId, "", 1234, "", "", "", List.of(1L), List.of()
         );
 
         assertThrows(Exceptions.ResourceNotFoundException.class, () -> freezerService.updateFreezerAndUsers(freezerId, dto));

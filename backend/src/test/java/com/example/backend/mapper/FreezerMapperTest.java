@@ -22,7 +22,7 @@ class FreezerMapperTest {
         Freezer freezer = new Freezer();
         freezer.setId(1L);
         freezer.setFile("bygg1");
-        freezer.setNumber("1111");
+        freezer.setNumber(1111);
         freezer.setAddress("Medicinaregatan 9");
         freezer.setRoom("101A");
         freezer.setType("-80C");
@@ -32,7 +32,7 @@ class FreezerMapperTest {
         assertNotNull(dto);
         assertEquals(1L, dto.id());
         assertEquals("bygg1", dto.file());
-        assertEquals("1111", dto.number());
+        assertEquals(1111, dto.number());
         assertEquals("Medicinaregatan 9", dto.address());
         assertEquals("101A", dto.room());
         assertEquals("-80C", dto.type());
@@ -64,7 +64,7 @@ class FreezerMapperTest {
         Freezer freezer = new Freezer();
         freezer.setId(5L);
         freezer.setFile("test.pdf");
-        freezer.setNumber("1111");
+        freezer.setNumber(1111);
         freezer.setAddress("Building A");
         freezer.setRoom("A101");
         freezer.setType("-80C");
@@ -74,7 +74,7 @@ class FreezerMapperTest {
 
         assertNotNull(dto);
         assertEquals(5L, dto.id());
-        assertEquals("1111", dto.number());
+        assertEquals(1111, dto.number());
         assertEquals(2, dto.users().size());
         assertEquals("Bob", dto.users().get(0).name()); // rank 1
         assertEquals("Anna", dto.users().get(1).name()); // rank 2
@@ -85,7 +85,7 @@ class FreezerMapperTest {
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
                 9L,
                 "doc.pdf",
-                "2222",
+                2222,
                 "Science Park",
                 "1310",
                 "-150C",
@@ -98,7 +98,7 @@ class FreezerMapperTest {
         assertNotNull(entity);
         assertEquals(9L, entity.getId());
         assertEquals("doc.pdf", entity.getFile());
-        assertEquals("2222", entity.getNumber());
+        assertEquals(2222, entity.getNumber());
         assertEquals("Science Park", entity.getAddress());
         assertEquals("1310", entity.getRoom());
         assertEquals("-150C", entity.getType());

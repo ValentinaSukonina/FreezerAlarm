@@ -40,14 +40,14 @@ public class FreezerController {
 
     // GET FREEZER BY NUMBER WITHOUT USERS
     @GetMapping("/number/{number}")
-    public ResponseEntity<FreezerDTO> findByNumber(@PathVariable String number) {
+    public ResponseEntity<FreezerDTO> findByNumber(@PathVariable Integer number) {
         FreezerDTO dto = freezerService.findByNumber(number);
         return ResponseEntity.ok(dto);
     }
 
     // GET FREEZER BY NUMBER WITH USERS
     @GetMapping("/number/{number}/with-users")
-    public ResponseEntity<FreezerWithUsersDTO> findByNumberWithUsers(@PathVariable String number) {
+    public ResponseEntity<FreezerWithUsersDTO> findByNumberWithUsers(@PathVariable Integer number) {
         FreezerWithUsersDTO dto = freezerService.findByNumberWithUsers(number);
         return ResponseEntity.ok(dto);
     }
@@ -68,13 +68,13 @@ public class FreezerController {
 
     // UPDATE FREEZER DETAILS BY FREEZER NUMBER
     @PutMapping("/number/{number}")
-    public ResponseEntity<FreezerDTO> updateFreezerDetailsByNumber(@PathVariable String number, @Validated @RequestBody Freezer freezer) {
+    public ResponseEntity<FreezerDTO> updateFreezerDetailsByNumber(@PathVariable Integer number, @Validated @RequestBody Freezer freezer) {
         FreezerDTO updatedFreezer = freezerService.updateFreezerDetailsByNumber(number, freezer);
         return ResponseEntity.ok(updatedFreezer);
     }
 
     @DeleteMapping("/number/{number}")
-    public ResponseEntity<Void> deleteFreezerByNumber(@PathVariable String number) {
+    public ResponseEntity<Void> deleteFreezerByNumber(@PathVariable Integer number) {
         freezerService.deleteFreezerByNumber(number);
         return ResponseEntity.noContent().build();
     }

@@ -173,12 +173,12 @@ class UserControllerTest {
     @Test
     @DisplayName("GET /api/users/{userId}/freezers should return user's freezers")
     void testGetFreezersByUserId() throws Exception {
-        FreezerDTO freezer = new FreezerDTO(1L, "file1", "FZ123", "Cold Ave", "Room 2", "-80");
+        FreezerDTO freezer = new FreezerDTO(1L, "file1", 1234, "Cold Ave", "Room 2", "-80");
         when(freezerService.getFreezersByUserId(1L)).thenReturn(List.of(freezer));
 
         mockMvc.perform(get("/api/users/1/freezers"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].number").value("FZ123"));
+                .andExpect(jsonPath("$[0].number").value(1234));
     }
 
 
@@ -325,12 +325,12 @@ class UserControllerTest {
     @Test
     @DisplayName("GET /api/users/{userId}/freezers - success")
     void testGetFreezersByUserId_success() throws Exception {
-        FreezerDTO dto = new FreezerDTO(1L, "file", "123", "addr", "room", "-80");
+        FreezerDTO dto = new FreezerDTO(1L, "file", 1234, "addr", "room", "-80");
         when(freezerService.getFreezersByUserId(1L)).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/users/1/freezers"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].number").value("123"));
+                .andExpect(jsonPath("$[0].number").value(1234));
     }
 
     @Test

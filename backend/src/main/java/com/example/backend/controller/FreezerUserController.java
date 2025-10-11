@@ -106,7 +106,7 @@ public class FreezerUserController {
 
     // Fetch users by freezer number
     @GetMapping("/users/{freezerNumber}")
-    public List<UserDTO> getUsersByFreezerNumber(@PathVariable String freezerNumber) {
+    public List<UserDTO> getUsersByFreezerNumber(@PathVariable Integer freezerNumber) {
         return freezerUserService.getUsersByFreezerNumber(freezerNumber);
     }
 

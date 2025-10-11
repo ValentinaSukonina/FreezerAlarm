@@ -30,7 +30,7 @@ public class Freezer {
     private String file;
 
     @Column(name = "number", unique = true, nullable = false, length = 4)
-    private String number;
+    private Integer number;
 
     @Column(name = "address", nullable = false, length = 50)
     private String address;

@@ -1,6 +1,5 @@
 package com.example.backend.repository;
 
-import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,28 +23,29 @@ public interface FreezerRepository extends ListCrudRepository<Freezer, Long> {
                                      @Param("address") String address,
                                      @Param("room") String room,
                                      @Param("type") String type,
-                                     @Param("number") String number);
+                                     @Param("number") Integer number);
 
     @Modifying
     @Transactional
     @Query("DELETE FROM Freezer f WHERE f.number = :number")
-    int deleteByNumber(@Param("number") String number);
+    int deleteByNumber(@Param("number") Integer number);
 
     // Get all freezers with users
-    @Query("SELECT DISTINCT f FROM Freezer f "
-            + "LEFT JOIN FETCH f.freezerUsers fu "
-            + "LEFT JOIN FETCH fu.user")
+    @Query("SELECT DISTINCT f FROM Freezer f " +
+            "LEFT JOIN FETCH f.freezerUsers fu " +
+            "LEFT JOIN FETCH fu.user " +
+            "ORDER BY f.number ASC")
     List<Freezer> findAllWithUsers();
 
     //Get freezer with number
     @Query("SELECT f FROM Freezer f WHERE f.number = :number")
-    Optional<Freezer> findByNumber(@Param("number") String number);
+    Optional<Freezer> findByNumber(@Param("number") Integer number);
 
     // Get freezer with users by number
     @Query("SELECT DISTINCT f FROM Freezer f " +
             "LEFT JOIN FETCH f.freezerUsers fu " +
             "LEFT JOIN FETCH fu.user " +
             "WHERE f.number = :number")
-    Freezer findByNumberWithUsers(@Param("number") String number);
+    Freezer findByNumberWithUsers(@Param("number") Integer number);
 
 }

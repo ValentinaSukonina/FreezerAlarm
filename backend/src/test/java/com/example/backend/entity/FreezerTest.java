@@ -9,11 +9,12 @@ class FreezerTest {
     private Freezer freezer1;
     private Freezer freezer2;
     private Freezer freezer3;
+
     @BeforeEach
     void setUp() {
-        freezer1 = new Freezer(1L, "bygg 1", "1111", "Medicinaregatan 9", "1310C", "-80C", null);
-        freezer2 = new Freezer(1L, "bygg 1", "1111", "Medicinaregatan 9", "1310C", "-80C", null);
-        freezer3 = new Freezer(2L, "bygg 1", "2222", "Medicinaregatan 9", "1310C", "-150C", null);
+        freezer1 = new Freezer(1L, "bygg 1", 1111, "Medicinaregatan 9", "1310C", "-80C", null);
+        freezer2 = new Freezer(1L, "bygg 1", 1111, "Medicinaregatan 9", "1310C", "-80C", null);
+        freezer3 = new Freezer(2L, "bygg 1", 2222, "Medicinaregatan 9", "1310C", "-150C", null);
     }
 
     @Test
@@ -48,7 +49,7 @@ class FreezerTest {
 
         freezer.setId(10L);
         freezer.setFile("bygg 10");
-        freezer.setNumber("1234");
+        freezer.setNumber(1234);
         freezer.setAddress("Testgatan 5");
         freezer.setRoom("1400A");
         freezer.setType("-20C");
@@ -56,7 +57,7 @@ class FreezerTest {
         // Validating values with getters
         assertEquals(10L, freezer.getId(), "ID should be set correctly");
         assertEquals("bygg 10", freezer.getFile(), "File should be set correctly");
-        assertEquals("1234", freezer.getNumber(), "Number should be set correctly");
+        assertEquals(1234, freezer.getNumber(), "Number should be set correctly");
         assertEquals("Testgatan 5", freezer.getAddress(), "Address should be set correctly");
         assertEquals("1400A", freezer.getRoom(), "Room should be set correctly");
         assertEquals("-20C", freezer.getType(), "Type should be set correctly");

@@ -110,12 +110,12 @@ class FreezerUserControllerTest {
     @Test
     @DisplayName("GET /api/freezer-user/freezers/{userId} should return list of freezers")
     void testGetFreezersByUserId() throws Exception {
-        FreezerDTO freezer = new FreezerDTO(1L, "file1", "1234", "Cold St", "Room A", "-80");
+        FreezerDTO freezer = new FreezerDTO(1L, "file1", 1234, "Cold St", "Room A", "-80");
         when(freezerUserService.getFreezersByUserId(2L)).thenReturn(List.of(freezer));
 
         mockMvc.perform(get("/api/freezer-user/freezers/2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].number").value("1234"));
+                .andExpect(jsonPath("$[0].number").value(1234));
     }
 
     @Test
@@ -130,7 +130,7 @@ class FreezerUserControllerTest {
                 "admin" // role added correctly
         );
 
-        when(freezerUserService.getUsersByFreezerNumber("1234")).thenReturn(List.of(user));
+        when(freezerUserService.getUsersByFreezerNumber(1234)).thenReturn(List.of(user));
 
         mockMvc.perform(get("/api/freezer-user/users/1234"))
                 .andExpect(status().isOk())

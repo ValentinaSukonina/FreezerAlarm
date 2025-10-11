@@ -45,23 +45,23 @@ class FreezerControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("GET /api/freezers/number/ABC123 should return freezer DTO")
+    @DisplayName("GET /api/freezers/number/1234 should return freezer DTO")
     void testFindByNumber() throws Exception {
         FreezerDTO dto = new FreezerDTO(
                 1L,
                 "file123.png",
-                "ABC123",
+                1234,
                 "123 Cold St",
                 "Room A",
                 "-80"
         );
 
-        when(freezerService.findByNumber("ABC123")).thenReturn(dto);
+        when(freezerService.findByNumber(1234)).thenReturn(dto);
 
-        mockMvc.perform(get("/api/freezers/number/ABC123"))
+        mockMvc.perform(get("/api/freezers/number/1234"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.number", is("ABC123")))
+                .andExpect(jsonPath("$.number", is(1234)))
                 .andExpect(jsonPath("$.address", is("123 Cold St")))
                 .andExpect(jsonPath("$.file", is("file123.png")))
                 .andExpect(jsonPath("$.room", is("Room A")))
@@ -74,7 +74,7 @@ class FreezerControllerTest {
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
                 1L,
                 "DEF456",       // file
-                "Main Freezer", // number
+                1234, // number
                 "123 Cold St",  // address
                 "Room A",       // room
                 "-80",          // type
@@ -86,7 +86,7 @@ class FreezerControllerTest {
 
         mockMvc.perform(get("/api/freezers"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].number").value("Main Freezer"))
+                .andExpect(jsonPath("$[0].number").value(1234))
                 .andExpect(jsonPath("$[0].address").value("123 Cold St"));
     }
 
@@ -113,20 +113,20 @@ class FreezerControllerTest {
     @Test
     void testFindByNumberWithUsers() throws Exception {
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
-                1L, "file456", "DEF123", "Cool Address", "B1", "-20", List.of(), List.of()
+                1L, "file456", 1234, "Cool Address", "B1", "-20", List.of(), List.of()
         );
 
-        when(freezerService.findByNumberWithUsers("DEF123")).thenReturn(dto);
+        when(freezerService.findByNumberWithUsers(1234)).thenReturn(dto);
 
         mockMvc.perform(get("/api/freezers/number/DEF123/with-users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.number").value("DEF123"));
+                .andExpect(jsonPath("$.number").value(1234));
     }
 
     @DisplayName("GET /api/freezers/{id} should return freezer DTO by ID")
     @Test
     void testFindById() throws Exception {
-        FreezerDTO dto = new FreezerDTO(1L, "file.png", "NUM1", "Address", "Room B", "-70");
+        FreezerDTO dto = new FreezerDTO(1L, "file.png", 1234, "Address", "Room B", "-70");
 
         when(freezerService.findById(1L)).thenReturn(dto);
 
@@ -138,16 +138,17 @@ class FreezerControllerTest {
     @DisplayName("PUT /api/freezers/number/{number} should update and return freezer DTO")
     @Test
     void testUpdateFreezerDetailsByNumber() throws Exception {
-        FreezerDTO updated = new FreezerDTO(1L, "updated.png", "1111", "Updated Address", "Room Z", "-60");
+        FreezerDTO updated;
+        updated = new FreezerDTO(1L, "updated.png", 1111, "Updated Address", "Room Z", "-60");
 
-        when(freezerService.updateFreezerDetailsByNumber(eq("1111"), any())).thenReturn(updated);
+        when(freezerService.updateFreezerDetailsByNumber(eq(1111), any())).thenReturn(updated);
 
         mockMvc.perform(put("/api/freezers/number/1111")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     {
                                       "file": "updated.png",
-                                      "number": "1111",
+                                      "number": 1111,
                                       "address": "Updated Address",
                                       "room": "Room Z",
                                       "type": "-60"
@@ -162,7 +163,7 @@ class FreezerControllerTest {
     void testCreateFreezer() throws Exception {
         Freezer freezer = new Freezer();
         freezer.setId(1L);
-        freezer.setNumber("F123");
+        freezer.setNumber(1234);
         freezer.setFile("file.png");
         freezer.setAddress("123 Street");
         freezer.setRoom("A1");
@@ -174,16 +175,16 @@ class FreezerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(freezer)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.number").value("F123"));
+                .andExpect(jsonPath("$.number").value(1234));
     }
 
 
     @Test
     @DisplayName("DELETE /api/freezers/number/{number} should delete and return 204")
     void testDeleteFreezerByNumber() throws Exception {
-        doNothing().when(freezerService).deleteFreezerByNumber("ABC123");
+        doNothing().when(freezerService).deleteFreezerByNumber(1234);
 
-        mockMvc.perform(delete("/api/freezers/number/ABC123"))
+        mockMvc.perform(delete("/api/freezers/number/1234"))
                 .andExpect(status().isNoContent());
     }
 
@@ -191,7 +192,7 @@ class FreezerControllerTest {
     @DisplayName("PUT /api/freezers/{id}/with-users should update and return updated FreezerWithUsersDTO")
     void testUpdateFreezerWithUsers_success() throws Exception {
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
-                1L, "file.png", "F456", "123 Ave", "Room B", "-20",
+                1L, "file.png", 1234, "123 Ave", "Room B", "-20",
                 List.of(1L), List.of()
         );
 
@@ -201,7 +202,7 @@ class FreezerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.number").value("F456"));
+                .andExpect(jsonPath("$.number").value(1234));
     }
 
 
@@ -209,7 +210,7 @@ class FreezerControllerTest {
     @DisplayName("POST /api/freezers/with-users should create freezer with users")
     void testCreateFreezerWithUsers() throws Exception {
         FreezerWithUsersDTO dto = new FreezerWithUsersDTO(
-                1L, "f.png", "ABC123", "Addr", "R1", "-80",
+                1L, "f.png", 1234, "Addr", "R1", "-80",
                 List.of(1L, 2L), List.of()
         );
 
@@ -220,14 +221,14 @@ class FreezerControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/freezers/number/ABC123"))
-                .andExpect(jsonPath("$.number").value("ABC123"));
+                .andExpect(jsonPath("$.number").value(1234));
     }
 
     @Test
     @DisplayName("PUT /api/freezers/{id}/with-users should return 404 if freezer not found")
     void testUpdateFreezerWithUsers_notFound() throws Exception {
         Long freezerId = 1L;
-        FreezerWithUsersDTO dto = new FreezerWithUsersDTO(freezerId, "file", "num", "addr", "room", "-80", List.of(1L), List.of());
+        FreezerWithUsersDTO dto = new FreezerWithUsersDTO(freezerId, "file", 1234, "addr", "room", "-80", List.of(1L), List.of());
 
         when(freezerService.updateFreezerAndUsers(eq(freezerId), any()))
                 .thenThrow(new Exceptions.ResourceNotFoundException("Not found"));
