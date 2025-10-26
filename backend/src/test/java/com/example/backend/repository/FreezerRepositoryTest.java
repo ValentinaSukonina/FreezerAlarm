@@ -72,7 +72,7 @@ public class FreezerRepositoryTest {
         entityManager.flush();
 
         int updated = freezerRepository.updateFreezerDetailsByNumber(
-                "newFile.png", "New Addr", "Room B", "-60", 8888
+                "newFile.txt", "New Addr", "Room B", "-60", 8888
         );
         entityManager.clear(); // To force reload
 

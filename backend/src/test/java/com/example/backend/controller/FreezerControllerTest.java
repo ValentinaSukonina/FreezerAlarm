@@ -118,7 +118,7 @@ class FreezerControllerTest {
 
         when(freezerService.findByNumberWithUsers(1234)).thenReturn(dto);
 
-        mockMvc.perform(get("/api/freezers/number/DEF123/with-users"))
+        mockMvc.perform(get("/api/freezers/number/1234/with-users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.number").value(1234));
     }
@@ -220,7 +220,7 @@ class FreezerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/freezers/number/ABC123"))
+                .andExpect(header().string("Location", "/api/freezers/number/1234"))
                 .andExpect(jsonPath("$.number").value(1234));
     }
 

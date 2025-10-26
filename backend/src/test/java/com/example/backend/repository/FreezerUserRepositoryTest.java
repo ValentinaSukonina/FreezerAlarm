@@ -97,7 +97,7 @@ public class FreezerUserRepositoryTest {
     void shouldFindFreezersByUserId() {
         List<FreezerDTO> freezers = freezerUserRepository.findFreezersByUserId(user.getId());
         assertThat(freezers).hasSize(1);
-        assertThat(freezers.get(0).number()).isEqualTo("1111");
+        assertThat(freezers.get(0).number()).isEqualTo(1111);
     }
 
     @Test

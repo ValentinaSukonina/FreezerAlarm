@@ -12,11 +12,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 @SpringJUnitConfig
 public class UserServiceTest {
     @Mock
@@ -29,6 +32,7 @@ public class UserServiceTest {
     private UserService userService;
     private User user;
     private UserDTO userDTO;
+
     @BeforeEach
     public void setUp() {
         user = new User();
@@ -40,6 +44,7 @@ public class UserServiceTest {
         user.setRole("user");
         userDTO = new UserDTO(1L, "John Doe", "123456789", "john@example.com", 1, "user");
     }
+
     @Test
     @DisplayName("Test creating a user")
     public void testCreateUser() {
@@ -49,6 +54,7 @@ public class UserServiceTest {
         assertEquals("John Doe", createdUser.getName());
         verify(userRepository, times(1)).save(user);
     }
+
     @Test
     @DisplayName("Test deleting a user")
     public void testDeleteUser() {
@@ -56,6 +62,7 @@ public class UserServiceTest {
         userService.deleteUser(1L);
         verify(userRepository, times(1)).deleteById(1L);
     }
+
     @Test
     @DisplayName("Test deleting a user by ID (when freezer bindings are present)")
     public void testDeleteUserById() {
@@ -66,6 +73,7 @@ public class UserServiceTest {
         verify(freezerUserRepository, times(1)).deleteByUserId(1L);
         verify(userRepository, times(1)).deleteById(1L);
     }
+
     @Test
     @DisplayName("Test updating a user")
     public void testUpdateUser() {
@@ -77,6 +85,7 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).save(user);
     }
+
     @Test
     @DisplayName("Test getting a user by ID")
     public void testGetUserById() {
@@ -87,18 +96,20 @@ public class UserServiceTest {
         assertEquals("John Doe", fetchedUser.name());  // Use 'name()' instead of 'getName()' for records
         verify(userRepository, times(1)).findById(1L);
     }
+
     @Test
     @DisplayName("Test getting all users")
     public void testGetAllUsers() {
         List<User> users = Arrays.asList(user);
         when(userRepository.findAll()).thenReturn(users);
-        when(userMapper.toUserDTOList(users)).thenReturn(Arrays.asList(userDTO));
+        when(userMapper.toUserDTO(user)).thenReturn(userDTO);
         List<UserDTO> userList = userService.getAllUsers();
         assertNotNull(userList);
         assertEquals(1, userList.size());
         assertEquals("John Doe", userList.get(0).name());
         verify(userRepository, times(1)).findAll();
     }
+
     @Test
     @DisplayName("Test getting all users - exception")
     public void testGetAllUsers_Exception() {
@@ -106,6 +117,7 @@ public class UserServiceTest {
         Exception exception = assertThrows(RuntimeException.class, () -> userService.getAllUsers());
         assertEquals("No users found", exception.getMessage());
     }
+
     @Test
     @DisplayName("Test finding user by name")
     public void testFindByName() {
@@ -114,6 +126,7 @@ public class UserServiceTest {
         assertTrue(fetchedUser.isPresent());
         assertEquals("John Doe", fetchedUser.get().getName());
     }
+
     @Test
     @DisplayName("Test finding user by name - user not found")
     public void testFindByName_UserNotFound() {
@@ -121,6 +134,7 @@ public class UserServiceTest {
         Optional<User> fetchedUser = userService.findByName("Jane Doe");
         assertFalse(fetchedUser.isPresent());
     }
+
     @Test
     @DisplayName("Test updating user - exception")
     public void testUpdateUser_Exception() {

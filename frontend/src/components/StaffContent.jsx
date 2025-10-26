@@ -64,14 +64,6 @@ const StaffContent = () => {
             }, ttl);
         }
     };
-    // const msgClass = (kind) =>
-    //     kind === "success"
-    //         ? "alert-success"
-    //         : kind === "error"
-    //             ? "alert-danger"
-    //             : kind === "warning"
-    //                 ? "alert-warning"
-    //                 : "alert-info";
 
     // -------- effects --------
     useEffect(() => {

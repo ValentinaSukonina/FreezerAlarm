@@ -36,14 +36,6 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
         setErrors(e => ({ ...e, [name]: "" }));
     };
 
-    // // phone input
-    // const handlePhoneChange = (val) => {
-    //     const digits = (val || "").replace(/\D/g, "");
-    //     const e164 = digits ? `+${digits}` : "";
-    //     setDraft(d => ({ ...d, phone_number: e164 }));
-    //     setErrors(e => ({ ...e, phone_number: "" }));
-    // };
-
     const handlePhoneChange = (val) => {
         const digits = (val || "").replace(/\D/g, "");
         const e164 = digits ? `+${digits}` : "";
@@ -89,7 +81,6 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
             setSaving(false);
         }
     };
-
 
     const cancelEdit = () => {
         setDraft({ ...user });
@@ -363,7 +354,6 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                 </div>
                             </div>
                         )}
-
 
                         {/* Footer actions */}
                         <div className="d-flex gap-2">
