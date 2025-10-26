@@ -202,7 +202,7 @@ const AddFreezerForm = forwardRef(
         };
 
         return (
-            <div className="text-center mb-4 mb-sm-2">
+            <div className="text-center my-1 my-sm-2">
                 {!showForm ? (
                     <button
                         className="btn"
@@ -214,7 +214,7 @@ const AddFreezerForm = forwardRef(
                 ) : (
                     <>
                         <button
-                            className="btn mb-4 mb-sm-2"
+                            className="btn my-1 my-sm-2"
                             style={{ backgroundColor: "#5D8736", color: "white" }}
                             onClick={handleHideForm}
                         >

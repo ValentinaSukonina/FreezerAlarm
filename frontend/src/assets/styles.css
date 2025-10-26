@@ -111,6 +111,11 @@ body {
     cursor: pointer;
 }
 
+.info-text {
+    background-color: #EAF6E2;
+    border-radius: 0.5rem;
+}
+
 .list-text {
     text-align: left;
 }
@@ -140,6 +145,32 @@ body {
 .google-icon {
     width: 20px;
     height: 20px;
+}
+
+.sort-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 0;
+    line-height: 1;
+    transition: all 0.2s ease-in-out;
+}
+
+.sort-btn:hover {
+    border-color: #5D8736;
+    background-color: #f3f3f3;
+    transform: scale(1.05);
+}
+
+.sort-btn i {
+    font-size: 1.2rem;
+    color: #333;
 }
 
 /* Freezer grid container */
@@ -253,7 +284,6 @@ body {
 .phone-link:hover {
     color: #5D8736;
     font-weight: bold;
-
 }
 
 .confirm-delete-section {
@@ -272,6 +302,219 @@ body {
     color: white;
     font-size: 0.9em;
     font-weight: bold;
+}
+
+.card-body {
+    padding-top: 0rem !important;
+    margin-left: 8px;
+}
+
+.card-body > .mb-2:first-of-type {
+    margin-top: 0 !important;
+}
+
+/* Ensure full visible border and filled corners */
+.user-card .card {
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    background-color: #fff !important;
+    overflow: hidden !important;
+}
+
+/* When expanded: darker border and subtle highlight */
+.user-card .card.expanded {
+    border-color: #5D8736 !important;
+    box-shadow: 0 0 6px rgba(93, 135, 54, 0.4) !important;
+}
+
+/* Fill bottom body corners */
+.user-card .card-body {
+    border-radius: 0 0 8px 8px !important;
+    background-color: #fff !important;
+}
+
+/* Remove header divider line completely */
+.user-card .card-header {
+    border-bottom: none !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 2px !important; /* tighten spacing */
+}
+
+/* Compact input fields in UserCard */
+.user-card input.form-control,
+.user-card select.form-select,
+.user-card .react-tel-input .form-control {
+    padding: 4px 8px !important;       /* reduce vertical padding */
+    height: auto !important;           /* remove Bootstrap fixed height */
+    line-height: 1.2;
+    font-size: 0.95rem;
+    border-radius: 3px;
+    border-color: #ccc;
+}
+
+/* Make selects match size visually */
+.user-card select.form-select {
+    padding-right: 30px !important;    /* space for dropdown arrow */
+}
+
+/* Reduce spacing between validation messages and inputs */
+.user-card .invalid-feedback {
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+.user-card .react-tel-input {
+    display: flex;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ---- Option 2: Hide flag in edit mode ---- */
+.user-card .react-tel-input .flag-dropdown {
+    display: none !important;
+}
+
+.user-card .react-tel-input .form-control {
+    border-radius: 4px !important;
+    border: 1px solid #ccc !important;
+    width: 100% !important;
+    height: 36px !important;
+}
+
+
+/* Remove extra spacing inside flag container */
+.user-card .react-tel-input .selected-flag {
+    padding: 3px !important;
+}
+
+/* Compact freezer number input */
+.user-card .assigned-freezer-input {
+    padding: 2px 2px !important;
+    height: 28px !important;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* General alert style */
+.alert {
+    font-size: 14px; /* Make the text smaller */
+    text-align: center;
+    padding: 6px 12px; /* Reduced padding for smaller box */
+    margin-top: 15px; /* Position the message under the form */
+    border-radius: 4px; /* Optional: rounded corners */
+    width: 100%; /* Make the message span across the width of the form */
+    max-width: 500px; /* Limit the width for better appearance */
+    margin-left: auto;
+    margin-right: auto; /* Center the message box */
+}
+
+/* Success message styling */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Error message styling */
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.mark-to-remove-btn {
+    background-color: white;
+    color: #AD1212FF;
+    border: 1px solid #AD1212FF;
+    font-weight: bold;
+    padding: 5px 7px;
+    line-height: 1;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Toggle always aligned with name */
+.toggle-btn {
+    flex: 0 0 auto;
+    background: white;
+    color: #5D8736;
+    border: none;
+    padding: 0 4px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* let name grow, keep phone on right when not editing */
+.name-phone-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.name-phone-container .name-section {
+    flex: 1 1 auto;
+}
+
+.name-phone-container .phone-section {
+    flex: 0 1 auto;
+    min-width: 120px;
+    text-align: right;
+}
+
+/* -------- EDIT MODE -------- */
+.header-row.edit-mode .name-phone-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.header-row.edit-mode .phone-section {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    text-align: left !important;
+}
+
+/* -------- PHONE INPUT INTERNALS -------- */
+.user-card .react-tel-input {
+    display: flex !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    max-width: 100% !important;
+}
+
+.user-card .form-control .flag-dropdown {
+    flex: 0 0 26px !important;
+    width: 26px !important;
+}
+
+.user-card .react-tel-input .form-control {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 20px !important;
+}
+
+/* -------- SMALL SCREEN -------- */
+@media (max-width: 600px) {
+    .header-row.edit-mode .name-phone-container {
+        flex-direction: column !important;
+    }
+
+    .header-row.edit-mode .phone-section {
+        width: 100% !important;
+    }
+
+    .bi-telephone {
+        display: none !important;
+    }
+}
+
+@media (max-width: 991px) {
+    .freezer-numbers {
+        display: none;
+    }
 }
 
 /* Ensure single column on small screens */
@@ -305,83 +548,14 @@ body {
     }
 }
 
-/* General alert style */
-.alert {
-    font-size: 14px; /* Make the text smaller */
-    text-align: center;
-    padding: 6px 12px; /* Reduced padding for smaller box */
-    margin-top: 15px; /* Position the message under the form */
-    border-radius: 4px; /* Optional: rounded corners */
-    width: 100%; /* Make the message span across the width of the form */
-    max-width: 500px; /* Limit the width for better appearance */
-    margin-left: auto;
-    margin-right: auto; /* Center the message box */
-}
-
-/* Success message styling */
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-/* Error message styling */
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-.phone-input-container {
-    width: 100% !important;   /* shrink to parent width */
-    max-width: 180px;         /* match container */
-}
-
-.phone-input-container input {
-    width: 100% !important;   /* force input to fill container */
-    max-width: 180px;         /* no overflow */
-}
-
-.mark-to-remove-btn {
-    background-color: white;
-    color: #AD1212FF;
-    border: 1px solid #AD1212FF;
-    font-weight: bold;
-    padding: 5px 7px;
-    line-height: 1;
-    border-radius: 5px;
-    transition: all 0.2s ease-in-out;
-}
-
-@media (max-width: 375px) {
-    .freezer-card {
-        margin-left: 0.25rem !important; /* smaller horizontal margins */
-        margin-right: 0.25rem !important;
-        padding-left: 0.5rem !important; /* smaller padding */
-        padding-right: 0.5rem !important;
-    }
-
-    .freezer-card .row {
-        padding: 1rem !important; /* shrink internal padding */
+@media (min-width: 576px) and (max-width: 600px) {
+    .container {
+        max-width: 100% !important;
     }
 }
 
-/*  to make freezer numbers align better in personal view */
-@media (min-width: 992px) {
-    .freezer-numbers {
-        display: block;
-        text-align: left;
-        padding-left: 15px;
-        white-space: normal;
-        line-height: 1.6;
-    }
 
-    /* add some space between freezer numbers */
-    .freezer-numbers div {
-        margin-bottom: 5px;
-    }
+* {
+    border: 1px dotted red !important;
 }
 
-@media (max-width: 991px) {
-    .freezer-numbers {
-        display: none;
-    }
-}

@@ -66,7 +66,7 @@ const LoginContent = () => {
 
 
     return (
-        <div className="container d-flex justify-content-center mt-5">
+        <div className="container d-flex justify-content-center mt-4 mt-md-5">
             <div className="col-md-6">
                 <div className="max-w-xl mx-auto bg-gray-50 p-6 rounded-xl shadow-md space-y-3">
                     <div className="flex items-start gap-2">
@@ -123,7 +123,7 @@ const LoginContent = () => {
                     <div className="col-12 text-center mt-3">
                         <button
                             type="submit"
-                            className="btn btn-lg"
+                            className="btn btn-lg py-1"
                             style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
                             disabled={isChecking}
                         >
@@ -136,7 +136,7 @@ const LoginContent = () => {
                 {message && (
                     <div
                         role="alert"
-                        className="my-2 my-sm-4 p-1 p-sm-3 text-center"
+                        className="my-1 my-sm-3 p-1 p-sm-3 text-center"
                          style={{
                              backgroundColor: isAuthorized ? "#D4EDDA" : "#F8D7DA",
                              color: isAuthorized ? "#155724" : "#721C24",

@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef} from "react";
 import {fetchAllFreezersWithUsers, createFreezer} from "../services/api";
 import FreezerCardUser from "../components/FreezerCardUser";
 import AddFreezerForm from "./AddFreezerForm";
+//import "../assets/sorting.ico;
 
 const FreezersAll = () => {
     const [successMessage, setSuccessMessage] = useState("");
@@ -11,6 +12,7 @@ const FreezersAll = () => {
     const [role, setRole] = useState(sessionStorage.getItem("role"));
     const [formError, setFormError] = useState("");
     const formRef = useRef();
+    const [sortOrder, setSortOrder] = useState("asc");
 
     const [newFreezer, setNewFreezer] = useState({
         number: "",
@@ -18,6 +20,15 @@ const FreezersAll = () => {
         address: "",
         type: "",
         file: ""
+    });
+
+    const toggleSortOrder = () => {
+        setSortOrder(prev => (prev === "asc" ? "desc" : "asc"));
+    };
+
+    const sortedFreezers = [...freezers].sort((a, b) => {
+        if (sortOrder === "asc") return a.number - b.number;
+        return b.number - a.number;
     });
 
     useEffect(() => {
@@ -97,8 +108,19 @@ const FreezersAll = () => {
 
     return (
         <div className="content-wrapper mx-2 my-1">
-            <h2 className="text-center mt-2 mt-sm-3 mb-3 mb-sm-4">Freezers Biomedicine</h2>
-
+            <h2 className="text-center my-2 my-sm-3 ">Freezers Biomedicine
+                <button
+                    className="sort-btn mx-4"
+                    onClick={toggleSortOrder}
+                    title={`Sort by number (${sortOrder === "asc" ? "descending" : "ascending"})`}
+                >
+                    {sortOrder === "asc" ? (
+                        <i className="bi bi-sort-down"></i>
+                    ) : (
+                        <i className="bi bi-sort-up"></i>
+                    )}
+                </button>
+            </h2>
             {role === "admin" && (
                 <>
                     <div className="freezer-form-container">
@@ -123,9 +145,9 @@ const FreezersAll = () => {
             )}
 
             {/* Updated Card Layout */}
-            <div className="freezer-grid mt-4">
+            <div className="freezer-grid mt-1 mt-sm-3">
 
-                {freezers.map((freezer) => (
+                {sortedFreezers.map((freezer) => (
                     <div key={freezer.id} className="freezer-card">
                         <FreezerCardUser freezer={freezer}/>
                     </div>

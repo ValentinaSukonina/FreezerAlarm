@@ -36,12 +36,24 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
         setErrors(e => ({ ...e, [name]: "" }));
     };
 
-    // phone input
+    // // phone input
+    // const handlePhoneChange = (val) => {
+    //     const digits = (val || "").replace(/\D/g, "");
+    //     const e164 = digits ? `+${digits}` : "";
+    //     setDraft(d => ({ ...d, phone_number: e164 }));
+    //     setErrors(e => ({ ...e, phone_number: "" }));
+    // };
+
     const handlePhoneChange = (val) => {
         const digits = (val || "").replace(/\D/g, "");
         const e164 = digits ? `+${digits}` : "";
-        setDraft(d => ({ ...d, phone_number: e164 }));
-        setErrors(e => ({ ...e, phone_number: "" }));
+
+        setDraft(prev => {
+            const updated = { ...prev, phone_number: e164 };
+            const { errors } = validateUser(updated, { mode: "edit", original: user });
+            setErrors(prevErrs => ({ ...prevErrs, phone_number: errors.phone_number || "" }));
+            return updated;
+        });
     };
 
     // save edited user
@@ -108,27 +120,24 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
     };
 
     return (
-        <div className="container-fluid px-0 px-sm-3 mx-auto" style={{ maxWidth: 600 }}>
+        <div className="user-card container-fluid px-0 px-sm-3 mx-auto" style={{ maxWidth: 600 }}>
             <div className="card my-1 shadow-sm">
-                {/* Header: toggle + name + phone */}
+                {/* Header */}
                 <div className="card-header bg-white p-1 p-sm-2">
-                    <div className="d-flex align-items-center">
+
+                    <div className={`d-flex flex-wrap align-items-start header-row ${expanded && editing ? "edit-mode" : ""}`}>
                         <button
                             type="button"
-                            className="btn btn-sm  "
+                            className="toggle-btn mt-1 p-0"
                             onClick={toggle}
                             aria-label={expanded ? "Collapse" : "Expand"}
-                            style={{ backgroundColor: "white", color: "#5D8736" }}
                         >
                             {expanded ? "▲" : "▼"}
                         </button>
 
-                        <div
-                            className={`d-flex ${expanded && editing ? "flex-column flex-sm-row" : "flex-row"} 
-              align-items-start align-items-sm-center w-100`}
-                        >
+                        <div className="flex-grow-1 name-phone-container">
                             {/* Name */}
-                            <div className="fw-semibold flex-grow-1 mb-1 mb-sm-0">
+                            <div className="name-section text-truncate fw-semibold">
                                 {expanded && editing ? (
                                     <>
                                         <input
@@ -137,50 +146,57 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                             value={draft.name || ""}
                                             onChange={handleChange}
                                         />
-                                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                                        {errors.name && (
+                                            <div className="invalid-feedback d-block">
+                                                {errors.name}
+                                            </div>
+                                        )}
                                     </>
                                 ) : (
                                     user.name
                                 )}
                             </div>
 
+
                             {/* Phone */}
-                            <div
-                                className={`mx-0 mx-sm-3 ${expanded && editing ? "phone-input-container" : ""}`}
-                                style={{
-                                    textAlign: "right",
-                                    minWidth: expanded && editing ? "180px" : "auto"
-                                }}
-                            >
+                            <div className="phone-section">
                                 {expanded && editing ? (
-                                    <PhoneInput
-                                        country="se"
-                                        onlyCountries={["se"]}
-                                        disableDropdown
-                                        countryCodeEditable={false}
-                                        masks={{ se: "..-... .. .." }}
-                                        placeholder="+46 XX-XXX XX XX"
-                                        value={draft.phone_number || ""}
-                                        onChange={handlePhoneChange}
-                                        inputClass={`form-control ${errors.phone_number ? "is-invalid" : ""}`}
-                                        containerClass="w-100"
-                                    />
+                                    <>
+                                        <PhoneInput
+                                            country="se"
+                                            onlyCountries={["se"]}
+                                            disableDropdown
+                                            countryCodeEditable={false}
+                                            masks={{ se: "..-... .. .." }}
+                                            placeholder="+46 XX-XXX XX XX"
+                                            value={draft.phone_number || ""}
+                                            onChange={handlePhoneChange}
+                                            inputClass={`form-control form-control-sm ${
+                                                errors.phone_number ? "is-invalid" : ""
+                                            }`}
+                                            inputStyle={{ width: "120px", height: "15px" }}
+                                        />
+                                        {errors.phone_number && (
+                                            <div className="invalid-feedback d-block">
+                                                {errors.phone_number}
+                                            </div>
+                                        )}
+                                    </>
                                 ) : (
                                     <a
                                         href={`tel:${user.phone_number}`}
                                         className="phone-link"
                                         title={`Call ${user.name}`}
                                     >
-                                        <i className="bi bi-telephone me-1"></i>{formatPhoneSE(user.phone_number)}
+                                        <i className="bi bi-telephone me-1"></i>
+                                        {formatPhoneSE(user.phone_number)}
                                     </a>
-                                )}
-                                {expanded && editing && errors.phone_number && (
-                                    <div className="invalid-feedback d-block">{errors.phone_number}</div>
                                 )}
                             </div>
                         </div>
-
                     </div>
+
+
                 </div>
 
                 {/* Body (collapsible) */}
@@ -259,7 +275,7 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                         </div>
 
                         {/* Freezers list + remove */}
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <div className="fw-semibold mb-2">Assigned Freezers:</div>
                             <div className="list-group">
                                 {editing ? (
@@ -272,7 +288,7 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
 
                                             return (
                                                 <div key={f.id} className="d-flex align-items-center mb-2">
-                          <span className="form-control me-2" style={{ width: "80px" }}>
+                          <span className="form-control assigned-freezer-input me-2" style={{ width: "50px" }}>
                             {f.number}
                           </span>
                                                     {isAsking ? (
@@ -281,7 +297,7 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                                                   style={{ color: "#AD1212FF" }}
                                                             >Remove?</span>
                                                             <button
-                                                                className="btn btn-sm"
+                                                                className="btn btn-sm py-0"
                                                                 style={{
                                                                     backgroundColor: "#AD1212FF",
                                                                     color: "white",
@@ -292,7 +308,7 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                                                 Yes
                                                             </button>
                                                             <button
-                                                                className="btn btn-sm btn-secondary"
+                                                                className="btn btn-sm btn-secondary py-0"
                                                                 onClick={cancelRemoveFreezer}
                                                             >
                                                                 Cancel
@@ -316,10 +332,11 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                 )}
                             </div>
                         </div>
+
                         {confirmDelete && (
-                            <div className="alert alert-warning d-flex align-items-center justify-content-between p-2 mb-2">
-                                <span className="me-3">Are you sure you want to delete this user?</span>
-                                <div className="d-flex gap-2">
+                            <div className="alert alert-warning p-1 mb-1 text-center">
+                                <div className="mb-2">Are you sure you want to delete this user?</div>
+                                <div className="d-flex justify-content-center gap-2">
                                     <button
                                         className="btn btn-danger btn-sm"
                                         onClick={async () => {
@@ -327,10 +344,7 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                             setDeleting(true);
                                             try {
                                                 await onDelete?.(user.id);
-                                                // Parent will remove the card; if not, you can also close locally:
-                                                // setConfirmDelete(false);
                                             } catch (err) {
-                                                // Surface error however you handle banners/messages in parent
                                                 console.error("Failed to delete user:", err);
                                             } finally {
                                                 setDeleting(false);
@@ -340,12 +354,16 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                     >
                                         {deleting ? "Deleting…" : "Yes, delete"}
                                     </button>
-                                    <button className="btn btn-secondary btn-sm" onClick={() => setConfirmDelete(false)}>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={() => setConfirmDelete(false)}
+                                    >
                                         Cancel
                                     </button>
                                 </div>
                             </div>
                         )}
+
 
                         {/* Footer actions */}
                         <div className="d-flex gap-2">
@@ -359,30 +377,42 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                     >
                                         {saving ? "Saving…" : "Save"}
                                     </button>
-                                    <button className="btn btn-secondary btn-sm" onClick={cancelEdit} disabled={saving}>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={cancelEdit}
+                                        disabled={saving}
+                                    >
                                         Cancel
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <button
-                                        className="btn btn-sm"
-                                        style={{ backgroundColor: "#5D8736", color: "white" }}
-                                        onClick={() => {
-                                            setDraft({ ...user });
-                                            setErrors({});
-                                            setEditing(true);
-                                        }}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        className="btn btn-sm"
-                                        style={{ backgroundColor: "#A9C46C", color: "white", border: "1px solid #c3e6cb" }}
-                                        onClick={() => setConfirmDelete(true)}
-                                    >
-                                        Delete
-                                    </button>
+                                    {!confirmDelete && (
+                                        <>
+                                            <button
+                                                className="btn btn-sm py-1"
+                                                style={{ backgroundColor: "#5D8736", color: "white" }}
+                                                onClick={() => {
+                                                    setDraft({ ...user });
+                                                    setErrors({});
+                                                    setEditing(true);
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="btn btn-sm py-1"
+                                                style={{
+                                                    backgroundColor: "#A9C46C",
+                                                    color: "white",
+                                                    border: "1px solid #c3e6cb",
+                                                }}
+                                                onClick={() => setConfirmDelete(true)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
                                 </>
                             )}
                         </div>

@@ -40,7 +40,7 @@ const HomeContent = () => {
         <div className="container text-center mt-4 pt-2">
             <div className="row justify-content-center">
                 <div className="col-12 col-sm-10 col-md-8 col-lg-6">
-                    <h2 className="mb-4">Why Use This System?</h2>
+                    <h2 className="mb-3 mb-sm-4">Why Use This System?</h2>
 
                     <ul className="list-unstyled">
                         <li className="list-item">
@@ -57,23 +57,16 @@ const HomeContent = () => {
                         </li>
                     </ul>
 
-                    <p style={{
-                        fontStyle: "italic",
-                        margin: "1.5rem",
-                        backgroundColor: "#EAF6E2",
-                        padding: "1rem",
-                        borderRadius: "0.5rem"
-                    }}>
+                    <p className="fst-italic mb-1 mb-sm-2 p-1 p-sm-2 rounded info-text">
                         This system is accessible only to staff members of the Institute of Biomedicine at the
                         University of
                         Gothenburg.
                     </p>
 
-
-                    <h4>Start using it now</h4>
+                    <h4 className=" mt-2 mt-sm-3">Start using it now</h4>
                     <button
                         type="button"
-                        className="btn btn-lg mt-3"
+                        className="btn btn-lg py-1 my-2"
                         style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
                         onClick={isLoggedIn ? handleLogout : handleLogin}
                     >

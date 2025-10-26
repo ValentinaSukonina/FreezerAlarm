@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,6 @@ import java.util.Optional;
 public class UserService {
 
     private final FreezerUserRepository freezerUserRepository;
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -112,8 +112,12 @@ public class UserService {
             throw new RuntimeException("No users found.");
         }
 
-        logger.info("Users fetched successfully: {}", users.size());
-        return userMapper.toUserDTOList(users);
+        // ✅ Sort alphabetically by name (case-insensitive)
+        users.sort(Comparator.comparing(User::getName, String.CASE_INSENSITIVE_ORDER));
+
+        return users.stream()
+                .map(userMapper::toUserDTO)
+                .toList();
     }
 
     public UserDTO getUserById(Long id) {

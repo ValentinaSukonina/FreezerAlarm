@@ -34,6 +34,13 @@ const StaffContent = () => {
     const [expandedUserId, setExpandedUserId] = useState(null);
     const [editErrors, setEditErrors] = useState({});
 
+    const [sortOrder, setSortOrder] = useState("asc");
+    const sortedUsers = [...users].sort((a, b) =>
+        sortOrder === "asc"
+            ? a.name.localeCompare(b.name)
+            : b.name.localeCompare(a.name)
+    );
+
     // drafts/errors for inline edit rows
     const [drafts, setDrafts] = useState({});        // { [id]: {...fields} }
 
@@ -57,14 +64,14 @@ const StaffContent = () => {
             }, ttl);
         }
     };
-    const msgClass = (kind) =>
-        kind === "success"
-            ? "alert-success"
-            : kind === "error"
-                ? "alert-danger"
-                : kind === "warning"
-                    ? "alert-warning"
-                    : "alert-info";
+    // const msgClass = (kind) =>
+    //     kind === "success"
+    //         ? "alert-success"
+    //         : kind === "error"
+    //             ? "alert-danger"
+    //             : kind === "warning"
+    //                 ? "alert-warning"
+    //                 : "alert-info";
 
     // -------- effects --------
     useEffect(() => {
@@ -210,7 +217,6 @@ const StaffContent = () => {
         });
         if (!valid) {
             setEditErrors((prev) => ({ ...prev, [userId]: errors }));
-            //showRowMsg(userId, "❌ Please fix highlighted fields.", "error");
             return;
         }
 
@@ -267,8 +273,12 @@ const StaffContent = () => {
 
     // -------- render --------
     return (
-        <main className="container py-4">
-            <h2 className="text-center mb-2 mb-sm-4">Registered Personnel</h2>
+        <main className="container py-4 px-1">
+            <h2 className="text-center mb-2 mb-sm-4">Registered Personnel
+                <button className="sort-btn mx-3" onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}>
+                    {sortOrder === "asc" ? <i className="bi bi-sort-alpha-down"></i> : <i className="bi bi-sort-alpha-up"></i>}
+                </button>
+            </h2>
 
             {/* TOP banner — used by Add form only */}
             {message.text && (
@@ -282,9 +292,9 @@ const StaffContent = () => {
                 </div>
             )}
 
-            <div className="d-flex justify-content-center mb-3">
+            <div className="d-flex justify-content-center mb-2 mb-sm-3">
                 <button
-                    className="btn mx-auto"
+                    className="btn mx-auto py-1"
                     style={{ backgroundColor: "#5D8736", color: "white" }}
                     onClick={() => setShowAddForm(!showAddForm)}
                 >
@@ -311,7 +321,7 @@ const StaffContent = () => {
         <div className="my-3">Loading users...</div>
     ) : users.length > 0 ? (
         <div>
-            {users.map((u) => (
+            {sortedUsers.map((u) => (
                 <UserCard
                     key={u.id}
                     user={u}
