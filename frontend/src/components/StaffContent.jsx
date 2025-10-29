@@ -26,6 +26,7 @@ const StaffContent = () => {
     // -------- state --------
     const [message, setMessage] = useState({ text: "", kind: "" }); // top banner (Add form only)
     const [deletingUserId, setDeletingUserId] = useState(null);
+    const [deletedUserIds, setDeletedUserIds] = useState([]);
     const [users, setUsers] = useState([]);
     const [rowMessages, setRowMessages] = useState({});
     const [loading, setLoading] = useState(true);
@@ -157,7 +158,7 @@ const StaffContent = () => {
         }));
     };
 
-    // ask/cancel confirmation for removing a freezer (inline)
+    // confirmation for removing a freezer (inline)
     const askRemoveFreezer = (userId, freezerId) => {
         setConfirmingFreezer({ userId, freezerId });
     };
@@ -176,7 +177,7 @@ const StaffContent = () => {
                         : user
                 )
             );
-            setConfirmingFreezer(null); // close the inline confirm UI
+            setConfirmingFreezer(null);
             showRowMsg(userId, "✅ Freezer removed from user.", "success");
         } catch (err) {
             setConfirmingFreezer(null);
@@ -184,14 +185,17 @@ const StaffContent = () => {
         }
     };
 
+    // delete User
     const handleDelete = async (userId) => {
         try {
             await deleteUser(userId);
-            showRowMsg(userId, "✅ User deleted successfully!", "success", 1500);
-            setDeletingUserId(null);
+            setDeletedUserIds((prev) => [...prev, userId]);
+
+            // remove after delay
             setTimeout(() => {
                 setUsers((prev) => prev.filter((u) => u.id !== userId));
-            }, 1500);
+                setDeletedUserIds((prev) => prev.filter((id) => id !== userId));
+            }, 2000);
         } catch (err) {
             showRowMsg(userId, "❌ Failed to delete user.", "error");
         }
@@ -313,18 +317,22 @@ const StaffContent = () => {
         <div className="my-3">Loading users...</div>
     ) : users.length > 0 ? (
         <div>
-            {sortedUsers.map((u) => (
+            {sortedUsers.map((u) =>
+                deletedUserIds.includes(u.id) ? (
+                    <div key={u.id} className="alert alert-success text-center my-2">
+                        ✅ User <strong>{u.name}</strong> deleted successfully!
+                    </div>
+                ) : (
                 <UserCard
                     key={u.id}
                     user={u}
+
                     onUpdate={async (id, fields) => {
                         const updated = await updateUser(id, fields);
                         setUsers((prev) => prev.map(x => (x.id === id ? { ...x, ...updated } : x)));
                     }}
-                    onDelete={async (id) => {
-                        await deleteUser(id);
-                        setUsers((prev) => prev.filter(x => x.id !== id));
-                    }}
+                    onDelete={handleDelete}
+
                     onRemoveFreezer={async (userId, freezerId) => {
                         await deleteFreezerFromUser(userId, freezerId);
                         setUsers(prev =>
