@@ -202,10 +202,10 @@ const AddFreezerForm = forwardRef(
         };
 
         return (
-            <div className="text-center my-1 my-sm-2">
+            <div className="text-center mb-2 mb-sm-3">
                 {!showForm ? (
                     <button
-                        className="btn"
+                        className="btn py-1"
                         style={{ backgroundColor: "#5D8736", color: "white" }}
                         onClick={handleShowForm}
                     >
@@ -214,7 +214,7 @@ const AddFreezerForm = forwardRef(
                 ) : (
                     <>
                         <button
-                            className="btn my-1 my-sm-2"
+                            className="btn py-1"
                             style={{ backgroundColor: "#5D8736", color: "white" }}
                             onClick={handleHideForm}
                         >
@@ -333,14 +333,14 @@ const AddFreezerForm = forwardRef(
 
                             <div className="d-flex justify-content-center gap-3 mt-3">
                                 <button
-                                    className="btn"
+                                    className="btn py-1"
                                     style={{ backgroundColor: "#5D8736", color: "white" }}
                                     onClick={handleSubmit}
                                     disabled={submitting}
                                 >
                                     {submitting ? "Adding…" : "Add"}
                                 </button>
-                                <button className="btn btn-secondary" onClick={handleCancel} disabled={submitting}>
+                                <button className="btn btn-secondary py-1" onClick={handleCancel} disabled={submitting}>
                                     Cancel
                                 </button>
                             </div>

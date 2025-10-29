@@ -144,7 +144,7 @@ const FreezersAll = () => {
                 </>
             )}
 
-            {/* Updated Card Layout */}
+            {/* Card Layout */}
             <div className="freezer-grid mt-1 mt-sm-3">
 
                 {sortedFreezers.map((freezer) => (

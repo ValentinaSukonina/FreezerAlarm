@@ -19,11 +19,9 @@ import "../assets/styles.css";
 import AddUserForm from "./AddUserForm";
 import UserCard from "./UserCard";
 
-// ---- small helpers ----
 const asArray = (v) => (Array.isArray(v) ? v : []);
 
 const StaffContent = () => {
-    // -------- state --------
     const [message, setMessage] = useState({ text: "", kind: "" }); // top banner (Add form only)
     const [deletingUserId, setDeletingUserId] = useState(null);
     const [deletedUserIds, setDeletedUserIds] = useState([]);
@@ -43,10 +41,10 @@ const StaffContent = () => {
     );
 
     // drafts/errors for inline edit rows
-    const [drafts, setDrafts] = useState({});        // { [id]: {...fields} }
+    const [drafts, setDrafts] = useState({});
 
     // Inline confirm for removing a freezer from a user
-    const [confirmingFreezer, setConfirmingFreezer] = useState(null); // { userId, freezerId } | null
+    const [confirmingFreezer, setConfirmingFreezer] = useState(null);
 
     const [showAddForm, setShowAddForm] = useState(false);
 
@@ -66,7 +64,6 @@ const StaffContent = () => {
         }
     };
 
-    // -------- effects --------
     useEffect(() => {
         const loadUsers = async () => {
             try {
@@ -122,13 +119,11 @@ const StaffContent = () => {
         fetchRoleIfNeeded();
     }, [role]);
 
-    // -------- utils & validators --------
     const toggleExpand = (userId) => {
         setExpandedUserId((prev) => (prev === userId ? null : userId));
     };
     const confirmDelete = (userId) => setDeletingUserId(userId);
 
-    // -------- handlers: edit inline --------
     const handleEditChange = (e, userId) => {
         const { name, value } = e.target;
         setDrafts((prev) => ({
@@ -138,7 +133,7 @@ const StaffContent = () => {
                 [name]: sanitizeByField(name, value, { live: true }),
             },
         }));
-        // clear that field's error as user types
+        // clear field's error as user types
         setEditErrors((prev) => ({
             ...prev,
             [userId]: { ...(prev[userId] || {}), [name]: "" },
@@ -229,7 +224,6 @@ const StaffContent = () => {
 
         try {
             const updated = await updateUser(userId, payload);
-            // commit to users
             setUsers((prev) =>
                 prev.map((u) => (u.id === userId ? { ...u, ...updated } : u))
             );
@@ -267,7 +261,6 @@ const StaffContent = () => {
 
     if (!role) return <Navigate to="/login" replace />;
 
-    // -------- render --------
     return (
         <main className="container py-4 px-1">
             <h2 className="text-center mb-2 mb-sm-4">Registered Personnel
@@ -350,335 +343,6 @@ const StaffContent = () => {
         !loading && <p className="text-center">No users found.</p>
     )}
 
-            {/*{loading ? (*/}
-            {/*    <div className="my-3">Loading users...</div>*/}
-            {/*) : users.length > 0 ? (*/}
-            {/*    <div className="table-responsive">*/}
-            {/*        <table className="table table-bordered table-sm text-center">*/}
-            {/*            <thead style={{ backgroundColor: "#A9C46C", color: "white" }}>*/}
-            {/*            <tr>*/}
-            {/*                <th>Name</th>*/}
-            {/*                <th>Email</th>*/}
-            {/*                <th className="d-none d-md-table-cell">Phone</th>*/}
-            {/*                <th className="d-none d-lg-table-cell">Rank</th>*/}
-            {/*                <th className="d-none d-lg-table-cell">Role</th>*/}
-            {/*                <th className="d-none d-lg-table-cell">Assigned freezers</th>*/}
-            {/*                <th className="d-none d-md-table-cell">Actions</th>*/}
-            {/*            </tr>*/}
-            {/*            </thead>*/}
-            {/*            <tbody>*/}
-            {/*            {users.map((user) => {*/}
-            {/*                const isEditing = editingUserId === user.id;*/}
-            {/*                const isExpanded = expandedUserId === user.id;*/}
-            {/*                const row = isEditing ? (drafts[user.id] || user) : user;*/}
-            {/*                const errs = editErrors[user.id] || {};*/}
-
-            {/*                return (*/}
-            {/*                    <React.Fragment key={user.id}>*/}
-            {/*                        <tr>*/}
-            {/*                        <td className="text-start d-flex justify-content-between align-items-center">*/}
-            {/*                            {isEditing ? (*/}
-            {/*                                <>*/}
-            {/*                                    <input*/}
-            {/*                                        name="name"*/}
-            {/*                                        className={`form-control ${errs.name ? "is-invalid" : ""}`}*/}
-            {/*                                        value={row.name || ""}*/}
-            {/*                                        onChange={(e) => handleEditChange(e, user.id)}*/}
-            {/*                                    />*/}
-            {/*                                    {errs.name && (*/}
-            {/*                                        <div className="invalid-feedback">{errs.name}</div>*/}
-            {/*                                    )}*/}
-            {/*                                </>*/}
-            {/*                            ) : (*/}
-            {/*                                <>*/}
-            {/*                                    {user.name}*/}
-            {/*                                    <button*/}
-            {/*                                        className="btn btn-sm d-md-none ms-auto"*/}
-            {/*                                        onClick={() => toggleExpand(user.id)}*/}
-            {/*                                        style={{ backgroundColor: "#A9C46C", color: "white" }}*/}
-            {/*                                    >*/}
-            {/*                                        {isExpanded ? "▲" : "▼"}*/}
-            {/*                                    </button>*/}
-            {/*                                </>*/}
-            {/*                            )}*/}
-            {/*                        </td>*/}
-
-            {/*                            /!* Email *!/*/}
-            {/*                            <td>*/}
-            {/*                                {isEditing ? (*/}
-            {/*                                    <>*/}
-            {/*                                        <input*/}
-            {/*                                            name="email"*/}
-            {/*                                            className={`form-control ${errs.email ? "is-invalid" : ""}`}*/}
-            {/*                                            value={row.email || ""}*/}
-            {/*                                            onChange={(e) => handleEditChange(e, user.id)}*/}
-            {/*                                        />*/}
-            {/*                                        {errs.email && (*/}
-            {/*                                            <div className="invalid-feedback">{errs.email}</div>*/}
-            {/*                                        )}*/}
-            {/*                                    </>*/}
-            {/*                                ) : (*/}
-            {/*                                    user.email*/}
-            {/*                                )}*/}
-            {/*                            </td>*/}
-
-            {/*                            /!* Phone *!/*/}
-            {/*                            <td className="d-none d-md-table-cell">*/}
-            {/*                                {isEditing ? (*/}
-            {/*                                    <>*/}
-            {/*                                        <PhoneInput*/}
-            {/*                                            country="se"*/}
-            {/*                                            onlyCountries={["se"]}*/}
-            {/*                                            disableDropdown*/}
-            {/*                                            countryCodeEditable={false}*/}
-            {/*                                            masks={{ se: "..-... .. .." }}*/}
-            {/*                                            placeholder="+46 XX-XXX XX XX"*/}
-            {/*                                            value={row.phone_number || ""}*/}
-            {/*                                            onChange={handleEditPhoneChange(user.id)}*/}
-            {/*                                            inputClass={`form-control ${*/}
-            {/*                                                errs.phone_number ? "is-invalid" : ""*/}
-            {/*                                            }`}*/}
-            {/*                                            containerClass="w-100"*/}
-            {/*                                        />*/}
-            {/*                                        {errs.phone_number && (*/}
-            {/*                                            <div className="invalid-feedback d-block">*/}
-            {/*                                                {errs.phone_number}*/}
-            {/*                                            </div>*/}
-            {/*                                        )}*/}
-            {/*                                    </>*/}
-            {/*                                ) : (*/}
-            {/*                                    formatPhoneSE(user.phone_number)*/}
-            {/*                                )}*/}
-            {/*                            </td>*/}
-
-            {/*                            /!* Rank *!/*/}
-            {/*                            <td className="d-none d-lg-table-cell">*/}
-            {/*                                {isEditing ? (*/}
-            {/*                                    <>*/}
-            {/*                                        <input*/}
-            {/*                                            name="user_rank"*/}
-            {/*                                            className={`form-control ${*/}
-            {/*                                                errs.user_rank ? "is-invalid" : ""*/}
-            {/*                                            }`}*/}
-            {/*                                            value={row.user_rank || ""}*/}
-            {/*                                            onChange={(e) => handleEditChange(e, user.id)}*/}
-            {/*                                        />*/}
-            {/*                                        {errs.user_rank && (*/}
-            {/*                                            <div className="invalid-feedback">*/}
-            {/*                                                {errs.user_rank}*/}
-            {/*                                            </div>*/}
-            {/*                                        )}*/}
-            {/*                                    </>*/}
-            {/*                                ) : (*/}
-            {/*                                    user.user_rank*/}
-            {/*                                )}*/}
-            {/*                            </td>*/}
-
-            {/*                            /!* Role *!/*/}
-            {/*                            <td className="d-none d-lg-table-cell">*/}
-            {/*                                {isEditing ? (*/}
-            {/*                                    <>*/}
-            {/*                                        <select*/}
-            {/*                                            name="role"*/}
-            {/*                                            className={`form-select ${errs.role ? "is-invalid" : ""}`}*/}
-            {/*                                            value={row.role || "user"}*/}
-            {/*                                            onChange={(e) => handleEditChange(e, user.id)}*/}
-            {/*                                        >*/}
-            {/*                                            <option value="user">user</option>*/}
-            {/*                                            <option value="admin">admin</option>*/}
-            {/*                                        </select>*/}
-            {/*                                        {errs.role && (*/}
-            {/*                                            <div className="invalid-feedback">{errs.role}</div>*/}
-            {/*                                        )}*/}
-            {/*                                    </>*/}
-            {/*                                ) : (*/}
-            {/*                                    user.role*/}
-            {/*                                )}*/}
-            {/*                            </td>*/}
-
-            {/*                            /!* Assigned Freezers *!/*/}
-            {/*                            <td className="d-none d-lg-table-cell freezer-numbers" style={{ width: "80px" }}>*/}
-            {/*                                {isEditing ? (*/}
-            {/*                                    <div className="d-flex flex-column">*/}
-            {/*                                        {asArray(user.freezers).map((freezer) => {*/}
-            {/*                                            const isAsking =*/}
-            {/*                                                confirmingFreezer &&*/}
-            {/*                                                confirmingFreezer.userId === user.id &&*/}
-            {/*                                                confirmingFreezer.freezerId === freezer.id;*/}
-
-            {/*                                            return (*/}
-            {/*                                                <div key={freezer.id} className="d-flex align-items-center mb-2">*/}
-            {/*                      <span className="form-control me-2" style={{ width: "80px" }}>*/}
-            {/*                        {freezer.number}*/}
-            {/*                      </span>*/}
-            {/*                                                    {isAsking ? (*/}
-            {/*                                                        <div className="d-flex align-items-center gap-2">*/}
-            {/*                          <span className="text-danger small fw-semibold">*/}
-            {/*                            Remove?*/}
-            {/*                          </span>*/}
-            {/*                                                            <button*/}
-            {/*                                                                className="btn btn-sm btn-danger"*/}
-            {/*                                                                onClick={() =>*/}
-            {/*                                                                    handleDeleteFreezer(user.id, freezer.id)*/}
-            {/*                                                                }*/}
-            {/*                                                            >*/}
-            {/*                                                                Yes*/}
-            {/*                                                            </button>*/}
-            {/*                                                            <button*/}
-            {/*                                                                className="btn btn-sm btn-secondary"*/}
-            {/*                                                                onClick={cancelRemoveFreezer}*/}
-            {/*                                                            >*/}
-            {/*                                                                Cancel*/}
-            {/*                                                            </button>*/}
-            {/*                                                        </div>*/}
-            {/*                                                    ) : (*/}
-            {/*                                                        <button*/}
-            {/*                                                            className="btn btn-danger btn-sm"*/}
-            {/*                                                            onClick={() => askRemoveFreezer(user.id, freezer.id)}*/}
-            {/*                                                            title="Remove this freezer from the user"*/}
-            {/*                                                        >*/}
-            {/*                                                            X*/}
-            {/*                                                        </button>*/}
-            {/*                                                    )}*/}
-            {/*                                                </div>*/}
-            {/*                                            );*/}
-            {/*                                        })}*/}
-            {/*                                    </div>*/}
-            {/*                                ) : (*/}
-            {/*                                    asArray(user.freezers).map((freezer) => (*/}
-            {/*                                        <div key={freezer.id}>{freezer.number}</div>*/}
-            {/*                                    ))*/}
-            {/*                                )}*/}
-            {/*                            </td>*/}
-
-            {/*                            /!* Actions *!/*/}
-            {/*                            <td className="d-none d-md-table-cell">*/}
-            {/*                                <div className="d-flex justify-content-center gap-2">*/}
-            {/*                                    {isEditing ? (*/}
-            {/*                                        <>*/}
-            {/*                                            <button*/}
-            {/*                                                className="btn btn-sm"*/}
-            {/*                                                style={{ backgroundColor: "#7BAE3F", color: "white" }}*/}
-            {/*                                                onClick={() => handleSave(user.id)}*/}
-            {/*                                            >*/}
-            {/*                                                Save*/}
-            {/*                                            </button>*/}
-            {/*                                            <button*/}
-            {/*                                                className="btn btn-sm btn-secondary"*/}
-            {/*                                                onClick={() => {*/}
-            {/*                                                    setEditingUserId(null);*/}
-            {/*                                                    setDrafts((prev) => {*/}
-            {/*                                                        const next = { ...prev };*/}
-            {/*                                                        delete next[user.id];*/}
-            {/*                                                        return next;*/}
-            {/*                                                    });*/}
-            {/*                                                    setEditErrors((prev) => {*/}
-            {/*                                                        const next = { ...prev };*/}
-            {/*                                                        delete next[user.id];*/}
-            {/*                                                        return next;*/}
-            {/*                                                    });*/}
-            {/*                                                }}*/}
-            {/*                                            >*/}
-            {/*                                                Cancel*/}
-            {/*                                            </button>*/}
-            {/*                                        </>*/}
-            {/*                                    ) : (*/}
-            {/*                                        <>*/}
-            {/*                                            <button*/}
-            {/*                                                className="btn btn-sm"*/}
-            {/*                                                style={{ backgroundColor: "#5D8736", color: "white" }}*/}
-            {/*                                                onClick={() => {*/}
-            {/*                                                    setDrafts((prev) => ({ ...prev, [user.id]: { ...user } }));*/}
-            {/*                                                    setEditErrors((prev) => ({ ...prev, [user.id]: {} }));*/}
-            {/*                                                    setEditingUserId(user.id);*/}
-            {/*                                                }}*/}
-            {/*                                            >*/}
-            {/*                                                Edit*/}
-            {/*                                            </button>*/}
-            {/*                                            <button*/}
-            {/*                                                className="btn btn-sm"*/}
-            {/*                                                style={{*/}
-            {/*                                                    backgroundColor: "#A9C46C",*/}
-            {/*                                                    color: "white",*/}
-            {/*                                                    border: "1px solid #c3e6cb",*/}
-            {/*                                                }}*/}
-            {/*                                                onClick={() => confirmDelete(user.id)}*/}
-            {/*                                            >*/}
-            {/*                                                Delete*/}
-            {/*                                            </button>*/}
-            {/*                                        </>*/}
-            {/*                                    )}*/}
-            {/*                                </div>*/}
-            {/*                            </td>*/}
-            {/*                        </tr>*/}
-
-            {/*                        /!* Mobile expanded row *!/*/}
-            {/*                        {isExpanded && (*/}
-            {/*                            <tr className="d-md-none">*/}
-            {/*                                <td colSpan="7" className="text-start bg-light">*/}
-            {/*                                    <div>*/}
-            {/*                                        <strong>Phone:</strong> {formatPhoneSE(user.phone_number)}*/}
-            {/*                                    </div>*/}
-            {/*                                    <div>*/}
-            {/*                                        <strong>Rank:</strong> {user.user_rank}*/}
-            {/*                                    </div>*/}
-            {/*                                    <div>*/}
-            {/*                                        <strong>Role:</strong> {user.role}*/}
-            {/*                                    </div>*/}
-            {/*                                    <div>*/}
-            {/*                                        <strong>Assigned Freezers:</strong>*/}
-            {/*                                    </div>*/}
-            {/*                                    {asArray(user.freezers).map((freezer) => (*/}
-            {/*                                        <div key={freezer.id}>{freezer.number}</div>*/}
-            {/*                                    ))}*/}
-            {/*                                </td>*/}
-            {/*                            </tr>*/}
-            {/*                        )}*/}
-
-            {/*                        /!* INLINE DELETE CONFIRMATION under the row *!/*/}
-            {/*                        {deletingUserId === user.id && (*/}
-            {/*                            <tr>*/}
-            {/*                                <td colSpan="7">*/}
-            {/*                                    <div className="alert alert-warning d-flex justify-content-between align-items-center my-2">*/}
-            {/*                                        <span>Are you sure you want to delete this user?</span>*/}
-            {/*                                        <span className="d-flex gap-2">*/}
-            {/*                  <button*/}
-            {/*                      className="btn btn-danger btn-sm"*/}
-            {/*                      onClick={() => handleDelete(user.id)}*/}
-            {/*                  >*/}
-            {/*                    Yes, delete*/}
-            {/*                  </button>*/}
-            {/*                  <button*/}
-            {/*                      className="btn btn-secondary btn-sm"*/}
-            {/*                      onClick={() => setDeletingUserId(null)}*/}
-            {/*                  >*/}
-            {/*                    Cancel*/}
-            {/*                  </button>*/}
-            {/*                </span>*/}
-            {/*                                    </div>*/}
-            {/*                                </td>*/}
-            {/*                            </tr>*/}
-            {/*                        )}*/}
-
-            {/*                        /!* INLINE ROW MESSAGE (edit/delete/freezer feedback) *!/*/}
-            {/*                        {rowMessages[user.id] && (*/}
-            {/*                            <tr>*/}
-            {/*                                <td colSpan="7">*/}
-            {/*                                    <div className={`alert ${msgClass(rowMessages[user.id].kind)} my-2`}>*/}
-            {/*                                        {rowMessages[user.id].text}*/}
-            {/*                                    </div>*/}
-            {/*                                </td>*/}
-            {/*                            </tr>*/}
-            {/*                        )}*/}
-            {/*                    </React.Fragment>*/}
-            {/*                );*/}
-            {/*            })}*/}
-            {/*            </tbody>*/}
-            {/*        </table>*/}
-            {/*    </div>*/}
-            {/*) : (*/}
-            {/*    !loading && <p className="text-center">No users found.</p>*/}
-            {/*)}*/}
         </main>
     );
 };

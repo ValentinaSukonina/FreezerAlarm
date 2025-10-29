@@ -25,9 +25,9 @@ const roleOptionsDefault = [
 const AddUserForm = ({
                          users,                // array of existing users (for duplicate checks)
                          onUserCreated,        // (createdWithFreezers) => void
-                         onClose,              // () => void (hide the form)
+                         onClose,
                          roleOptions = roleOptionsDefault,
-                         setTopMessage,        // ( {text,kind} ) => void  (optional UI banner)
+                         setTopMessage,        // UI banner
                      }) => {
     const [newUser, setNewUser] = useState({
         firstname: "",
