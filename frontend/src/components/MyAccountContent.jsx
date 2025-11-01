@@ -161,13 +161,13 @@ const MyAccount = () => {
                 ) : (
                     <div className="d-flex align-items-center">
                         <input
-                            className="form-control rounded me-3"
+                            className="form-control rounded me-3 p-1"
                             value={formatPhoneSE(user.phone_number)}
                             disabled
                             readOnly
                         />
                         <button
-                            className="btn px-3 rounded"
+                            className="btn px-3 py-1 rounded"
                             style={{
                                 backgroundColor: "#5D8736",
                                 color: "white",

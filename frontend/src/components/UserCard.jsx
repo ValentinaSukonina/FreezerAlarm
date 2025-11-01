@@ -325,39 +325,11 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                         </div>
 
                         {confirmDelete && (
-                            // <div className="alert alert-warning p-1 mb-1 text-center">
-                            //     <div className="mb-2">Are you sure you want to delete this user?</div>
-                            //     <div className="d-flex justify-content-center gap-2">
-                            //         <button
-                            //             className="btn btn-danger btn-sm"
-                            //             onClick={async () => {
-                            //                 if (deleting) return;
-                            //                 setDeleting(true);
-                            //                 try {
-                            //                     await onDelete?.(user.id);
-                            //                 } catch (err) {
-                            //                     console.error("Failed to delete user:", err);
-                            //                 } finally {
-                            //                     setDeleting(false);
-                            //                     setConfirmDelete(false);
-                            //                 }
-                            //             }}
-                            //         >
-                            //             {deleting ? "Deleting…" : "Yes, delete"}
-                            //         </button>
-                            //         <button
-                            //             className="btn btn-secondary btn-sm"
-                            //             onClick={() => setConfirmDelete(false)}
-                            //         >
-                            //             Cancel
-                            //         </button>
-                            //     </div>
-                            // </div>
 
                             <div className="confirm-delete-section d-flex align-items-center">
                                 <span className="me-2 alert-circle">!</span>
                                 <span className="fw-bold text-danger me-2" style={{color: "#b00000"}}>
-                                    Confirm delete user?
+                                    Confirm delete?
                                 </span>
                                 <button
                                     className="btn btn-sm me-2 px-3"
@@ -381,7 +353,7 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                                         }
                                     }}
                                 >
-                                    {deleting ? "Deleting…" : "Yes, delete"}
+                                    {deleting ? "Deleting…" : "Yes"}
                                 </button>
                                 <button
                                     className="btn btn-sm"
