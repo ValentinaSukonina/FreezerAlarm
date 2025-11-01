@@ -254,5 +254,135 @@ class FreezerServiceTest {
 
         assertThrows(Exceptions.ResourceNotFoundException.class, () -> freezerService.updateFreezerAndUsers(freezerId, dto));
     }
+
+    @Test
+    @DisplayName("Should find freezer by number")
+    void findFreezerByNumber_success() {
+        Integer freezerNumber = 1123;
+
+        Freezer freezer = new Freezer();
+        freezer.setId(1L);
+        freezer.setNumber(freezerNumber);
+        freezer.setRoom("Room 1");
+        freezer.setAddress("New Street");
+        freezer.setType("-80");
+        freezer.setFile("file1");
+
+        FreezerDTO freezerDTO = new FreezerDTO(
+                freezer.getId(),
+                freezer.getFile(),
+                freezer.getNumber(),
+                freezer.getAddress(),
+                freezer.getRoom(),
+                freezer.getType()
+        );
+        when(freezerRepository.findByNumber(freezerNumber)).thenReturn(Optional.of(freezer));
+        when(freezerMapper.toFreezerDTO(freezer)).thenReturn(freezerDTO);
+
+        FreezerDTO result = freezerService.findByNumber(freezerNumber);
+
+        assertNotNull(result);
+        assertEquals(freezerNumber, result.number());
+        assertEquals("Room 1", result.room());
+        verify(freezerRepository, times(1)).findByNumber(freezerNumber);
+        verify(freezerMapper, times(1)).toFreezerDTO(freezer);
+    }
+
+    @Test
+    @DisplayName("Should throw when freezer not found by number")
+    void findFreezerByNumber_notFound() {
+        Integer freezerNumber = 9999;
+
+        when(freezerRepository.findByNumber(freezerNumber))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                Exceptions.ResourceNotFoundException.class,
+                () -> freezerService.findByNumber(freezerNumber)
+        );
+
+        verify(freezerRepository, times(1)).findByNumber(freezerNumber);
+    }
+
+    @Test
+    @DisplayName("Should find freezer by number")
+    void findFreezerById_success() {
+        Long freezerId = 1L;
+
+        Freezer freezer = new Freezer();
+        freezer.setId(freezerId);
+        freezer.setNumber(1234);
+        freezer.setRoom("Room 1");
+        freezer.setAddress("New Street");
+        freezer.setType("-80");
+        freezer.setFile("file1");
+
+        FreezerDTO freezerDTO = new FreezerDTO(
+                freezer.getId(),
+                freezer.getFile(),
+                freezer.getNumber(),
+                freezer.getAddress(),
+                freezer.getRoom(),
+                freezer.getType()
+        );
+        when(freezerRepository.findById(freezerId)).thenReturn(Optional.of(freezer));
+        when(freezerMapper.toFreezerDTO(freezer)).thenReturn(freezerDTO);
+
+        FreezerDTO result = freezerService.findById(freezerId);
+
+        assertNotNull(result);
+        assertEquals(freezerId, result.id());
+        assertEquals("Room 1", result.room());
+        assertEquals(1234, result.number());
+        verify(freezerRepository, times(1)).findById(freezerId);
+        verify(freezerMapper, times(1)).toFreezerDTO(freezer);
+    }
+
+    @Test
+    @DisplayName("Should throw when freezer not found by id")
+    void findFreezerById_notFound() {
+        Long freezerId = 1L;
+
+        when(freezerRepository.findById(freezerId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                Exceptions.ResourceNotFoundException.class,
+                () -> freezerService.findById(freezerId)
+        );
+
+        verify(freezerRepository, times(1)).findById(freezerId);
+        verify(freezerMapper, never()).toFreezerDTO(any());
+    }
+
+    @Test
+    @DisplayName("deleteFreezerByNumber — success")
+    void deleteFreezerByNumber_success() {
+        Integer number = 100;
+
+        when(freezerRepository.deleteByNumber(number)).thenReturn(1);
+
+        assertDoesNotThrow(() -> freezerService.deleteFreezerByNumber(number));
+
+        verify(freezerRepository, times(1)).deleteByNumber(number);
+    }
+
+    @Test
+    @DisplayName("deleteFreezerByNumber — freezer not found")
+    void deleteFreezerByNumber_notFound() {
+        Integer number = 999;
+
+        when(freezerRepository.deleteByNumber(number)).thenReturn(0);
+
+        Exceptions.ResourceNotFoundException ex = assertThrows(
+                Exceptions.ResourceNotFoundException.class,
+                () -> freezerService.deleteFreezerByNumber(number)
+        );
+
+        assertEquals("Freezer with number " + number + " not found.", ex.getMessage());
+
+        verify(freezerRepository, times(1)).deleteByNumber(number);
+    }
+
 }
 

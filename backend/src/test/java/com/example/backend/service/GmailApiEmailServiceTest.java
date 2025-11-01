@@ -4,10 +4,11 @@ import com.example.backend.config.GmailConfig;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.auth.oauth2.GoogleCredentials;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;

@@ -15,10 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -106,7 +107,7 @@ public class GmailApiEmailService implements EmailService {
 
         MimeMessage email = new MimeMessage(session);
         email.setFrom(new InternetAddress(from));
-        email.setRecipients(javax.mail.Message.RecipientType.TO, InternetAddress.parse(to, true));
+        email.setRecipients(jakarta.mail.Message.RecipientType.TO, InternetAddress.parse(to, true));
         email.setSubject(subject);
         email.setText(bodyText, StandardCharsets.UTF_8.name());
 
