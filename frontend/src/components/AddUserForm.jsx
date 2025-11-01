@@ -13,7 +13,6 @@ import {
 } from "../services/utils";
 import "../assets/styles.css";
 
-// local helpers (same logic you used in StaffContent)
 const normalizeName  = (s = "") => s.normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
 const normalizeEmail = (s = "") => s.normalize("NFC").trim().toLowerCase();
 
@@ -199,6 +198,7 @@ const AddUserForm = ({
             <h5 className="mb-3">Add New User</h5>
             <div className="d-flex flex-column gap-2">
                 <input
+                    id="firstname"
                     name="firstname"
                     className={`form-control ${newErrors.firstname ? "is-invalid" : ""}`}
                     placeholder="Firstname"
@@ -208,6 +208,7 @@ const AddUserForm = ({
                 {newErrors.firstname && <div className="text-danger small">{newErrors.firstname}</div>}
 
                 <input
+                    id="surname"
                     name="surname"
                     className={`form-control ${newErrors.surname ? "is-invalid" : ""}`}
                     placeholder="Surname"
@@ -217,6 +218,7 @@ const AddUserForm = ({
                 {newErrors.surname && <div className="text-danger small">{newErrors.surname}</div>}
 
                 <input
+                    id="email"
                     name="email"
                     type="email"
                     inputMode="email"
@@ -229,6 +231,9 @@ const AddUserForm = ({
                 {newErrors.email && <div className="text-danger small">{newErrors.email}</div>}
 
                 <PhoneInput
+                    id="phone_number"
+                    name="phone_number"
+                    inputProps={{ name: "phone_number", id: "phone_number" }}
                     country="se"
                     onlyCountries={["se"]}
                     disableDropdown
@@ -243,6 +248,7 @@ const AddUserForm = ({
                 {newErrors.phone_number && <div className="text-danger small">{newErrors.phone_number}</div>}
 
                 <select
+                    id="user_rank"
                     name="user_rank"
                     className={`form-control ${newErrors.user_rank ? "is-invalid" : ""}`}
                     value={newUser.user_rank}
@@ -257,6 +263,8 @@ const AddUserForm = ({
                 {newErrors.user_rank && <div className="text-danger small">{newErrors.user_rank}</div>}
 
                 <Select
+                    inputId="role"
+                    name="role"
                     className="role-type-select"
                     classNamePrefix="ft"
                     options={roleOptions}

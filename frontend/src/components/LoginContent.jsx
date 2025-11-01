@@ -1,21 +1,29 @@
 import React, {useState} from "react";
 import axios from "axios"; // Import axios to make API requests
-
+import { sanitizeByField } from "../services/utils";
 
 const LoginContent = () => {
     const [formData, setFormData] = useState({
         fullName: "",
-        email: "",
-        phoneNumber: ""
+        email: ""
     });
 
     const [message, setMessage] = useState("");
     const [isChecking, setIsChecking] = useState(false);
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    // Handle input change
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value});
+        const { name, value } = e.target;
+
+        let sanitized = value ?? "";
+
+        if (name === "fullName") {
+            sanitized = sanitizeByField("name", sanitized, { live: true }); // ✅ map to "name"
+        } else if (name === "email") {
+            sanitized = sanitizeByField("email", sanitized, { live: true });
+        }
+
+        setFormData(prev => ({ ...prev, [name]: sanitized }));
     };
 
     // Handle form submission
@@ -31,8 +39,8 @@ const LoginContent = () => {
             setIsChecking(true);
             const response = await axios.get("http://localhost:8000/api/auth/check-user", {
                 params: {
-                    name: formData.fullName,
-                    email: formData.email
+                    name: formData.fullName.trim(),
+                    email: formData.email.trim()
                 },
                 withCredentials: true
             });
@@ -41,8 +49,8 @@ const LoginContent = () => {
                 // ✅ Set session email on backend
                 await axios.post(
                     "http://localhost:8000/api/auth/set-preauth-email",
-                    {email: formData.email},
-                    {withCredentials: true}
+                    { email: formData.email.trim() },
+                    { withCredentials: true }
                 );
 
                 setIsAuthorized(true);
@@ -59,11 +67,9 @@ const LoginContent = () => {
         }
     };
 
-
     const handleLogin = () => {
         window.location.href = "http://localhost:8000/oauth2/authorization/google";
     };
-
 
     return (
         <div className="container d-flex justify-content-center mt-4 mt-md-5">
@@ -120,10 +126,10 @@ const LoginContent = () => {
                     </div>
 
 
-                    <div className="col-12 text-center mt-3">
+                    <div className="col-12 text-center m-2">
                         <button
                             type="submit"
-                            className="btn btn-lg py-1"
+                            className="btn btn-lg py-0 m-1"
                             style={{backgroundColor: "#5D8736", borderColor: "#5D8736", color: "white"}}
                             disabled={isChecking}
                         >
@@ -136,7 +142,7 @@ const LoginContent = () => {
                 {message && (
                     <div
                         role="alert"
-                        className="my-1 my-sm-3 p-1 p-sm-3 text-center"
+                        className="my-1 my-sm-3 p-1 p-sm-2 text-center"
                          style={{
                              backgroundColor: isAuthorized ? "#D4EDDA" : "#F8D7DA",
                              color: isAuthorized ? "#155724" : "#721C24",

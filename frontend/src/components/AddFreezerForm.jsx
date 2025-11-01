@@ -44,7 +44,7 @@ const AddFreezerForm = forwardRef(
                         const fetched = await fetchUsers();
                         setUsers(Array.isArray(fetched) ? fetched : []);
                     } catch {
-                        // optional: swallow; banner is for freezer add, not fetching users
+                        // optional: swallow; banner is for freezer add
                     }
                 })();
             }
@@ -233,6 +233,8 @@ const AddFreezerForm = forwardRef(
 
                             {/* Freezer number */}
                             <input
+                                id="freezer-number"
+                                autoComplete="off"
                                 type="text"
                                 name="number"
                                 className={`form-control mb-2 ${numberError ? "is-invalid" : ""}`}
@@ -252,6 +254,9 @@ const AddFreezerForm = forwardRef(
 
                             {/* Room */}
                             <input
+                                id="room"
+                                autoComplete="off"
+                                type="text"
                                 name="room"
                                 className={`form-control mb-2 ${roomError ? "is-invalid" : ""}`}
                                 placeholder="Room (e.g., 1310C)"
@@ -268,6 +273,9 @@ const AddFreezerForm = forwardRef(
 
                             {/* Address */}
                             <input
+                                id="address"
+                                autoComplete="off"
+                                type="text"
                                 name="address"
                                 className={`form-control mb-2 ${addressError ? "is-invalid" : ""}`}
                                 placeholder="Address"
