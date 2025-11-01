@@ -1,6 +1,5 @@
 package com.example.backend.service;
 
-import com.example.backend.controller.UserController;
 import com.example.backend.dto.FreezerDTO;
 import com.example.backend.dto.FreezerWithUsersDTO;
 import com.example.backend.entity.Freezer;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ public class FreezerService {
     private final FreezerUserRepository freezerUserRepository;
     private final UserRepository userRepository;
     private final FreezerMapper freezerMapper;
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public FreezerService(FreezerRepository freezerRepository, FreezerUserRepository freezerUserRepository, UserRepository userRepository, FreezerMapper freezerMapper) {
         this.freezerRepository = freezerRepository;
@@ -133,7 +133,7 @@ public class FreezerService {
                 .orElseThrow(() -> new Exceptions.ResourceNotFoundException("Freezer not found with ID: " + freezerId));
 
         // Update basic fields using data from the DTO
-        freezer.setNumber(Integer.valueOf(dto.number()));
+        freezer.setNumber(dto.number());
         freezer.setRoom(dto.room());
         freezer.setAddress(dto.address());
         freezer.setType(dto.type());
@@ -141,9 +141,16 @@ public class FreezerService {
 
         freezerRepository.save(freezer);
 
+        // Clear Hibernate collection to avoid stale proxy errors
+        if (freezer.getFreezerUsers() != null) {
+            freezer.getFreezerUsers().clear();
+        }
+
         // Reassign users
         freezerUserRepository.deleteByFreezer(freezer);
 
+        // Reinsert link rows
+        List<FreezerUser> newLinks = new ArrayList<>();
         for (Long userId : dto.userIds()) {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new Exceptions.ResourceNotFoundException("User not found with ID: " + userId));
@@ -151,8 +158,16 @@ public class FreezerService {
             FreezerUser link = new FreezerUser();
             link.setUser(user);
             link.setFreezer(freezer);
-            freezerUserRepository.save(link);
+
+            newLinks.add(link);
+
+            // If bidirectional relationship - keep both sides synced
+            if (user.getFreezerUsers() != null) {
+                user.getFreezerUsers().add(link);
+            }
         }
+
+        freezerUserRepository.saveAll(newLinks);
 
         Freezer updatedFreezer = freezerRepository.findByNumberWithUsers(freezer.getNumber());
         return freezerMapper.toFreezerWithUsersDTO(updatedFreezer);

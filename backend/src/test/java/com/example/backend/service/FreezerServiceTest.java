@@ -22,10 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 class FreezerServiceTest {
 
@@ -96,6 +94,32 @@ class FreezerServiceTest {
         when(freezerRepository.findByNumberWithUsers(999)).thenReturn(null);
 
         assertThrows(Exceptions.ResourceNotFoundException.class, () -> freezerService.findByNumberWithUsers(999));
+    }
+
+    @Test
+    @DisplayName("Should return freezers for user id")
+    void testGetFreezersByUserId() {
+        // Arrange
+        Long userId = 10L;
+
+        List<FreezerDTO> mockFreezers = List.of(
+                new FreezerDTO(1L, "File1", 1234, "Room A", "Address A", "-80"),
+                new FreezerDTO(2L, "File2", 4567, "Room B", "Address B", "-20")
+        );
+
+        when(freezerUserRepository.findFreezersByUserId(userId))
+                .thenReturn(mockFreezers);
+
+        // Act
+        List<FreezerDTO> result = freezerService.getFreezersByUserId(userId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(mockFreezers, result);
+
+        verify(freezerUserRepository, times(1))
+                .findFreezersByUserId(userId);
     }
 
     @Test
@@ -212,8 +236,9 @@ class FreezerServiceTest {
         assertEquals("file1", result.file());
         assertEquals("Room 1", result.room());
 
+        verify(freezerRepository).save(existingFreezer);
         verify(freezerUserRepository).deleteByFreezer(existingFreezer);
-        verify(freezerUserRepository).save(any(FreezerUser.class));
+        verify(freezerUserRepository).saveAll(anyList());
     }
 
     @Test
