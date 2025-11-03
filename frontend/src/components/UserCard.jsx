@@ -119,7 +119,7 @@ const UserCard = ({ user, onUpdate, onDelete, onRemoveFreezer }) => {
                     <div className={`d-flex flex-wrap align-items-start header-row ${expanded && editing ? "edit-mode" : ""}`}>
                         <button
                             type="button"
-                            className="toggle-btn mt-1 p-0"
+                            className="toggle-btn mt-1 p-0 me-1"
                             onClick={toggle}
                             aria-label={expanded ? "Collapse" : "Expand"}
                         >
