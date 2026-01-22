@@ -4,11 +4,10 @@ import com.example.backend.config.GmailConfig;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.UserCredentials;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import jakarta.mail.internet.MimeMessage;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -155,8 +154,20 @@ class GmailApiEmailServiceTest {
 
         GoogleCredentials credential = realService.buildCredentials();
         assertNotNull(credential);
+        assertTrue(credential instanceof UserCredentials,
+                "Expected UserCredentials (user OAuth), not service account credentials");
 
         Gmail gmail = realService.buildGmailService(credential);
+        assertNotNull(gmail);
+    }
+
+    @Test
+    void buildGmailService_createsService() throws Exception {
+        GoogleCredentials credentials = mock(GoogleCredentials.class);
+        GmailApiEmailService realService = new GmailApiEmailService(mockConfig);
+
+        Gmail gmail = realService.buildGmailService(credentials);
+
         assertNotNull(gmail);
     }
 

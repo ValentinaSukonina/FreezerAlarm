@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.config.GmailConfig;
+import com.example.backend.exception.Exceptions;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
@@ -40,29 +41,22 @@ public class GmailApiEmailService implements EmailService {
 
     @Override
     public void sendEmail(String to, String subject, String bodyText)
-            throws MessagingException, IOException, GeneralSecurityException {
+            throws MessagingException, GeneralSecurityException {
+
         validateEmailAddresses(to);
 
-        Gmail service;
         try {
             GoogleCredentials credential = buildCredentials();
-            service = buildGmailService(credential);
-        } catch (Exception ex) {
-            logger.error("❌ Failed to authenticate with Google API: {}", ex.getMessage(), ex);
-            throw new RuntimeException("Authentication failed. Refresh token may be invalid or expired.");
-        }
+            Gmail service = buildGmailService(credential);
 
-        MimeMessage email = createEmail(to, gmailProps.getEmailFrom(), subject, bodyText);
-        Message message = createMessageWithEmail(email);
-
-        try {
+            MimeMessage email = createEmail(to, gmailProps.getEmailFrom(), subject, bodyText);
+            Message message = createMessageWithEmail(email);
             service.users().messages().send("me", message).execute();
-        } catch (Exception e) {
-            String err = e.getMessage();
-            if (err != null && err.contains("invalid_grant")) {
-                logger.error("❌ Refresh token is invalid or expired.");
-            }
-            throw e;
+
+        } catch (IOException ex) {
+            throw new Exceptions.EmailAuthenticationException(
+                    "Gmail authentication failed. Refresh token may be invalid.", ex
+            );
         }
     }
 
@@ -73,7 +67,7 @@ public class GmailApiEmailService implements EmailService {
                 InternetAddress internetAddress = new InternetAddress(email.trim());
                 internetAddress.validate();
             } catch (Exception ex) {
-                logger.error("❌ Invalid recipient email: {}", email);
+                logger.warn("❌ Invalid recipient email: {}", email);
                 throw new IllegalArgumentException("Invalid email address: " + email.trim());
             }
         }
@@ -84,8 +78,7 @@ public class GmailApiEmailService implements EmailService {
                 .setClientId(gmailProps.getClientId())
                 .setClientSecret(gmailProps.getClientSecret())
                 .setRefreshToken(gmailProps.getRefreshToken())
-                .build()
-                .createScoped("https://www.googleapis.com/auth/gmail.send");
+                .build();
     }
 
     protected Gmail buildGmailService(GoogleCredentials credentials)

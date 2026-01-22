@@ -26,14 +26,22 @@ public class Exceptions {
     }
 
     public static class ResourceNotFoundException extends RuntimeException {
-        public ResourceNotFoundException(String message){
+        public ResourceNotFoundException(String message) {
             super(message);
         }
     }
 
     public static class FreezerUserAlreadyExistsException extends RuntimeException {
-        public FreezerUserAlreadyExistsException(String message){
+        public FreezerUserAlreadyExistsException(String message) {
             super(message);
         }
     }
+
+    public static class EmailAuthenticationException extends RuntimeException {
+
+        public EmailAuthenticationException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
 }

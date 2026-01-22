@@ -1,5 +1,6 @@
 package com.example.backend.exception;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -72,5 +73,18 @@ public class GlobalExceptionHandler {
     private String extractConstraintViolationMessage(DataIntegrityViolationException ex) {
         Throwable rootCause = ex.getRootCause();
         return (rootCause != null && rootCause.getMessage() != null) ? rootCause.getMessage() : "Unknown database constraint violation";
+    }
+
+    @ExceptionHandler(Exceptions.EmailAuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailAuthenticationException(
+            Exceptions.EmailAuthenticationException ex) {
+
+        LoggerFactory.getLogger(GlobalExceptionHandler.class)
+                .error("Gmail authentication failed", ex);
+
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage()
+        );
     }
 }
